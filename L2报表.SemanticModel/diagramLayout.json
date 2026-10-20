@@ -1,0 +1,134 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 0,
+        "y": 0
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 546,
+            "y": 116.375
+          },
+          "nodeIndex": "度量值",
+          "size": {
+            "height": 104,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 254,
+            "y": 113.375
+          },
+          "nodeIndex": "月报指标映射",
+          "size": {
+            "height": 145,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 0,
+            "y": 109.375
+          },
+          "nodeIndex": "日报指标映射",
+          "size": {
+            "height": 145,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 0,
+            "y": 310.47499084472656
+          },
+          "nodeIndex": "L1-KFM日报",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 626.99998474121094,
+            "y": 311.375
+          },
+          "nodeIndex": "KFM选冶厂月报",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1244.9999847412109,
+            "y": 162.375
+          },
+          "nodeIndex": "L2-05-01 硫磺及硫酸价格分析月报",
+          "nodeLineageTag": "d3dfe0d7-08fb-48ce-be44-6e9270507f18",
+          "size": {
+            "height": 296,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1528.9999847412109,
+            "y": 211.375
+          },
+          "nodeIndex": "L2-03-01 销售管理费用预算执行汇总表",
+          "nodeLineageTag": "d6ec5702-920c-4516-a9a1-929a848d56f7",
+          "size": {
+            "height": 248,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 2146.9999847412109,
+            "y": 104.125
+          },
+          "nodeIndex": "L2-01-02 集团合并利润汇总表",
+          "nodeLineageTag": "3c5faa89-4ba7-465c-b07a-3af108aba99c",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1862.9999847412109,
+            "y": 104.125
+          },
+          "nodeIndex": "L2-03-02 财务费用汇总表",
+          "nodeLineageTag": "0c431584-73b5-4ced-af79-8f011e020960",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        }
+      ],
+      "name": "所有表",
+      "zoomValue": 100,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "所有表",
+  "defaultDiagram": "所有表"
+}

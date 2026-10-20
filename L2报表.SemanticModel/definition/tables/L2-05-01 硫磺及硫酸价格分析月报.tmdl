@@ -1,0 +1,220 @@
+table 'L2-05-01 硫磺及硫酸价格分析月报'
+	lineageTag: d3dfe0d7-08fb-48ce-be44-6e9270507f18
+
+	column 硫磺-采购价(单价)
+		dataType: double
+		lineageTag: b8749074-119b-4a5e-96fe-71357c03f2ad
+		summarizeBy: sum
+		sourceColumn: 硫磺-采购价(单价)
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 硫磺-陆运费(单价)
+		dataType: double
+		lineageTag: 28a2e241-3467-437e-b9f6-9e2dd10593c9
+		summarizeBy: sum
+		sourceColumn: 硫磺-陆运费(单价)
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 硫磺-清关税费(单价)
+		dataType: double
+		lineageTag: d0007328-2125-435c-af19-023708f6f7e1
+		summarizeBy: sum
+		sourceColumn: 硫磺-清关税费(单价)
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 硫磺-DDP(单价)
+		dataType: double
+		lineageTag: 7645490b-1f10-4bda-9748-41b9081c08f3
+		summarizeBy: sum
+		sourceColumn: 硫磺-DDP(单价)
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 硫磺-采购量
+		dataType: double
+		lineageTag: dc9e5931-3e61-464a-aea7-3eb3e2a427bc
+		summarizeBy: sum
+		sourceColumn: 硫磺-采购量
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 硫酸-DDP(单价)
+		dataType: double
+		lineageTag: 813ee224-fa20-4ad5-b1fb-38569911633b
+		summarizeBy: sum
+		sourceColumn: 硫酸-DDP(单价)
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 硫酸-采购量
+		dataType: double
+		lineageTag: 36c98121-09f1-4991-9b51-b54a46e70315
+		summarizeBy: sum
+		sourceColumn: 硫酸-采购量
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column '数据类别 级别 01'
+		dataType: string
+		lineageTag: 52cc08f0-7bad-4e32-8f58-ce30aeaa338a
+		summarizeBy: none
+		sourceColumn: 数据类别 级别 01
+
+		annotation SummarizationSetBy = Automatic
+
+	column '年月 级别 01'
+		dataType: string
+		lineageTag: 08962b13-9ddb-49ba-bd9f-5c2ce16c897b
+		summarizeBy: none
+		sourceColumn: 年月 级别 01
+
+		annotation SummarizationSetBy = Automatic
+
+	column '年 级别 01'
+		dataType: string
+		lineageTag: a460c0a0-e998-48e2-9402-be290bca661e
+		summarizeBy: none
+		sourceColumn: 年 级别 01
+
+		annotation SummarizationSetBy = Automatic
+
+	column '月 级别 01'
+		dataType: string
+		lineageTag: f1d55f5b-b020-4cb8-84bb-d6b22e89a26e
+		summarizeBy: none
+		sourceColumn: 月 级别 01
+
+		annotation SummarizationSetBy = Automatic
+
+	column 加载年月
+		dataType: string
+		lineageTag: 60b489c7-c3ae-4948-b113-b743eba22f2a
+		summarizeBy: none
+		sourceColumn: 加载年月
+
+		annotation SummarizationSetBy = Automatic
+
+	column 期间名称
+		dataType: string
+		lineageTag: b8663b66-e65e-44d5-8042-412928c55bea
+		summarizeBy: none
+		sourceColumn: 期间名称
+		sortByColumn: 期间排序
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column 期间排序
+		dataType: double
+		lineageTag: 1c8aa649-b924-4a5c-a4b8-62be9806a8a1
+		summarizeBy: sum
+		sourceColumn: 期间排序
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition 'L2-05-01 硫磺及硫酸价格分析月报' = m
+		mode: import
+		queryGroup: 财经\多月
+		source =
+				let
+				    /*
+				    【查询名称】ZRFI_CP008 硫磺&硫酸采购成本BW取数
+				    【对应报表】L2原材料采购月报（硫磺、硫酸）
+				    【BW对象】Cube:ZRFI_CP008   Query:ZRFI_CP008_Q0001
+				    【说明】
+				        1、按月循环取数：从参数 p_月报起始日期 开始，拉取至当年12月，逐期查询BW，最后合并为长表
+				        2、BW参数[ZMSDQNY]：YYYYMM格式年月，控制BW查询的统计期间
+				        3、指标：硫磺/硫酸采购单价、分项费用、采购量；维度包含数据类别、日历年月
+				        4、末尾增加【加载年月】字段，标记本次PQ循环查询的期间，用于PowerBI内筛选、报表切片
+				        5、连接参数统一规范：QAS服务器、系统编号、客户端ID，与ZRFI_CP005保持一致
+				        6、BatchSize调大，提升大批量BW数据拉取性能
+				        7、新增【期间名称】字段：ACT=年-月；BGT=年预算
+				        8、新增【期间排序】数值列：ACT用年月数字排序，BGT统一放同一年末尾，用于报表可视化排序
+				    */
+				    // 1、连接BW QAS环境
+				    数据源 = SapBusinessWarehouse.Cubes(QAS服务器, 系统编号, 客户端ID, [LanguageCode="ZH", Implementation="2.0", BatchSize=500000000]),
+				    // 2、定位Cube与目标BW查询
+				    立方体 = 数据源{[Name="ZRFI_CP008"]}[Data],
+				    基础查询 = 立方体{[Id="ZRFI_CP008/ZRFI_CP008_Q0001"]}[Data],
+				    // ========== 月份循环配置 ==========
+				    // 月报起始月份，取自PowerBI参数 p_月报起始日期
+				    起始月份 = p_月报起始日期,
+				    // 结束月份：当年12月1日
+				    结束月份 = #date(Date.Year(DateTimeZone.SwitchZone(DateTimeZone.UtcNow(), 8)), 12, 1),
+				    // 生成连续月份序列
+				    月份序列 = List.Generate(() => 起始月份, each _ <= 结束月份, each Date.AddMonths(_, 1)),
+				    // 转换为BW要求的 YYYYMM 文本格式
+				    月份文本列表 = List.Transform(月份序列, each Text.From(Date.Year(_) * 100 + Date.Month(_))),
+				    // 单月取数函数：输入年月文本，返回当月BW查询结果，并追加【加载年月】标记列
+				    查询单月 = (month as text) =>
+				        let
+				            Query = Cube.Transform(基础查询, {
+				                // BW期间参数，传入当前循环年月
+				                {Cube.ApplyParameter, "[ZMSDQNY]", {month}},
+				                // ========== 度量值：采购成本&采购量指标 ==========
+				                {Cube.AddMeasureColumn, "硫磺-采购价(单价)", "[Measures].[4VGQHR12MHZ3FTP539NWA8ZZ6]"},    // 硫磺采购单价
+				                {Cube.AddMeasureColumn, "硫磺-陆运费(单价)", "[Measures].[4VGQHR12MHZ3FTP539NWA96AQ]"},    // 硫磺陆路运费单价
+				                {Cube.AddMeasureColumn, "硫磺-清关税费(单价)", "[Measures].[4VGQHR12MHZ3FTP539NWA9CMA]"},  // 硫磺清关税费单价
+				                {Cube.AddMeasureColumn, "硫磺-DDP(单价)", "[Measures].[4VGQHR12MHZ3FTP539NWA9IXU]"},       // 硫磺DDP全成本单价
+				                {Cube.AddMeasureColumn, "硫磺-采购量", "[Measures].[4VGQHR12MHZ3FTP539NWA9P9E]"},           // 硫磺采购数量
+				                {Cube.AddMeasureColumn, "硫酸-DDP(单价)", "[Measures].[4VGQHR12MHZ3FTP539NWA9VKY]"},       // 硫酸DDP全成本单价
+				                {Cube.AddMeasureColumn, "硫酸-采购量", "[Measures].[4VGQHR12MHZ3FTP539NWAA1WI]"},           // 硫酸采购数量
+				                // ========== 维度字段展开 ==========
+				                {Cube.AddAndExpandDimensionColumn, "[ZSJLB]", {"[ZSJLB].[LEVEL01]"}, {"数据类别 级别 01"}},    // 数据类别
+				                {Cube.AddAndExpandDimensionColumn, "[0CALMONTH]", {"[0CALMONTH].[LEVEL01]"}, {"年月 级别 01"}},// 日历年月
+				                {Cube.AddAndExpandDimensionColumn, "[0CALYEAR]", {"[0CALYEAR].[LEVEL01]"}, {"年 级别 01"}},    // 日历年
+				                {Cube.AddAndExpandDimensionColumn, "[0CALMONTH2]", {"[0CALMONTH2].[LEVEL01]"}, {"月 级别 01"}}  // 月份(1~12)
+				            }),
+				            // 增加【加载年月】文本列（YYYYMM），标记本条数据对应的查询期间，用于报表筛选
+				            附加加载年月 = Table.AddColumn(Query, "加载年月", each month),
+				            // 新增【期间名称】：ACT -> "年-月"；BGT -> "年预算"，月份固定两位
+				            附加期间名称 = Table.AddColumn(附加加载年月, "期间名称",
+				                each if [数据类别 级别 01] = "ACT"
+				                      then Text.From([年 级别 01]) & "-" & Text.PadStart(Text.From([月 级别 01]),2,"0")
+				                      else if [数据类别 级别 01] = "BGT"
+				                      then Text.From([年 级别 01]) & "预算"
+				                      else null
+				            ),
+				            // 新增【期间排序】数值列，Number.From 把BW返回的文本年月转为数字再计算
+				            附加期间排序 = Table.AddColumn(附加期间名称, "期间排序",
+				                each if [数据类别 级别 01] = "ACT"
+				                      then Number.From([年 级别 01]) * 100 + Number.From([月 级别 01])
+				                      else if [数据类别 级别 01] = "BGT"
+				                      then Number.From([年 级别 01]) * 100 + 99
+				                      else null
+				            )
+				        in
+				            附加期间排序,
+				    // 遍历月份列表，逐个执行单月查询
+				    各月结果 = List.Transform(月份文本列表, 查询单月),
+				    // 将所有月份结果合并为一张长表
+				    合并结果 = Table.Combine(各月结果),
+				    // 使用【期间排序】字段排序，直接满足：月度ACT按日期从小到大，BGT预算在同一年最后
+				    排序后表 = Table.Sort(合并结果,{{"期间排序", Order.Ascending}})
+				in
+				    排序后表
+
+	annotation PBI_ResultType = Table
+

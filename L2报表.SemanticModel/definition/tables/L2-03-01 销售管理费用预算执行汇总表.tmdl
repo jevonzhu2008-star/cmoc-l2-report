@@ -1,0 +1,141 @@
+table 'L2-03-01 销售管理费用预算执行汇总表'
+	lineageTag: d6ec5702-920c-4516-a9a1-929a848d56f7
+
+	column 累计实际
+		dataType: double
+		lineageTag: 0eb76c50-bac8-4a5e-a69a-35464f367376
+		summarizeBy: sum
+		sourceColumn: 累计实际
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 累计实际(千人民币)
+		dataType: double
+		lineageTag: f18d6e02-54e8-4abd-8a1a-8d358838af83
+		summarizeBy: sum
+		sourceColumn: 累计实际(千人民币)
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 累计预算
+		dataType: double
+		lineageTag: 72a33de3-96c8-48e6-afa8-417fcd24f6ba
+		summarizeBy: sum
+		sourceColumn: 累计预算
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 累计执行%
+		dataType: double
+		lineageTag: 113391ce-a268-4095-8077-7c23861734cf
+		summarizeBy: sum
+		sourceColumn: 累计执行%
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 公司代码
+		dataType: string
+		lineageTag: 46a20433-22b1-4d1b-8df5-13749ee7e568
+		summarizeBy: none
+		sourceColumn: 公司代码
+
+		annotation SummarizationSetBy = Automatic
+
+	column 销管费分类
+		dataType: string
+		lineageTag: 62ddfd7b-224d-4781-9b49-a4487d62fd30
+		summarizeBy: none
+		sourceColumn: 销管费分类
+
+		annotation SummarizationSetBy = Automatic
+
+	column 管理口径利润中心
+		dataType: string
+		lineageTag: 4dd302d5-d15a-4775-b73f-5acf206e9b68
+		summarizeBy: none
+		sourceColumn: 管理口径利润中心
+
+		annotation SummarizationSetBy = Automatic
+
+	column 加载年月
+		dataType: string
+		lineageTag: 1986833c-5b38-4394-aed1-814611a90e0e
+		summarizeBy: none
+		sourceColumn: 加载年月
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'L2-03-01 销售管理费用预算执行汇总表' = m
+		mode: import
+		queryGroup: 财经\多月
+		source =
+				let
+				    /*
+				    【查询名称】ZRFI_CP005 销管费用BW取数
+				    【对应报表】L2销管费用月报
+				    【BW对象】Cube:ZRFI_CP005   Query:ZRFI_CP005_Q0002
+				    【说明】
+				        1、循环取数：从参数 p_月报起始日期 开始，一直取到当年12月，逐月查询BW后合并成长表
+				        2、BW参数[ZMSDQNY]：YYYYMM格式年月，返回截止当月YTD累计指标
+				        3、维度：公司代码、销管费分类、管理口径利润中心
+				        4、指标全部为YTD累计值，每一期返回的是截至该月份的累计快照，合并后可用于多期对比
+				        5、连接参数统一：QAS服务器、系统编号、客户端ID，和项目其他BW查询保持一套参数规范
+				        6、BatchSize调大，用于提升大批量BW数据拉取性能
+				    */
+				    // 1、连接BW QAS环境
+				    数据源 = SapBusinessWarehouse.Cubes(QAS服务器, 系统编号, 客户端ID, [LanguageCode="ZH", Implementation="2.0", BatchSize=500000000]),
+				
+				    // 2、定位Cube与目标BW查询
+				    立方体 = 数据源{[Name="ZRFI_CP005"]}[Data],
+				    基础查询 = 立方体{[Id="ZRFI_CP005/ZRFI_CP005_Q0002"]}[Data],
+				
+				    // ========== 月份循环配置 ==========
+				    // 月报起始月份，取自PowerBI参数 p_月报起始日期
+				    起始月份 = p_月报起始日期,
+				    // 结束月份：当年12月1日
+				    结束月份 = #date(Date.Year(DateTimeZone.SwitchZone(DateTimeZone.UtcNow(), 8)), 12, 1),
+				    // 生成连续月份序列
+				    月份序列 = List.Generate(() => 起始月份, each _ <= 结束月份, each Date.AddMonths(_, 1)),
+				    // 转换为BW要求的 YYYYMM 文本格式
+				    月份文本列表 = List.Transform(月份序列, each Text.From(Date.Year(_) * 100 + Date.Month(_))),
+				
+				    // 单月取数函数：输入年月文本，返回当月BW查询结果，并追加月份标记列
+				    查询单月 = (month as text) =>
+				        let
+				            Query = Cube.Transform(基础查询, {
+				                // BW期间参数，传入当前循环年月
+				                {Cube.ApplyParameter, "[ZMSDQNY]", {month}},
+				
+				                // ========== 度量值：YTD累计指标 ==========
+				                {Cube.AddMeasureColumn, "累计实际", "[Measures].[4VGQHR12MHZ3FT2S9KPZM93SH]"},                // YTD累计实际金额
+				                {Cube.AddMeasureColumn, "累计实际(千人民币)", "[Measures].[4VGQHR12MHZ3FT2S9KPZM9A41]"},    // YTD累计实际(千元)
+				                {Cube.AddMeasureColumn, "累计预算", "[Measures].[4VGQHR12MHZ3FT2S9KPZM9GFL]"},              // YTD累计预算金额
+				                {Cube.AddMeasureColumn, "累计执行%", "[Measures].[4VGQHR12MHZ3FT2S9KPZM9MR5]"},            // YTD预算执行率
+				
+				                // ========== 维度字段展开 ==========
+				                {Cube.AddAndExpandDimensionColumn, "[ZBUKRS]", {"[ZBUKRS].[LEVEL01]"}, {"公司代码"}},
+				                {Cube.AddAndExpandDimensionColumn, "[ZXGFFL]", {"[ZXGFFL].[LEVEL01]"}, {"销管费分类"}},
+				                {Cube.AddAndExpandDimensionColumn, "[ZPRCTR_GL]", {"[ZPRCTR_GL].[LEVEL01]"}, {"管理口径利润中心"}}
+				            }),
+				            // 增加月份文本列（YYYYMM），标记本条数据对应的查询期间
+				            附加月份 = Table.AddColumn(Query, "加载年月", each month)
+				        in
+				            附加月份,
+				
+				    // 遍历月份列表，逐个执行单月查询
+				    各月结果 = List.Transform(月份文本列表, 查询单月),
+				    // 将所有月份结果合并为一张长表
+				    合并结果 = Table.Combine(各月结果)
+				in
+				    合并结果
+
+	annotation PBI_ResultType = Table
+

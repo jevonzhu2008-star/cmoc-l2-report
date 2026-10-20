@@ -1,0 +1,82 @@
+/// 按单位返回格式字符串（用于度量值的动态格式字符串）
+function FormatAmount = ```
+		() =>
+		VAR v_Unit1 = SELECTEDVALUE('KFM选冶厂月报'[单位])
+		VAR v_Unit2 = SELECTEDVALUE('L1-KFM日报'[单位])
+		VAR v_Unit = COALESCE(v_Unit1, v_Unit2) // 取不为空的单位
+		RETURN
+		SWITCH(
+		    TRUE(),
+		    v_Unit IN {"%", "t/t"}, "#,0.00",  // 比率单位（%/t/t）→ 两位小数
+		    TRUE(), "#,0"                       // 数量单位（吨等）→ 整数
+		)
+		
+		
+		```
+	lineageTag: 15da78dd-fbd0-4602-96c6-32c1edbef155
+
+/// 去年同月值：解析「月份-筛选器」切片器并回退到去年同月
+function SameMonthPriorYear = ```
+		( amount : EXPR ) => 
+		// ============================================================
+		// 同期 —— 去年同期（去年同月）
+		// ------------------------------------------------------------
+		// 背景：本模型使用「月份-筛选器」切片器，其取值有两种形态：
+		//       ① “最近月份”  → 代表数据中最后一个有实际数的月份
+		//       ② 具体月份文本 → 如 “202608”
+		// 因此需先将切片器值解析为真实月份，再回退到去年同月取数。
+		// ============================================================
+		VAR SelectedFilter =
+		    // 切片器当前选中值（取自「月份-筛选器」列，而非「月份」列）
+		    SELECTEDVALUE('KFM选冶厂月报'[月份-筛选器])
+		VAR LatestMonth =
+		    // 真实「最近月份」= 有实际数的最大月份（与 M 中 LatestMonth 同口径）
+		    CALCULATE(
+		        MAX('KFM选冶厂月报'[月份]),
+		        'KFM选冶厂月报'[实际数] <> 0,
+		        ALL('KFM选冶厂月报')
+		    )
+		VAR CurrentMonth =
+		    // 解析切片器选中值：“最近月份” → LatestMonth；月份文本 → 转为数字
+		    SWITCH(
+		        TRUE(),
+		        SelectedFilter = "最近月份", LatestMonth,
+		        NOT ISBLANK(SelectedFilter), VALUE(SelectedFilter),
+		        BLANK()
+		    )
+		VAR PriorYearMonth =
+		    // 去年同月：利用 YYYYMM 编码特性，减 100 即得（如 202608 → 202508）
+		    CurrentMonth - 100
+		RETURN
+		    IF(
+		        NOT ISBLANK(CurrentMonth),
+		        CALCULATE(
+		            amount ,
+		            // 先清除「月份」与「月份-筛选器」上的全部筛选：
+		            // 否则切片器遗留的 [月份-筛选器]=“最近月份” 会与
+		            // [月份]=去年同月 互斥，导致整表被清空、结果恒为空。
+		            ALL(
+		                'KFM选冶厂月报'[月份],
+		                'KFM选冶厂月报'[月份-筛选器]
+		            ),
+		            // 再单独施加「去年同月」这一个筛选条件
+		            'KFM选冶厂月报'[月份] = PriorYearMonth
+		        ),
+		        BLANK()
+		    )
+		```
+	lineageTag: 612311e5-2cf2-419d-8691-0887015a30f1
+
+function FormatRatio =
+		() =>
+		VAR v_Unit1 = SELECTEDVALUE('KFM选冶厂月报'[单位])
+		VAR v_Unit2 = SELECTEDVALUE('L1-KFM日报'[单位])
+		VAR v_Unit = COALESCE(v_Unit1, v_Unit2) // 取不为空的单位
+		RETURN
+		SWITCH(
+		    TRUE(),
+		    v_Unit IN {"%", "t/t"}, "+#,0.00;-#,0.00",  // 比率单位（%/t/t）→ 带正负号两位小数（差额）
+		    TRUE(), "#,0.00%"                       // 数量单位 → 百分比
+		)
+	lineageTag: 218991ec-c130-43e5-a106-45cd669d18b4
+

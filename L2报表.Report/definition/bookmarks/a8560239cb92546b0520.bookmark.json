@@ -1,0 +1,1353 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/bookmark/2.1.0/schema.json",
+  "displayName": "其他指标",
+  "name": "a8560239cb92546b0520",
+  "options": {
+    "applyOnlyToTargetVisuals": true,
+    "targetVisualNames": [
+      "b1f4c824c9076603d157",
+      "979a623837f5c344c589"
+    ],
+    "suppressData": true
+  },
+  "explorationState": {
+    "version": "1.3",
+    "activeSection": "ad90dc3587cb9698b4f0",
+    "sections": {
+      "ad90dc3587cb9698b4f0": {
+        "visualContainers": {
+          "83210b365f5608c3da2b": {
+            "filters": {
+              "byExpr": [
+                {
+                  "name": "b153835be0db10a7bc3f",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "度量值"
+                        }
+                      },
+                      "Property": "标题-月报"
+                    }
+                  },
+                  "howCreated": 0
+                }
+              ]
+            },
+            "singleVisual": {
+              "visualType": "cardVisual",
+              "objects": {}
+            }
+          },
+          "979a623837f5c344c589": {
+            "filters": {
+              "byExpr": [
+                {
+                  "name": "7c7bfcb791055253ffaf",
+                  "type": "Categorical",
+                  "expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "KFM选冶厂月报_Original"
+                        }
+                      },
+                      "Property": "单位"
+                    }
+                  },
+                  "howCreated": 1
+                },
+                {
+                  "name": "a2b0e65b44c70228f5ff",
+                  "type": "Advanced",
+                  "expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "KFM选冶厂月报_Original"
+                        }
+                      },
+                      "Property": "序号"
+                    }
+                  },
+                  "howCreated": 1
+                },
+                {
+                  "name": "5cfe33fddc500e7834b5",
+                  "type": "Categorical",
+                  "expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "KFM选冶厂月报_Original"
+                        }
+                      },
+                      "Property": "类别"
+                    }
+                  },
+                  "howCreated": 1
+                },
+                {
+                  "name": "f270d2fd360521631e9c",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "度量值"
+                        }
+                      },
+                      "Property": "年比计划"
+                    }
+                  },
+                  "howCreated": 1
+                },
+                {
+                  "name": "5ef10e9fec2998d08aec",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "度量值"
+                        }
+                      },
+                      "Property": "年计划"
+                    }
+                  },
+                  "howCreated": 1
+                },
+                {
+                  "name": "c8535adc53ad0236b847",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "度量值"
+                        }
+                      },
+                      "Property": "年累计完成"
+                    }
+                  },
+                  "howCreated": 1
+                },
+                {
+                  "name": "cb405f74dfc93f759c31",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "度量值"
+                        }
+                      },
+                      "Property": "年累计完成比计划"
+                    }
+                  },
+                  "howCreated": 1
+                },
+                {
+                  "name": "704f5f5fcf51c9692348",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "度量值"
+                        }
+                      },
+                      "Property": "同期年累计完成"
+                    }
+                  },
+                  "howCreated": 1
+                },
+                {
+                  "name": "3a67ef76a282527e604e",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "度量值"
+                        }
+                      },
+                      "Property": "月比计划"
+                    }
+                  },
+                  "howCreated": 1
+                },
+                {
+                  "name": "97d77b2d70c683871b9a",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "度量值"
+                        }
+                      },
+                      "Property": "月计划"
+                    }
+                  },
+                  "howCreated": 1
+                },
+                {
+                  "name": "8c2ee326e9d78428fc37",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "度量值"
+                        }
+                      },
+                      "Property": "月计划累计"
+                    }
+                  },
+                  "howCreated": 1
+                },
+                {
+                  "name": "c52a7e0370677f0e3da5",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "度量值"
+                        }
+                      },
+                      "Property": "月完成"
+                    }
+                  },
+                  "howCreated": 1
+                },
+                {
+                  "name": "2a0e64f4a7bd68bc2c28",
+                  "type": "Categorical",
+                  "expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "KFM选冶厂月报_Original"
+                        }
+                      },
+                      "Property": "总类别"
+                    }
+                  },
+                  "howCreated": 1
+                },
+                {
+                  "name": "73c2a33ac4d47b7c0834",
+                  "type": "Categorical",
+                  "filter": {
+                    "Version": 2,
+                    "From": [
+                      {
+                        "Name": "k",
+                        "Entity": "KFM选冶厂月报",
+                        "Type": 0
+                      }
+                    ],
+                    "Where": [
+                      {
+                        "Condition": {
+                          "In": {
+                            "Expressions": [
+                              {
+                                "Column": {
+                                  "Expression": {
+                                    "SourceRef": {
+                                      "Source": "k"
+                                    }
+                                  },
+                                  "Property": "总类别"
+                                }
+                              }
+                            ],
+                            "Values": [
+                              [
+                                {
+                                  "Literal": {
+                                    "Value": "'其他指标'"
+                                  }
+                                }
+                              ]
+                            ]
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "KFM选冶厂月报"
+                        }
+                      },
+                      "Property": "总类别"
+                    }
+                  },
+                  "howCreated": 0
+                },
+                {
+                  "name": "5d921234c8a11f9ab470",
+                  "type": "Categorical",
+                  "expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "KFM选冶厂月报"
+                        }
+                      },
+                      "Property": "类别2"
+                    }
+                  },
+                  "howCreated": 0
+                },
+                {
+                  "name": "9583d963c46f28fe6673",
+                  "type": "Categorical",
+                  "expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "KFM选冶厂月报"
+                        }
+                      },
+                      "Property": "单位"
+                    }
+                  },
+                  "howCreated": 0
+                },
+                {
+                  "name": "7e820996978ed4c42a95",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "度量值"
+                        }
+                      },
+                      "Property": "月计划"
+                    }
+                  },
+                  "howCreated": 0
+                },
+                {
+                  "name": "2d43339245de35412f19",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "度量值"
+                        }
+                      },
+                      "Property": "月完成"
+                    }
+                  },
+                  "howCreated": 0
+                },
+                {
+                  "name": "b9044405765aa6a3cc17",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "度量值"
+                        }
+                      },
+                      "Property": "月比计划"
+                    }
+                  },
+                  "howCreated": 0
+                },
+                {
+                  "name": "89b8c58fd815f7514d12",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "度量值"
+                        }
+                      },
+                      "Property": "."
+                    }
+                  },
+                  "howCreated": 0
+                },
+                {
+                  "name": "ad89712c0cf1a178368f",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "度量值"
+                        }
+                      },
+                      "Property": "月计划累计"
+                    }
+                  },
+                  "howCreated": 0
+                },
+                {
+                  "name": "fe821041e213bddf11f6",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "度量值"
+                        }
+                      },
+                      "Property": "年累计完成"
+                    }
+                  },
+                  "howCreated": 0
+                },
+                {
+                  "name": "0fba1d6e7b2a52cce750",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "度量值"
+                        }
+                      },
+                      "Property": "年比计划"
+                    }
+                  },
+                  "howCreated": 0
+                },
+                {
+                  "name": "0854d99380e68c60db6c",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "度量值"
+                        }
+                      },
+                      "Property": "同期年累计完成"
+                    }
+                  },
+                  "howCreated": 0
+                },
+                {
+                  "name": "00ffa7728c4f0b1c78b3",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "度量值"
+                        }
+                      },
+                      "Property": "年计划"
+                    }
+                  },
+                  "howCreated": 0
+                },
+                {
+                  "name": "49ec3159e4e5ce145141",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "度量值"
+                        }
+                      },
+                      "Property": "年累计完成比计划"
+                    }
+                  },
+                  "howCreated": 0
+                }
+              ]
+            },
+            "singleVisual": {
+              "visualType": "pivotTable",
+              "objects": {},
+              "orderBy": [
+                {
+                  "Direction": 1,
+                  "Expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "度量值"
+                        }
+                      },
+                      "Property": "."
+                    }
+                  }
+                },
+                {
+                  "Direction": 1,
+                  "Expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "度量值"
+                        }
+                      },
+                      "Property": "."
+                    }
+                  }
+                },
+                {
+                  "Direction": 1,
+                  "Expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "度量值"
+                        }
+                      },
+                      "Property": "."
+                    }
+                  }
+                }
+              ],
+              "activeProjections": {
+                "Rows": [
+                  {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "KFM选冶厂月报"
+                        }
+                      },
+                      "Property": "总类别"
+                    }
+                  },
+                  {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "KFM选冶厂月报"
+                        }
+                      },
+                      "Property": "类别2"
+                    }
+                  },
+                  {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "KFM选冶厂月报"
+                        }
+                      },
+                      "Property": "单位"
+                    }
+                  }
+                ]
+              },
+              "expansionStates": [
+                {
+                  "roles": [
+                    "Rows"
+                  ],
+                  "levels": [
+                    {
+                      "queryRefs": [
+                        "KFM选冶厂月报_Modify.总类别"
+                      ],
+                      "isPinned": true
+                    },
+                    {
+                      "queryRefs": [
+                        "KFM选冶厂月报_Modify.类别2"
+                      ],
+                      "isPinned": true
+                    },
+                    {
+                      "queryRefs": [
+                        "KFM选冶厂月报_Modify.单位"
+                      ],
+                      "isPinned": true
+                    }
+                  ],
+                  "root": {
+                    "identityValues": []
+                  }
+                }
+              ]
+            }
+          },
+          "8eba846fb9c5606180ed": {
+            "filters": {
+              "byExpr": [
+                {
+                  "name": "bbdf8986e092e31c2ead",
+                  "type": "Advanced",
+                  "filter": {
+                    "Version": 2,
+                    "From": [
+                      {
+                        "Name": "k",
+                        "Entity": "KFM选冶厂月报",
+                        "Type": 0
+                      }
+                    ],
+                    "Where": [
+                      {
+                        "Condition": {
+                          "Not": {
+                            "Expression": {
+                              "Comparison": {
+                                "ComparisonKind": 0,
+                                "Left": {
+                                  "Column": {
+                                    "Expression": {
+                                      "SourceRef": {
+                                        "Source": "k"
+                                      }
+                                    },
+                                    "Property": "实际数"
+                                  }
+                                },
+                                "Right": {
+                                  "Literal": {
+                                    "Value": "0L"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "KFM选冶厂月报"
+                        }
+                      },
+                      "Property": "实际数"
+                    }
+                  },
+                  "howCreated": 1
+                },
+                {
+                  "name": "662fb4cfd88b93de0a94",
+                  "type": "Categorical",
+                  "expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "KFM选冶厂月报"
+                        }
+                      },
+                      "Property": "月份-筛选器"
+                    }
+                  },
+                  "howCreated": 0
+                }
+              ]
+            },
+            "singleVisual": {
+              "visualType": "slicer",
+              "objects": {
+                "merge": {
+                  "general": [
+                    {
+                      "properties": {
+                        "filter": {
+                          "filter": {
+                            "Version": 2,
+                            "From": [
+                              {
+                                "Name": "k",
+                                "Entity": "KFM选冶厂月报",
+                                "Type": 0
+                              }
+                            ],
+                            "Where": [
+                              {
+                                "Condition": {
+                                  "In": {
+                                    "Expressions": [
+                                      {
+                                        "Column": {
+                                          "Expression": {
+                                            "SourceRef": {
+                                              "Source": "k"
+                                            }
+                                          },
+                                          "Property": "月份-筛选器"
+                                        }
+                                      }
+                                    ],
+                                    "Values": [
+                                      [
+                                        {
+                                          "Literal": {
+                                            "Value": "'最近月份'"
+                                          }
+                                        }
+                                      ]
+                                    ]
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  ],
+                  "data": [
+                    {
+                      "properties": {
+                        "mode": {
+                          "expr": {
+                            "Literal": {
+                              "Value": "'Dropdown'"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ],
+                  "selection": [
+                    {
+                      "properties": {
+                        "strictSingleSelect": {
+                          "expr": {
+                            "Literal": {
+                              "Value": "true"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "orderBy": [
+                {
+                  "Direction": 2,
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "KFM选冶厂月报"
+                        }
+                      },
+                      "Property": "月份-筛选器"
+                    }
+                  }
+                }
+              ],
+              "activeProjections": {
+                "Values": [
+                  {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "KFM选冶厂月报"
+                        }
+                      },
+                      "Property": "月份-筛选器"
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "b1f4c824c9076603d157": {
+            "filters": {
+              "byExpr": [
+                {
+                  "name": "7c7bfcb791055253ffaf",
+                  "type": "Categorical",
+                  "expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "KFM选冶厂月报_Original"
+                        }
+                      },
+                      "Property": "单位"
+                    }
+                  },
+                  "howCreated": 1
+                },
+                {
+                  "name": "a2b0e65b44c70228f5ff",
+                  "type": "Advanced",
+                  "expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "KFM选冶厂月报_Original"
+                        }
+                      },
+                      "Property": "序号"
+                    }
+                  },
+                  "howCreated": 1
+                },
+                {
+                  "name": "5cfe33fddc500e7834b5",
+                  "type": "Categorical",
+                  "expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "KFM选冶厂月报_Original"
+                        }
+                      },
+                      "Property": "类别"
+                    }
+                  },
+                  "howCreated": 1
+                },
+                {
+                  "name": "f270d2fd360521631e9c",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "度量值"
+                        }
+                      },
+                      "Property": "年比计划"
+                    }
+                  },
+                  "howCreated": 1
+                },
+                {
+                  "name": "5ef10e9fec2998d08aec",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "度量值"
+                        }
+                      },
+                      "Property": "年计划"
+                    }
+                  },
+                  "howCreated": 1
+                },
+                {
+                  "name": "c8535adc53ad0236b847",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "度量值"
+                        }
+                      },
+                      "Property": "年累计完成"
+                    }
+                  },
+                  "howCreated": 1
+                },
+                {
+                  "name": "cb405f74dfc93f759c31",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "度量值"
+                        }
+                      },
+                      "Property": "年累计完成比计划"
+                    }
+                  },
+                  "howCreated": 1
+                },
+                {
+                  "name": "704f5f5fcf51c9692348",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "度量值"
+                        }
+                      },
+                      "Property": "同期年累计完成"
+                    }
+                  },
+                  "howCreated": 1
+                },
+                {
+                  "name": "3a67ef76a282527e604e",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "度量值"
+                        }
+                      },
+                      "Property": "月比计划"
+                    }
+                  },
+                  "howCreated": 1
+                },
+                {
+                  "name": "97d77b2d70c683871b9a",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "度量值"
+                        }
+                      },
+                      "Property": "月计划"
+                    }
+                  },
+                  "howCreated": 1
+                },
+                {
+                  "name": "8c2ee326e9d78428fc37",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "度量值"
+                        }
+                      },
+                      "Property": "月计划累计"
+                    }
+                  },
+                  "howCreated": 1
+                },
+                {
+                  "name": "c52a7e0370677f0e3da5",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "度量值"
+                        }
+                      },
+                      "Property": "月完成"
+                    }
+                  },
+                  "howCreated": 1
+                },
+                {
+                  "name": "2a0e64f4a7bd68bc2c28",
+                  "type": "Categorical",
+                  "expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "KFM选冶厂月报_Original"
+                        }
+                      },
+                      "Property": "总类别"
+                    }
+                  },
+                  "howCreated": 1
+                },
+                {
+                  "name": "919a3b3c5f8113481475",
+                  "type": "Categorical",
+                  "filter": {
+                    "Version": 2,
+                    "From": [
+                      {
+                        "Name": "k",
+                        "Entity": "KFM选冶厂月报",
+                        "Type": 0
+                      }
+                    ],
+                    "Where": [
+                      {
+                        "Condition": {
+                          "In": {
+                            "Expressions": [
+                              {
+                                "Column": {
+                                  "Expression": {
+                                    "SourceRef": {
+                                      "Source": "k"
+                                    }
+                                  },
+                                  "Property": "总类别"
+                                }
+                              }
+                            ],
+                            "Values": [
+                              [
+                                {
+                                  "Literal": {
+                                    "Value": "'采矿'"
+                                  }
+                                }
+                              ],
+                              [
+                                {
+                                  "Literal": {
+                                    "Value": "'选冶合计'"
+                                  }
+                                }
+                              ],
+                              [
+                                {
+                                  "Literal": {
+                                    "Value": "'产品质量'"
+                                  }
+                                }
+                              ]
+                            ]
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "KFM选冶厂月报"
+                        }
+                      },
+                      "Property": "总类别"
+                    }
+                  },
+                  "howCreated": 0
+                },
+                {
+                  "name": "de428e67cde4dadab092",
+                  "type": "Categorical",
+                  "expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "KFM选冶厂月报"
+                        }
+                      },
+                      "Property": "类别2"
+                    }
+                  },
+                  "howCreated": 0
+                },
+                {
+                  "name": "76f4d97a0e27a4d4b045",
+                  "type": "Categorical",
+                  "expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "KFM选冶厂月报"
+                        }
+                      },
+                      "Property": "单位"
+                    }
+                  },
+                  "howCreated": 0
+                },
+                {
+                  "name": "7e59bccad3ac3c9b87ba",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "度量值"
+                        }
+                      },
+                      "Property": "月计划"
+                    }
+                  },
+                  "howCreated": 0
+                },
+                {
+                  "name": "fe5262c58f47e2b1e316",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "度量值"
+                        }
+                      },
+                      "Property": "月完成"
+                    }
+                  },
+                  "howCreated": 0
+                },
+                {
+                  "name": "0be64d192d7de24f3f33",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "度量值"
+                        }
+                      },
+                      "Property": "月比计划"
+                    }
+                  },
+                  "howCreated": 0
+                },
+                {
+                  "name": "06a1a9a8e3b05a4892ff",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "度量值"
+                        }
+                      },
+                      "Property": "."
+                    }
+                  },
+                  "howCreated": 0
+                },
+                {
+                  "name": "67ed00a25822c1da1b42",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "度量值"
+                        }
+                      },
+                      "Property": "月计划累计"
+                    }
+                  },
+                  "howCreated": 0
+                },
+                {
+                  "name": "3d20c95a265acde572ab",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "度量值"
+                        }
+                      },
+                      "Property": "年累计完成"
+                    }
+                  },
+                  "howCreated": 0
+                },
+                {
+                  "name": "c0a0de160be6ebf971c8",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "度量值"
+                        }
+                      },
+                      "Property": "年比计划"
+                    }
+                  },
+                  "howCreated": 0
+                },
+                {
+                  "name": "3e40b200214feb0e72f4",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "度量值"
+                        }
+                      },
+                      "Property": "同期年累计完成"
+                    }
+                  },
+                  "howCreated": 0
+                },
+                {
+                  "name": "8d37568a2970319bf959",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "度量值"
+                        }
+                      },
+                      "Property": "年计划"
+                    }
+                  },
+                  "howCreated": 0
+                },
+                {
+                  "name": "99a9c5c70bbf88367116",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "度量值"
+                        }
+                      },
+                      "Property": "年累计完成比计划"
+                    }
+                  },
+                  "howCreated": 0
+                }
+              ]
+            },
+            "singleVisual": {
+              "visualType": "pivotTable",
+              "objects": {},
+              "orderBy": [
+                {
+                  "Direction": 1,
+                  "Expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "度量值"
+                        }
+                      },
+                      "Property": "."
+                    }
+                  }
+                },
+                {
+                  "Direction": 1,
+                  "Expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "度量值"
+                        }
+                      },
+                      "Property": "."
+                    }
+                  }
+                },
+                {
+                  "Direction": 1,
+                  "Expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "度量值"
+                        }
+                      },
+                      "Property": "."
+                    }
+                  }
+                }
+              ],
+              "activeProjections": {
+                "Rows": [
+                  {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "KFM选冶厂月报"
+                        }
+                      },
+                      "Property": "总类别"
+                    }
+                  },
+                  {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "KFM选冶厂月报"
+                        }
+                      },
+                      "Property": "类别2"
+                    }
+                  },
+                  {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "KFM选冶厂月报"
+                        }
+                      },
+                      "Property": "单位"
+                    }
+                  }
+                ]
+              },
+              "expansionStates": [
+                {
+                  "roles": [
+                    "Rows"
+                  ],
+                  "levels": [
+                    {
+                      "queryRefs": [
+                        "KFM选冶厂月报_Modify.总类别"
+                      ],
+                      "isPinned": true
+                    },
+                    {
+                      "queryRefs": [
+                        "KFM选冶厂月报_Modify.类别2"
+                      ],
+                      "isPinned": true
+                    },
+                    {
+                      "queryRefs": [
+                        "KFM选冶厂月报_Modify.单位"
+                      ],
+                      "isPinned": true
+                    }
+                  ],
+                  "root": {
+                    "identityValues": []
+                  }
+                }
+              ],
+              "display": {
+                "mode": "hidden"
+              }
+            }
+          }
+        }
+      }
+    },
+    "objects": {
+      "merge": {
+        "outspacePane": [
+          {
+            "properties": {
+              "expanded": {
+                "expr": {
+                  "Literal": {
+                    "Value": "false"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

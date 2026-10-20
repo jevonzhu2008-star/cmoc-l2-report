@@ -1,0 +1,102 @@
+table 日报指标映射
+	lineageTag: 06b1ef45-ee23-4924-b096-124c378aea69
+
+	column 序号
+		dataType: double
+		formatString: 0
+		lineageTag: 81dfde1f-ad33-4fa0-adbd-e282cd665a09
+		summarizeBy: sum
+		sourceColumn: 序号
+
+		annotation SummarizationSetBy = Automatic
+
+	column 指标项
+		dataType: string
+		lineageTag: fd52b315-ee19-4f86-9658-e12127cbf716
+		summarizeBy: none
+		sourceColumn: 指标项
+		sortByColumn: 序号
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column 类别
+		dataType: string
+		lineageTag: bd9fff6c-e3c3-456c-a420-c6ac3acb7325
+		summarizeBy: none
+		sourceColumn: 类别
+
+		annotation SummarizationSetBy = Automatic
+
+	column 环节
+		dataType: string
+		lineageTag: 91b060cf-6fb5-41a1-bfa9-32fd6a5d7e80
+		summarizeBy: none
+		sourceColumn: 环节
+
+		annotation SummarizationSetBy = Automatic
+
+	column 环节序号
+		dataType: double
+		formatString: 0
+		lineageTag: e7e7348e-1a45-4d22-9545-19bc18045f74
+		summarizeBy: sum
+		sourceColumn: 环节序号
+
+		annotation SummarizationSetBy = Automatic
+
+	column 报表
+		dataType: string
+		lineageTag: 5a5efab2-740c-4397-855c-c90f502b9102
+		summarizeBy: none
+		sourceColumn: 报表
+
+		annotation SummarizationSetBy = Automatic
+
+	column 指标名称
+		dataType: string
+		lineageTag: 4b392b21-9f37-41ba-b4af-6b9eee00f57f
+		summarizeBy: none
+		sourceColumn: 指标名称
+
+		annotation SummarizationSetBy = Automatic
+
+	column 关联字段
+		dataType: string
+		lineageTag: a1416dfd-c776-44e9-be82-060b6cff3613
+		summarizeBy: none
+		sourceColumn: 关联字段
+
+		annotation SummarizationSetBy = Automatic
+
+	column 指标类别
+		dataType: string
+		lineageTag: 3e0960fe-6d3b-4764-a47a-9fbe68d71030
+		summarizeBy: none
+		sourceColumn: 指标类别
+
+		annotation SummarizationSetBy = Automatic
+
+	column 是否周报
+		dataType: string
+		lineageTag: 5988e11e-d6f0-4f18-8ffa-41e3be4cc46a
+		summarizeBy: none
+		sourceColumn: 是否周报
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 日报指标映射 = m
+		mode: import
+		queryGroup: 成本
+		source =
+				let
+				  // 从 SharePoint 站点定位「指标映射」工作簿，读取「日报」Sheet（首行提升为标题）
+				  源 = SharePoint.Files(成本SharePoint站点, [ApiVersion = 15]),
+				  指标映射文件 = Table.SelectRows(源, each Text.Contains([Name], "指标映射") and [Extension] = ".xlsx"){0}[Content],
+				  日报表 = Excel.Workbook(指标映射文件, true){[Item = "日报", Kind = "Sheet"]}[Data]
+				in
+				  日报表
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,280 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "f146e6d39223b42ed24a",
+  "position": {
+    "x": 14.47728760308941,
+    "y": 133.91491032857704,
+    "z": 1002,
+    "height": 381.83846053148318,
+    "width": 1856.7121350962168,
+    "tabOrder": 2
+  },
+  "visual": {
+    "visualType": "lineChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "L2-05-01 硫磺及硫酸价格分析月报"
+                    }
+                  },
+                  "Property": "期间名称"
+                }
+              },
+              "queryRef": "L2-05-01 硫磺及硫酸价格分析月报.期间名称",
+              "nativeQueryRef": "期间名称",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "L2-05-01 硫磺及硫酸价格分析月报"
+                        }
+                      },
+                      "Property": "硫磺-DDP(单价)"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(L2-05-01 硫磺及硫酸价格分析月报.硫磺-DDP(单价))",
+              "nativeQueryRef": "硫磺-DDP(单价) 的总和"
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "L2-05-01 硫磺及硫酸价格分析月报"
+                        }
+                      },
+                      "Property": "硫磺-采购价(单价)"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(L2-05-01 硫磺及硫酸价格分析月报.硫磺-采购价(单价))",
+              "nativeQueryRef": "硫磺-采购价(单价) 的总和"
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "L2-05-01 硫磺及硫酸价格分析月报"
+                        }
+                      },
+                      "Property": "硫酸-DDP(单价)"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(L2-05-01 硫磺及硫酸价格分析月报.硫酸-DDP(单价))",
+              "nativeQueryRef": "硫酸-DDP(单价) 的总和"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "valueAxis": [
+        {
+          "properties": {
+            "roundRange": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "dataPoint": [
+        {
+          "properties": {
+            "fill": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "ThemeDataColor": {
+                      "ColorId": 6,
+                      "Percent": 0.6
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Sum(L2-05-01 硫磺及硫酸价格分析月报.硫磺-DDP(单价))"
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "a69affb63ccb1b21b939",
+        "field": {
+          "Aggregation": {
+            "Expression": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "L2-05-01 硫磺及硫酸价格分析月报"
+                  }
+                },
+                "Property": "硫磺-DDP(单价)"
+              }
+            },
+            "Function": 0
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "99d2c513728f6277d505",
+        "field": {
+          "Aggregation": {
+            "Expression": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "L2-05-01 硫磺及硫酸价格分析月报"
+                  }
+                },
+                "Property": "硫磺-采购价(单价)"
+              }
+            },
+            "Function": 0
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "c893a6b1454d0422f606",
+        "field": {
+          "Aggregation": {
+            "Expression": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "L2-05-01 硫磺及硫酸价格分析月报"
+                  }
+                },
+                "Property": "硫酸-DDP(单价)"
+              }
+            },
+            "Function": 0
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "be0db0518d969d8a7dd1",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "L2-05-01 硫磺及硫酸价格分析月报"
+              }
+            },
+            "Property": "期间名称"
+          }
+        },
+        "type": "Categorical",
+        "objects": {
+          "general": [
+            {
+              "properties": {
+                "isInvertedSelectionMode": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "true"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "3ccb2948fc67eba7b03a",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "L2-05-01 硫磺及硫酸价格分析月报"
+              }
+            },
+            "Property": "数据类别 级别 01"
+          }
+        },
+        "type": "Categorical",
+        "filter": {
+          "Version": 2,
+          "From": [
+            {
+              "Name": "l",
+              "Entity": "L2-05-01 硫磺及硫酸价格分析月报",
+              "Type": 0
+            }
+          ],
+          "Where": [
+            {
+              "Condition": {
+                "In": {
+                  "Expressions": [
+                    {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Source": "l"
+                          }
+                        },
+                        "Property": "数据类别 级别 01"
+                      }
+                    }
+                  ],
+                  "Values": [
+                    [
+                      {
+                        "Literal": {
+                          "Value": "'ACT'"
+                        }
+                      }
+                    ]
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        "howCreated": "User"
+      }
+    ]
+  }
+}

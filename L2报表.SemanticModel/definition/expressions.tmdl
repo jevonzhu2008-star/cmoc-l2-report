@@ -1,0 +1,90 @@
+expression p_月报起始日期 = #date(2025, 1, 1) meta [IsParameterQuery = true, IsParameterQueryRequired = true, Type = type date]
+	lineageTag: d37f2340-7e85-4790-a15d-b76741818d33
+	queryGroup: 参数
+
+	annotation PBI_NavigationStepName = 导航
+
+	annotation PBI_ResultType = Date
+
+expression p_日报起始日期 = #date(2026, 1, 1) meta [IsParameterQuery = true, IsParameterQueryRequired = true, Type = type date]
+	lineageTag: 11d89abb-ed2d-42a8-bf70-517ae5c3a03e
+	queryGroup: 参数
+
+	annotation PBI_ResultType = Date
+
+expression 服务器 =
+		let
+		    源 = "10.43.11.32" meta [IsParameterQuery = true, IsParameterQueryRequired = false, Type = type text]
+		in
+		    源
+	lineageTag: 3d1c1810-0927-4b08-91ce-2fd791266ab7
+	queryGroup: 参数
+
+	annotation PBI_ResultType = Text
+
+expression 系统编号 = "00" meta [IsParameterQuery = true, IsParameterQueryRequired = false, Type = type text]
+	lineageTag: ccc630c4-3332-4432-9740-ec4ea8a87f4e
+	queryGroup: 参数
+
+	annotation PBI_ResultType = Text
+
+expression 客户端ID = "100" meta [IsParameterQuery = true, IsParameterQueryRequired = false, Type = type text]
+	lineageTag: 7c1720ff-1ca5-4ea0-bc78-056db0769523
+	queryGroup: 参数
+
+	annotation PBI_ResultType = Text
+
+expression 成本SharePoint站点 = "https://cmocco.sharepoint.com/teams/PBI/" meta [IsParameterQuery = true, IsParameterQueryRequired = false, Type = type text]
+	lineageTag: f1eed767-a705-433e-8198-a945562adb00
+	queryGroup: 参数
+
+	annotation PBI_ResultType = Text
+
+expression QAS服务器 =
+		let
+		    源 = "10.43.15.32" meta [IsParameterQuery = true, IsParameterQueryRequired = false, Type = type text]
+		in
+		    源
+	lineageTag: 6041bff7-364e-41e9-a6ec-8b223c1a189a
+	queryGroup: 参数
+
+	annotation PBI_ResultType = Text
+
+expression 动态年月偏移 = -7 meta [IsParameterQuery = true, IsParameterQueryRequired = false, Type = type number]
+	lineageTag: 1dd751e2-7755-4003-bcba-ad29b64d226a
+	queryGroup: 参数
+
+	annotation PBI_ResultType = Number
+
+expression 财经SharePoint站点 = "https://xsyzz.sharepoint.com/sites/CMOCGroup/" meta [IsParameterQuery = true, IsParameterQueryRequired = false, Type = type text]
+	lineageTag: 9e6b9c11-4f6a-4b51-8c63-0b5f673c9c38
+	queryGroup: 参数
+
+	annotation PBI_ResultType = Text
+
+expression L2-03-02指标排序 =
+		let
+		  // 从 SharePoint 站点定位「指标映射」工作簿，读取「日报」Sheet（首行提升为标题）
+		  源 = SharePoint.Files(财经SharePoint站点, [ApiVersion = 15]),
+		  指标映射文件 = Table.SelectRows(源, each Text.Contains([Name], "L2-03-02 财务费用汇总表指标映射") and [Extension] = ".xlsx"){0}[Content],
+		  指标排序 = Excel.Workbook(指标映射文件, true){[Item = "指标排序", Kind = "Sheet"]}[Data]
+		in
+		  指标排序
+	lineageTag: c82a7a0b-3ae5-4fe1-80da-6e8171c49168
+	queryGroup: 辅助
+
+	annotation PBI_ResultType = Table
+
+expression L2-03-02结构排序 =
+		let
+		  // 从 SharePoint 站点定位「指标映射」工作簿，读取「日报」Sheet（首行提升为标题）
+		  源 = SharePoint.Files(财经SharePoint站点, [ApiVersion = 15]),
+		  指标映射文件 = Table.SelectRows(源, each Text.Contains([Name], "L2-03-02 财务费用汇总表指标映射") and [Extension] = ".xlsx"){0}[Content],
+		  指标排序 = Excel.Workbook(指标映射文件, true){[Item = "结构排序", Kind = "Sheet"]}[Data]
+		in
+		  指标排序
+	lineageTag: 075aaf9e-2292-4f6e-a600-55c8c9f7ee5a
+	queryGroup: 辅助
+
+	annotation PBI_ResultType = Table
+
