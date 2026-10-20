@@ -64,7 +64,7 @@ expression 财经SharePoint站点 = "https://xsyzz.sharepoint.com/sites/CMOCGrou
 
 expression L2-03-02指标排序 =
 		let
-		  // 从 SharePoint 站点定位「指标映射」工作簿，读取「日报」Sheet（首行提升为标题）
+		  // 从 SharePoint 站点定位「指标映射」工作簿，读取「指标排序」Sheet（首行提升为标题）
 		  源 = SharePoint.Files(财经SharePoint站点, [ApiVersion = 15]),
 		  指标映射文件 = Table.SelectRows(源, each Text.Contains([Name], "L2-03-02 财务费用汇总表指标映射") and [Extension] = ".xlsx"){0}[Content],
 		  指标排序 = Excel.Workbook(指标映射文件, true){[Item = "指标排序", Kind = "Sheet"]}[Data]
@@ -77,12 +77,12 @@ expression L2-03-02指标排序 =
 
 expression L2-03-02结构排序 =
 		let
-		  // 从 SharePoint 站点定位「指标映射」工作簿，读取「日报」Sheet（首行提升为标题）
+		  // 从 SharePoint 站点定位「指标映射」工作簿，读取「结构排序」Sheet（首行提升为标题）
 		  源 = SharePoint.Files(财经SharePoint站点, [ApiVersion = 15]),
 		  指标映射文件 = Table.SelectRows(源, each Text.Contains([Name], "L2-03-02 财务费用汇总表指标映射") and [Extension] = ".xlsx"){0}[Content],
-		  指标排序 = Excel.Workbook(指标映射文件, true){[Item = "结构排序", Kind = "Sheet"]}[Data]
+		  结构排序 = Excel.Workbook(指标映射文件, true){[Item = "结构排序", Kind = "Sheet"]}[Data]
 		in
-		  指标排序
+		  结构排序
 	lineageTag: 075aaf9e-2292-4f6e-a600-55c8c9f7ee5a
 	queryGroup: 辅助
 
