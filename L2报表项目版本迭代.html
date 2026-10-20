@@ -95,6 +95,15 @@ svg text{font-family:var(--sans)}
 <script>
 const DATA = [
   {
+    "short": "7fc6268",
+    "date": "2026-10-20 18:08",
+    "msg": "版本迭代页自动提取提交正文作为完整备注",
+    "files": 2,
+    "add": 49,
+    "del": 9,
+    "ms": false
+  },
+  {
     "short": "ba3c323",
     "date": "2026-10-20 18:02",
     "msg": "新增快报金融投资业务专属表并调整动态年月口径",
@@ -125,6 +134,12 @@ const DATA = [
 
 // 完整提交备注（由 update-version-html.py 维护，去 Co-Authored-By）
 const NOTES = {
+  "7fc6268": [
+    "- update-version-html.py 的「完整备注」来源改为：手动 NOTES 优先，",
+    "否则自动取 commit message 正文（body，去掉标题、空行与 Co-Authored-By）",
+    "- 修复 ba3c323、1eeff74 等新增提交缺失完整备注的问题",
+    "- 以后提交时写好正文，版本迭代页即自动带完整备注，无需再手动维护 NOTES"
+  ],
   "ba3c323": [
     "语义模型",
     "- 新增事实表 L2-01-03 快报-金融投资业务专属（18 列）：",
