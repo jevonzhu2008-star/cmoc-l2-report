@@ -1,0 +1,318 @@
+# -*- coding: utf-8 -*-
+"""
+update-version-html.py
+从 git log 自动生成 / 更新 L2报表项目版本迭代.html
+
+用法：
+    python update-version-html.py
+
+行为：
+    1. 读取 main 分支的全部提交记录（hash / 日期 / 提交信息 / 变更规模）。
+    2. 按变更规模自动判定里程碑（文件数 >= 20 或新增行 >= 1500）。
+    3. 结合本文件内维护的 NOTES（按短 hash 键控的「完整备注」），
+       生成自包含的 L2报表项目版本迭代.html。
+
+维护说明：
+    - 新增提交后，为重要提交在 NOTES 里补充「完整备注」即可；
+    - 也可将本脚本接入 post-commit hook（参考 L3 项目做法），
+      每次提交后自动刷新版本迭代页。
+"""
+
+import json
+import os
+import re
+import subprocess
+import sys
+from datetime import datetime
+
+# Windows 控制台默认 cp1252，打印中文会报错；统一改为 UTF-8 输出。
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8")
+    except (AttributeError, ValueError):
+        pass
+
+# ---------------------------------------------------------------------------
+# 完整提交备注（按短 hash 键控）。提交信息里已能说明的，此处可省略或只补充细节。
+# ---------------------------------------------------------------------------
+NOTES = {
+    "e0e1f3d": [
+        "项目概述",
+        "- 集团层（L2）合并报表，Power BI 项目格式（PBIP），语言文化 zh-CN",
+        "- 含报告（PBIR）与语义模型（TMDL）两部分",
+        "报告层（L2报表.Report，报告定义版本 4.0）",
+        "- 共 7 个页面、27 个视觉对象、4 个书签",
+        "· 月报 —— 落地页",
+        "· 日报",
+        "· 月报数据导出 —— 隐藏数据页",
+        "· 集团合并利润汇总表 —— 活动页（L2-01-02）",
+        "· 销售管理费用预算执行汇总表（L2-03-01）",
+        "· 财务费用汇总表（L2-03-02）",
+        "· 硫磺及硫酸价格分析月报（L2-05-01）",
+        "- 主题：Fluent2-CY26SU09 基础主题 + 自定义资源",
+        "语义模型（L2报表.SemanticModel，版本 4.2，兼容级别 1702）",
+        "- 选冶厂事实表（承自 L3）：KFM选冶厂月报（19 列）、L1-KFM日报（17 列）",
+        "- 集团财经事实表：L2-01-02 集团合并利润汇总表（14 列）、",
+        "L2-03-01 销售管理费用预算执行汇总表（8 列）、",
+        "L2-03-02 财务费用汇总表（7 列）、",
+        "L2-05-01 硫磺及硫酸价格分析月报（14 列）",
+        "- 映射表：日报指标映射（10 列）、月报指标映射（7 列）",
+        "- 度量值表（27 个）：00辅助（7）、01新口径（4）、02月报（9）、03日报（7）",
+        "- DAX 函数（UDF）：FormatAmount、FormatRatio、SameMonthPriorYear",
+        "- Power Query 参数：p_月报起始日期=2025-01-01、p_日报起始日期=2026-01-01、",
+        "服务器、系统编号=00、客户端ID=100、成本SharePoint站点、QAS服务器、",
+        "动态年月偏移=-7、财经SharePoint站点",
+        "- 表达式：L2-03-02指标排序、L2-03-02结构排序",
+        "进度说明",
+        "- 集团财经四张表（L2-01-02 / L2-03-01 / L2-03-02 / L2-05-01）已并入语义模型",
+        "- 选冶厂月报/日报（KFM）与集团财经共享一套语义模型，度量值按 00辅助/01新口径/02月报/03日报 分组",
+        "- .gitignore 已排除本地连接设置（localSettings.json）与数据缓存（cache.abf）",
+    ],
+}
+
+
+def repo_root():
+    out = subprocess.run(
+        ["git", "rev-parse", "--show-toplevel"],
+        capture_output=True, text=True, encoding="utf-8",
+    ).stdout.strip()
+    return out or os.path.dirname(os.path.abspath(__file__))
+
+
+def run(cmd):
+    return subprocess.run(
+        cmd, capture_output=True, text=True, encoding="utf-8",
+    ).stdout
+
+
+def collect_commits(root):
+    os.chdir(root)
+    log = run([
+        "git", "log", "main", "--format=%H%x1f%h%x1f%ad%x1f%s",
+        "--date=format:%Y-%m-%d %H:%M",
+    ])
+    commits = []
+    for line in log.strip().splitlines():
+        if not line.strip():
+            continue
+        parts = line.split("\x1f")
+        if len(parts) != 4:
+            continue
+        full, short, date, subject = parts
+        stat = run(["git", "show", "--shortstat", "--format=", full])
+        files = add = dele = 0
+        m = re.search(r"(\d+) files? changed", stat)
+        if m:
+            files = int(m.group(1))
+        m = re.search(r"(\d+) insertions?\(\+\)", stat)
+        if m:
+            add = int(m.group(1))
+        m = re.search(r"(\d+) deletions?\(-\)", stat)
+        if m:
+            dele = int(m.group(1))
+        commits.append({
+            "short": short,
+            "full": full,
+            "date": date,
+            "msg": subject,
+            "files": files,
+            "add": add,
+            "del": dele,
+        })
+    return commits
+
+
+def is_milestone(c, index, total):
+    # 根提交（初始化）一律视为里程碑；其余按规模判定。
+    if index == total - 1:
+        return True
+    return c["files"] >= 20 or c["add"] >= 1500
+
+
+def build_html(commits, notes):
+    data = []
+    for i, c in enumerate(commits):
+        data.append({
+            "short": c["short"],
+            "date": c["date"],
+            "msg": c["msg"],
+            "files": c["files"],
+            "add": c["add"],
+            "del": c["del"],
+            "ms": is_milestone(c, i, len(commits)),
+        })
+
+    # 迭代跨度（天）：最新提交 - 最早提交
+    try:
+        newest = datetime.strptime(commits[0]["date"], "%Y-%m-%d %H:%M")
+        oldest = datetime.strptime(commits[-1]["date"], "%Y-%m-%d %H:%M")
+        days = round((newest - oldest).total_seconds() / 86400.0, 1)
+    except (IndexError, ValueError):
+        days = 0.0
+
+    data_json = json.dumps(data, ensure_ascii=False, indent=2)
+    notes_json = json.dumps(notes, ensure_ascii=False, indent=2)
+
+    return HTML_TEMPLATE.format(
+        data_json=data_json,
+        notes_json=notes_json,
+        days=days,
+    )
+
+
+HTML_TEMPLATE = """<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L2报表 · 项目版本迭代</title>
+<style>
+:root{{
+  --surface-1:#fcfcfb; --plane:#f9f9f7;
+  --ink-1:#0b0b0b; --ink-2:#52514e; --ink-muted:#898781;
+  --grid:#e1e0d9; --axis:#c3c2b7;
+  --accent:#2a78d6; --accent-strong:#1c5cab;
+  --up:#0ca30c; --down:#d03b3b;
+  --border:rgba(11,11,11,0.10);
+  --mono:"Consolas","JetBrains Mono","Courier New",monospace;
+  --sans:system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;
+}}
+@media (prefers-color-scheme: dark){{
+  :root:not([data-theme="light"]){{
+    --surface-1:#1a1a19; --plane:#0d0d0d;
+    --ink-1:#f0efec; --ink-2:#c3c2b7; --ink-muted:#898781;
+    --grid:#2c2c2a; --axis:#383835;
+    --accent:#3987e5; --accent-strong:#6da7ec;
+    --up:#0ca30c; --down:#e66767;
+    --border:rgba(255,255,255,0.10);
+  }}
+}}
+:root[data-theme="dark"]{{
+  --surface-1:#1a1a19; --plane:#0d0d0d;
+  --ink-1:#f0efec; --ink-2:#c3c2b7; --ink-muted:#898781;
+  --grid:#2c2c2a; --axis:#383835;
+  --accent:#3987e5; --accent-strong:#6da7ec;
+  --up:#0ca30c; --down:#e66767;
+  --border:rgba(255,255,255,0.10);
+}}
+*{{box-sizing:border-box}}
+body{{
+  margin:0; padding:28px 20px 56px;
+  background:var(--plane); color:var(--ink-1);
+  font-family:var(--sans); font-size:14px; line-height:1.55;
+}}
+.wrap{{max-width:1500px; margin:0 auto}}
+header h1{{margin:0 0 6px; font-size:clamp(22px,4vw,30px); letter-spacing:-.01em}}
+header .sub{{color:var(--ink-2); margin:0 0 20px; font-size:13.5px}}
+.kpis{{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin:16px 0 28px}}
+.kpi{{background:var(--surface-1); border:1px solid var(--border); border-radius:10px; padding:14px 16px}}
+.kpi .n{{font-size:24px; font-weight:700; font-variant-numeric:tabular-nums; letter-spacing:-.02em}}
+.kpi .l{{font-size:12px; color:var(--ink-2); margin-top:2px}}
+.card{{background:var(--surface-1); border:1px solid var(--border); border-radius:12px; padding:20px 22px; margin-bottom:24px}}
+.card h2{{font-size:16px; margin:0 0 14px; padding-bottom:10px; border-bottom:1px solid var(--border)}}
+svg text{{font-family:var(--sans)}}
+.timeline{{position:relative; padding-left:24px}}
+.timeline::before{{content:""; position:absolute; left:6px; top:8px; bottom:8px; width:2px; background:var(--grid)}}
+.tl-item{{position:relative; padding:10px 0 10px 0}}
+.tl-dot{{position:absolute; left:-24px; top:15px; width:14px; height:14px; border-radius:50%; background:var(--accent); border:2px solid var(--surface-1); box-shadow:0 0 0 2px var(--border)}}
+.tl-item.milestone .tl-dot{{background:var(--down); box-shadow:0 0 0 2px var(--border)}}
+.tl-head{{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap}}
+.tl-time{{font-family:var(--mono); font-size:12px; color:var(--ink-muted); white-space:nowrap}}
+.tl-hash{{font-family:var(--mono); font-size:12px; color:var(--accent); cursor:default}}
+.tl-msg{{font-size:13.5px; margin:2px 0 0}}
+.tl-delta{{font-family:var(--mono); font-size:12px; margin-top:3px}}
+.tl-delta .add{{color:var(--up)}}
+.tl-delta .del{{color:var(--down)}}
+.tl-delta .files{{color:var(--ink-muted)}}
+.note{{font-size:12px; color:var(--ink-muted); margin-top:12px}}
+@media(max-width:560px){{
+  body{{padding:20px 14px 40px}}
+  .card{{padding:16px 14px}}
+}}
+
+.tl-notes{{margin-top:6px; font-size:12.5px; color:var(--ink-2)}}
+.tl-notes summary{{cursor:pointer; color:var(--accent); font-size:12px; user-select:none}}
+.tl-notes summary:hover{{color:var(--accent-strong)}}
+.tl-notes ul{{margin:6px 0 0 18px; padding:0}}
+.tl-notes li{{margin:3px 0; line-height:1.5}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>L2报表 · 项目版本迭代</h1>
+    <p class="sub">基于 <code style="font-family:var(--mono)">git log</code>（main 分支）自动生成，展示 L2 集团合并报表从初始化到当前版本的演进轨迹。</p>
+  </header>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="card">
+    <h2>版本迭代时间线</h2>
+    <div class="timeline" id="timeline"></div>
+  </div>
+
+</div>
+
+
+<script>
+const DATA = {data_json};
+
+// 完整提交备注（由 update-version-html.py 维护，去 Co-Authored-By）
+const NOTES = {notes_json};
+
+// 摘要统计
+const totalAdd = DATA.reduce((s,d)=>s+d.add,0);
+const totalDel = DATA.reduce((s,d)=>s+d.del,0);
+const totalFiles = DATA.reduce((s,d)=>s+d.files,0);
+const days = "{days}";
+
+document.getElementById('kpis').innerHTML = `
+  <div class="kpi"><div class="n">${{DATA.length}}</div><div class="l">提交数（main）</div></div>
+  <div class="kpi"><div class="n">${{days}} 天</div><div class="l">迭代跨度</div></div>
+  <div class="kpi"><div class="n">${{totalFiles}}</div><div class="l">累计变更文件</div></div>
+  <div class="kpi"><div class="n" style="color:var(--up)">+${{totalAdd.toLocaleString()}}</div><div class="l">累计新增行</div></div>
+  <div class="kpi"><div class="n" style="color:var(--down)">−${{totalDel.toLocaleString()}}</div><div class="l">累计删除行</div></div>
+`;
+
+// ============ 时间线 ============
+document.getElementById('timeline').innerHTML = DATA.map(d=>`
+  <div class="tl-item${{d.ms?' milestone':''}}">
+    <span class="tl-dot"></span>
+    <div class="tl-head">
+      <span class="tl-time">${{d.date}}</span>
+      <span class="tl-hash" title="${{d.msg}}">${{d.short}}</span>
+    </div>
+    <div class="tl-msg">${{d.msg}}</div>
+    <div class="tl-delta">
+      <span class="add">+${{d.add.toLocaleString()}}</span> /
+      <span class="del">−${{d.del.toLocaleString()}}</span>
+      <span class="files"> · ${{d.files}} 文件</span>
+    </div>
+    ${{(NOTES[d.short]||[]).length ? `<details class="tl-notes"><summary>完整备注</summary><ul>${{(NOTES[d.short]||[]).map(x=>`<li>${{x}}</li>`).join('')}}</ul></details>` : ''}}
+  </div>
+`).join('');
+
+
+
+
+</script>
+</body>
+</html>
+"""
+
+
+def main():
+    root = repo_root()
+    commits = collect_commits(root)
+    if not commits:
+        print("未找到任何提交记录。")
+        return
+    html = build_html(commits, NOTES)
+    out_path = os.path.join(root, "L2报表项目版本迭代.html")
+    with open(out_path, "w", encoding="utf-8") as f:
+        f.write(html)
+    print(f"已生成 {out_path}（共 {len(commits)} 个提交）")
+
+
+if __name__ == "__main__":
+    main()
