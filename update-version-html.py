@@ -9,13 +9,13 @@ update-version-html.py
 行为：
     1. 读取 main 分支的全部提交记录（hash / 日期 / 提交信息 / 变更规模）。
     2. 按变更规模自动判定里程碑（文件数 >= 20 或新增行 >= 1500）。
-    3. 结合本文件内维护的 NOTES（按短 hash 键控的「完整备注」），
-       生成自包含的 L2报表项目版本迭代.html。
+    3. 「完整备注」优先取 NOTES 手动维护，否则自动取提交正文（body）；
+       据此生成自包含的 L2报表项目版本迭代.html。
 
 维护说明：
-    - 新增提交后，为重要提交在 NOTES 里补充「完整备注」即可；
-    - 也可将本脚本接入 post-commit hook（参考 L3 项目做法），
-      每次提交后自动刷新版本迭代页。
+    - 提交时写好 commit message 正文（body），版本迭代页会自动展示为「完整备注」；
+    - 需要额外补充时，再在 NOTES 里按短 hash 添加条目覆盖；
+    - 已接入 post-commit hook，每次提交后自动刷新版本迭代页。
 """
 
 import json
@@ -88,7 +88,7 @@ def run(cmd):
 def collect_commits(root):
     os.chdir(root)
     log = run([
-        "git", "log", "main", "--format=%H%x1f%h%x1f%ad%x1f%s",
+        "git", "log", "main", "--format=%H%x1f%h%x1f%ad",
         "--date=format:%Y-%m-%d %H:%M",
     ])
     commits = []
@@ -96,13 +96,22 @@ def collect_commits(root):
         if not line.strip():
             continue
         parts = line.split("\x1f")
-        if len(parts) != 4:
+        if len(parts) != 3:
             continue
-        full, short, date, subject = parts
+        full, short, date = parts
+        # 完整提交消息（subject + body）
+        full_msg = run(["git", "show", "-s", "--format=%B", full]).strip()
+        msg_lines = full_msg.splitlines()
+        subject = msg_lines[0].strip() if msg_lines else ""
         # 过滤「补录本次提交」维护提交（由 post-commit 自动补录产生），
         # 避免版本迭代页在每次补录后自我引用、无限递归。
         if "补录本次提交" in subject:
             continue
+        # body：去掉标题行、空行与 Co-Authored-By 署名行，作为自动「完整备注」
+        body = [
+            l.strip() for l in msg_lines[1:]
+            if l.strip() and not l.strip().startswith("Co-Authored-By")
+        ]
         stat = run(["git", "show", "--shortstat", "--format=", full])
         files = add = dele = 0
         m = re.search(r"(\d+) files? changed", stat)
@@ -119,6 +128,7 @@ def collect_commits(root):
             "full": full,
             "date": date,
             "msg": subject,
+            "body": body,
             "files": files,
             "add": add,
             "del": dele,
@@ -155,7 +165,16 @@ def build_html(commits, notes):
         days = 0.0
 
     data_json = json.dumps(data, ensure_ascii=False, indent=2)
-    notes_json = json.dumps(notes, ensure_ascii=False, indent=2)
+
+    # 完整备注：手动 NOTES 优先，否则回退到提交正文（body）自动提取
+    merged_notes = {}
+    for c in commits:
+        manual = notes.get(c["short"])
+        if manual:
+            merged_notes[c["short"]] = manual
+        elif c.get("body"):
+            merged_notes[c["short"]] = c["body"]
+    notes_json = json.dumps(merged_notes, ensure_ascii=False, indent=2)
 
     return HTML_TEMPLATE.format(
         data_json=data_json,
