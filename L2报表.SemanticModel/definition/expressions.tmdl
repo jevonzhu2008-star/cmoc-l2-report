@@ -50,7 +50,7 @@ expression QAS服务器 =
 
 	annotation PBI_ResultType = Text
 
-expression 动态年月偏移 = -7 meta [IsParameterQuery = true, IsParameterQueryRequired = false, Type = type number]
+expression 动态年月偏移 = -1 meta [IsParameterQuery = true, IsParameterQueryRequired = false, Type = type number]
 	lineageTag: 1dd751e2-7755-4003-bcba-ad29b64d226a
 	queryGroup: 参数
 

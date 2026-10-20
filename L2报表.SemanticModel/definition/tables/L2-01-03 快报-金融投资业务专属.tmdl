@@ -1,0 +1,194 @@
+table 'L2-01-03 快报-金融投资业务专属'
+	lineageTag: 94fa0046-8d8d-4546-97d7-bf5bc2710f8a
+
+	column 年净值-成本
+		dataType: double
+		lineageTag: e1e0b394-f5c1-45b7-b07c-17aa932b28cd
+		summarizeBy: sum
+		sourceColumn: 年净值-成本
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 年净值-公允价值变动
+		dataType: double
+		lineageTag: 25b589e9-aa9f-4a06-8dcc-8e3510bb7a43
+		summarizeBy: sum
+		sourceColumn: 年净值-公允价值变动
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 年净值-合计
+		dataType: double
+		lineageTag: 1edeeca7-c6db-4094-b09a-72400667e882
+		summarizeBy: sum
+		sourceColumn: 年净值-合计
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 本年-新增投资
+		dataType: double
+		lineageTag: 17d84700-e1b4-4dfa-8719-44585a768817
+		summarizeBy: sum
+		sourceColumn: 本年-新增投资
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 本年利润-累计公允价值变动
+		dataType: double
+		lineageTag: ba5bb2d1-3dbd-4184-8739-30bc135f9c46
+		summarizeBy: sum
+		sourceColumn: 本年利润-累计公允价值变动
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 本年利润-累计投资收益
+		dataType: double
+		lineageTag: bfe70665-938e-4a87-8b6c-14ef4db54814
+		summarizeBy: sum
+		sourceColumn: 本年利润-累计投资收益
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 本年利润-累计所得税费用影响
+		dataType: double
+		lineageTag: bf756fc2-267e-448c-8fcb-7ce013660a6c
+		summarizeBy: sum
+		sourceColumn: 本年利润-累计所得税费用影响
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 本年利润-退出成本
+		dataType: double
+		lineageTag: 4abbbf27-699a-40ea-ad1c-0976387f59bd
+		summarizeBy: sum
+		sourceColumn: 本年利润-退出成本
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 本年利润-退出持有收益
+		dataType: double
+		lineageTag: e32de8cf-6478-40c0-99b5-e748fc9abe9d
+		summarizeBy: sum
+		sourceColumn: 本年利润-退出持有收益
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 本年利润-累计公允价值变动(上月累计)
+		dataType: double
+		lineageTag: b62458df-abe7-4468-a2ff-21328621928f
+		summarizeBy: sum
+		sourceColumn: 本年利润-累计公允价值变动(上月累计)
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 本年利润-累计投资收益(上月累计)
+		dataType: double
+		lineageTag: fa0efaff-9439-44af-8410-967697da99d4
+		summarizeBy: sum
+		sourceColumn: 本年利润-累计投资收益(上月累计)
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 本年利润-累计所得税费用影响(上月累计)
+		dataType: double
+		lineageTag: 7124ecc8-d1dc-4a90-a1f5-ad088dc8bdb7
+		summarizeBy: sum
+		sourceColumn: 本年利润-累计所得税费用影响(上月累计)
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 本年利润-当月数
+		dataType: double
+		lineageTag: 20aa53ab-8b3b-46bc-a620-aff2ccf7e2ca
+		summarizeBy: sum
+		sourceColumn: 本年利润-当月数
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 期末净值-成本
+		dataType: double
+		lineageTag: fe757a48-2026-45a5-aeaa-5dd4a2a96ebc
+		summarizeBy: sum
+		sourceColumn: 期末净值-成本
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 期末净值-公允价值变动
+		dataType: double
+		lineageTag: 795434d7-95de-4d42-a452-8a978f3f1123
+		summarizeBy: sum
+		sourceColumn: 期末净值-公允价值变动
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 期末净值-合计
+		dataType: double
+		lineageTag: 3a850056-282a-44db-add5-2c3f091b97e2
+		summarizeBy: sum
+		sourceColumn: 期末净值-合计
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 当月汇率变动影响-币种（CNY)
+		dataType: double
+		lineageTag: 3cb4e56e-aa9f-4fb6-a40b-847652c60fd6
+		summarizeBy: sum
+		sourceColumn: 当月汇率变动影响-币种（CNY)
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column '公司代码 级别 01'
+		dataType: string
+		lineageTag: 1ede0a5d-36d1-433e-a636-900a6cdfa95b
+		summarizeBy: none
+		sourceColumn: 公司代码 级别 01
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'L2-01-03 快报-金融投资业务专属' = m
+		mode: import
+		source =
+				let
+				    源 = SapBusinessWarehouse.Cubes(QAS服务器, "00", "100", [Implementation="2.0", LanguageCode="ZH", EnableStructures=true]),
+				    ZRFI_CP012 = 源{[Name="ZRFI_CP012"]}[Data],
+				    #"ZRFI_CP012/ZRFI_CP012_Q0001" = ZRFI_CP012{[Id="ZRFI_CP012/ZRFI_CP012_Q0001"]}[Data],
+				    添加的项 = Cube.Transform(#"ZRFI_CP012/ZRFI_CP012_Q0001", {{Cube.ApplyParameter, "[ZMSDQNY]", {"202601"}}, {Cube.AddMeasureColumn, "年净值-成本", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2R9KUV]"}, {Cube.AddMeasureColumn, "年净值-公允价值变动", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2R9R6F]"}, {Cube.AddMeasureColumn, "年净值-合计", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2R9XHZ]"}, {Cube.AddMeasureColumn, "本年-新增投资", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2RA3TJ]"}, {Cube.AddMeasureColumn, "本年利润-累计公允价值变动", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2RAA53]"}, {Cube.AddMeasureColumn, "本年利润-累计投资收益", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2RAGGN]"}, {Cube.AddMeasureColumn, "本年利润-累计所得税费用影响", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2RAMS7]"}, {Cube.AddMeasureColumn, "本年利润-退出成本", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2RAT3R]"}, {Cube.AddMeasureColumn, "本年利润-退出持有收益", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2RAZFB]"}, {Cube.AddMeasureColumn, "本年利润-累计公允价值变动(上月累计)", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2RB5QV]"}, {Cube.AddMeasureColumn, "本年利润-累计投资收益(上月累计)", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2RBC2F]"}, {Cube.AddMeasureColumn, "本年利润-累计所得税费用影响(上月累计)", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2RBIDZ]"}, {Cube.AddMeasureColumn, "本年利润-当月数", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2RBOPJ]"}, {Cube.AddMeasureColumn, "期末净值-成本", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2RBV13]"}, {Cube.AddMeasureColumn, "期末净值-公允价值变动", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2RC1CN]"}, {Cube.AddMeasureColumn, "期末净值-合计", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2RC7O7]"}, {Cube.AddMeasureColumn, "当月汇率变动影响-币种（CNY)", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2RCDZR]"}, {Cube.AddAndExpandDimensionColumn, "[ZBUKRS]", {"[ZBUKRS].[LEVEL01]"}, {"公司代码 级别 01"}}})
+				in
+				    添加的项
+
+	annotation PBI_ResultType = Table
+

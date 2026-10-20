@@ -34,7 +34,7 @@ queryGroup 辅助
 
 annotation __PBI_TimeIntelligenceEnabled = 0
 
-annotation PBI_QueryOrder = ["服务器","QAS服务器","系统编号","客户端ID","p_日报起始日期","p_月报起始日期","成本SharePoint站点","L1-KFM日报","KFM选冶厂月报","日报指标映射","月报指标映射","L2-03-02指标排序","L2-01-02 集团合并利润汇总表","L2-03-02 财务费用汇总表","L2-03-01 销售管理费用预算执行汇总表","L2-05-01 硫磺及硫酸价格分析月报","财经SharePoint站点","动态年月偏移","L2-03-02结构排序","度量值"]
+annotation PBI_QueryOrder = ["服务器","QAS服务器","系统编号","客户端ID","p_日报起始日期","p_月报起始日期","成本SharePoint站点","L1-KFM日报","KFM选冶厂月报","日报指标映射","月报指标映射","L2-03-02指标排序","L2-01-02 集团合并利润汇总表","L2-03-02 财务费用汇总表","L2-03-01 销售管理费用预算执行汇总表","L2-05-01 硫磺及硫酸价格分析月报","财经SharePoint站点","动态年月偏移","L2-03-02结构排序","度量值","L2-01-03 快报-金融投资业务专属"]
 
 annotation PBI_ProTooling = ["MCP-PBIModeling","DevMode"]
 
@@ -47,6 +47,7 @@ ref table 'L2-05-01 硫磺及硫酸价格分析月报'
 ref table 'L2-03-01 销售管理费用预算执行汇总表'
 ref table 'L2-01-02 集团合并利润汇总表'
 ref table 'L2-03-02 财务费用汇总表'
+ref table 'L2-01-03 快报-金融投资业务专属'
 
 ref cultureInfo zh-CN
 

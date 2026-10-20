@@ -99,6 +99,10 @@ def collect_commits(root):
         if len(parts) != 4:
             continue
         full, short, date, subject = parts
+        # 过滤「补录本次提交」维护提交（由 post-commit 自动补录产生），
+        # 避免版本迭代页在每次补录后自我引用、无限递归。
+        if "补录本次提交" in subject:
+            continue
         stat = run(["git", "show", "--shortstat", "--format=", full])
         files = add = dele = 0
         m = re.search(r"(\d+) files? changed", stat)

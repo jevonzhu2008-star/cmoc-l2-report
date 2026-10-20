@@ -106,7 +106,8 @@ table 'L2-03-02 财务费用汇总表'
 				    // 动态年月文本：UTC转东八区，取上月日期（自动处理跨年，1月自动变成上一年12月）
 				    当前东八时间 = DateTimeZone.SwitchZone(DateTimeZone.UtcNow(),8),
 				    上月日期 = Date.AddMonths(Date.From(当前东八时间), 动态年月偏移),
-				    动态年月文本 = Text.From(Date.Year(上月日期)*100 + Date.Month(上月日期)),
+				    动态年月文本 = // Text.From(Date.Year(上月日期)*100 + Date.Month(上月日期))
+				"202603",
 				    // 3、BW查询转换：传入动态期间参数，批量拉取财务费用分项度量值
 				    添加的项 = Cube.Transform(基础查询,
 				        {
