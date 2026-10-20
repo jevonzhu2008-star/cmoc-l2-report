@@ -95,6 +95,15 @@ svg text{font-family:var(--sans)}
 <script>
 const DATA = [
   {
+    "short": "e04fa05",
+    "date": "2026-10-20 18:42",
+    "msg": "修复 M 引擎语法错误：非法步骤名改为合法标识符",
+    "files": 2,
+    "add": 7,
+    "del": 7,
+    "ms": false
+  },
+  {
     "short": "2b93780",
     "date": "2026-10-20 18:37",
     "msg": "拆分 L2-01-03 快报-金融投资业务专属的 BW 度量值列表",
@@ -152,6 +161,12 @@ const DATA = [
 
 // 完整提交备注（由 update-version-html.py 维护，去 Co-Authored-By）
 const NOTES = {
+  "e04fa05": [
+    "- 步骤名「null替换为0」以 M 关键字 null 开头、「0替换回null」以数字 0 开头，",
+    "均非合法 M 标识符，导致 Power BI 打开项目时报「应为令牌 Identifier」",
+    "- 改名为合法中文标识符：「null替换为0」→「空值替换为0」、",
+    "「0替换回null」→「零替换为空值」"
+  ],
   "2b93780": [
     "- 将 Cube.Transform 的 18 个度量值 + 1 个维度展开由单行拆分为多行",
     "- 按业务分组添加注释：年净值指标、本年新增投资、本年利润指标、",
