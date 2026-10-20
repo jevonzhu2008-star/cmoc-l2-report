@@ -196,8 +196,8 @@ table 'L2-01-02 集团合并利润汇总表'
 				    添加结构唯一ID = Table.AddColumn(BW查询转换, "结构唯一ID", each Cube.AttributeMemberProperty([结构.结构], "[MEMBER_UNIQUE_NAME]")),
 				    // 增加加载年月字段，标记本次取数对应的BW查询期间（YYYYMM文本），用于建模关联
 				    添加加载年月 = Table.AddColumn(添加结构唯一ID, "加载年月", each 动态年月文本),
-				    null替换为0 = Table.ReplaceValue(添加加载年月, null, 0, Replacer.ReplaceValue, {"结构.结构","结构唯一ID","当月YTD", "同比YTD", "去年同期YTD", "预算YTD", "预算达成率", "1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月", "环比MTD", "当月MTD", "上月MTD", "加载年月"}),
-				    逆透视分月列 = Table.UnpivotOtherColumns(null替换为0, {"结构.结构","结构唯一ID","环比MTD", "当月MTD", "上月MTD", "加载年月", "预算达成率", "预算YTD", "去年同期YTD", "同比YTD", "当月YTD"}, "月份", "实际值"),
+				    空值替换为0 = Table.ReplaceValue(添加加载年月, null, 0, Replacer.ReplaceValue, {"结构.结构","结构唯一ID","当月YTD", "同比YTD", "去年同期YTD", "预算YTD", "预算达成率", "1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月", "环比MTD", "当月MTD", "上月MTD", "加载年月"}),
+				    逆透视分月列 = Table.UnpivotOtherColumns(空值替换为0, {"结构.结构","结构唯一ID","环比MTD", "当月MTD", "上月MTD", "加载年月", "预算达成率", "预算YTD", "去年同期YTD", "同比YTD", "当月YTD"}, "月份", "实际值"),
 				    // ========= 新增：月份排序列 =========
 				    添加月份排序 = Table.AddColumn(逆透视分月列, "月份排序", each
 				        if [月份] = "1月" then 1
@@ -214,9 +214,9 @@ table 'L2-01-02 集团合并利润汇总表'
 				        else if [月份] = "12月" then 12
 				        else 999
 				    , Int64.Type),
-				  0替换回null = Table.ReplaceValue(添加月份排序, 0, null, Replacer.ReplaceValue, {"实际值"})
+				  零替换为空值 = Table.ReplaceValue(添加月份排序, 0, null, Replacer.ReplaceValue, {"实际值"})
 				in
-				    0替换回null
+				    零替换为空值
 
 	annotation PBI_ResultType = Table
 
