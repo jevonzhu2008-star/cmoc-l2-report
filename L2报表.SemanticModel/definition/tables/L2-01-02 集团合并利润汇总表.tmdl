@@ -154,10 +154,10 @@ table 'L2-01-02 集团合并利润汇总表'
 				        7、新增【月份排序】用于矩阵按正确顺序排序，解决PowerBI文本月份"10月排在2月前面"的排序问题
 				    */
 				    // 1、连接BW QAS环境
-				    源 = SapBusinessWarehouse.Cubes(QAS服务器, 系统编号, 客户端ID, [Implementation="2.0", LanguageCode="ZH", EnableStructures=true]),
+				    数据源 = SapBusinessWarehouse.Cubes(QAS服务器, 系统编号, 客户端ID, [Implementation="2.0", LanguageCode="ZH", EnableStructures=true]),
 				    // 2、定位Cube与目标Query
-				    ZRFI_CP011 = 源{[Name="ZRFI_CP011"]}[Data],
-				    基础查询 = ZRFI_CP011{[Id="ZRFI_CP011/ZRFI_CP011_Q0001"]}[Data],
+				    立方体 = 数据源{[Name="ZRFI_CP011"]}[Data],
+				    基础查询 = 立方体{[Id="ZRFI_CP011/ZRFI_CP011_Q0001"]}[Data],
 				    // 动态年月：UTC转东八区，取上月日期（自动处理跨年，1月会变成上一年12月）
 				    当前东八时间 = DateTimeZone.SwitchZone(DateTimeZone.UtcNow(),8),
 				    上月日期 = Date.AddMonths(Date.From(当前东八时间),动态年月偏移),

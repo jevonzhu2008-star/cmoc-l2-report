@@ -90,19 +90,19 @@ table 'L2-03-02 财务费用汇总表'
 				        9、在数据取出后使用Cube.AttributeMemberProperty 读取维度成员唯一标识 MEMBER_UNIQUE_NAME
 				    */
 				    // ========= 内嵌读取SharePoint：指标排序表 =========
-				    源_指标排序 = SharePoint.Files(财经SharePoint站点, [ApiVersion = 15]),
-				    指标映射文件_指标排序 = Table.SelectRows(源_指标排序, each Text.Contains([Name], "L2-03-02 财务费用汇总表指标映射") and [Extension] = ".xlsx"){0}[Content],
-				    指标排序表 = Excel.Workbook(指标映射文件_指标排序, true){[Item = "指标排序", Kind = "Sheet"]}[Data],
+				    指标排序源 = SharePoint.Files(财经SharePoint站点, [ApiVersion = 15]),
+				    指标排序文件 = Table.SelectRows(指标排序源, each Text.Contains([Name], "L2-03-02 财务费用汇总表指标映射") and [Extension] = ".xlsx"){0}[Content],
+				    指标排序表 = Excel.Workbook(指标排序文件, true){[Item = "指标排序", Kind = "Sheet"]}[Data],
 				    // ========= 内嵌读取SharePoint：结构排序表 =========
-				    源_结构排序 = SharePoint.Files(财经SharePoint站点, [ApiVersion = 15]),
-				    指标映射文件_结构排序 = Table.SelectRows(源_结构排序, each Text.Contains([Name], "L2-03-02 财务费用汇总表指标映射") and [Extension] = ".xlsx"){0}[Content],
-				    结构排序表 = Excel.Workbook(指标映射文件_结构排序, true){[Item = "结构排序", Kind = "Sheet"]}[Data],
+				    结构排序源 = SharePoint.Files(财经SharePoint站点, [ApiVersion = 15]),
+				    结构排序文件 = Table.SelectRows(结构排序源, each Text.Contains([Name], "L2-03-02 财务费用汇总表指标映射") and [Extension] = ".xlsx"){0}[Content],
+				    结构排序表 = Excel.Workbook(结构排序文件, true){[Item = "结构排序", Kind = "Sheet"]}[Data],
 				    // ========= BW原生取数逻辑 =========
 				    // 1、连接BW QAS环境
-				    源 = SapBusinessWarehouse.Cubes(QAS服务器, 系统编号, 客户端ID, [Implementation="2.0", LanguageCode="ZH", EnableStructures=true]),
+				    数据源 = SapBusinessWarehouse.Cubes(QAS服务器, 系统编号, 客户端ID, [Implementation="2.0", LanguageCode="ZH", EnableStructures=true]),
 				    // 2、定位Cube与目标BW查询
-				    ZRFI_CP010 = 源{[Name="ZRFI_CP010"]}[Data],
-				    基础查询 = ZRFI_CP010{[Id="ZRFI_CP010/ZRFI_CP010_Q0001"]}[Data],
+				    立方体 = 数据源{[Name="ZRFI_CP010"]}[Data],
+				    基础查询 = 立方体{[Id="ZRFI_CP010/ZRFI_CP010_Q0001"]}[Data],
 				    // 动态年月文本：UTC转东八区，取上月日期（自动处理跨年，1月自动变成上一年12月）
 				    当前东八时间 = DateTimeZone.SwitchZone(DateTimeZone.UtcNow(),8),
 				    上月日期 = Date.AddMonths(Date.From(当前东八时间), 动态年月偏移),
