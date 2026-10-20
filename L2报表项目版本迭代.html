@@ -95,6 +95,15 @@ svg text{font-family:var(--sans)}
 <script>
 const DATA = [
   {
+    "short": "dd34ca9",
+    "date": "2026-10-20 21:06",
+    "msg": "切换报告活动页到「硫磺及硫酸价格分析月报」",
+    "files": 1,
+    "add": 1,
+    "del": 1,
+    "ms": false
+  },
+  {
     "short": "5bc9318",
     "date": "2026-10-20 18:48",
     "msg": "统一语义模型 M 查询的步骤命名与格式",
@@ -268,7 +277,7 @@ const NOTES = {
 const totalAdd = DATA.reduce((s,d)=>s+d.add,0);
 const totalDel = DATA.reduce((s,d)=>s+d.del,0);
 const totalFiles = DATA.reduce((s,d)=>s+d.files,0);
-const days = "0.0";
+const days = "0.1";
 
 document.getElementById('kpis').innerHTML = `
   <div class="kpi"><div class="n">${DATA.length}</div><div class="l">提交数（main）</div></div>
