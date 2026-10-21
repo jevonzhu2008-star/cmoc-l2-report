@@ -259,7 +259,7 @@ table 'L2-01-02 集团合并利润汇总表'
 				                    else null
 				            , type text),
 				            // 把0还原为空，避免报表展示0干扰
-				            零替换为空值 = Table.ReplaceValue(添加季度, 0, null, Replacer.ReplaceValue, {"实际值"})
+				            零替换为空值 = Table.ReplaceValue(添加季度, 0, 0, Replacer.ReplaceValue, {"实际值"})
 				        in
 				            零替换为空值,
 				    // 遍历月份列表，逐个执行单月查询

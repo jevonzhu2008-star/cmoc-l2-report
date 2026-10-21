@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "44bc85994c68c0c714f8",
   "position": {
-    "x": 14.47728760308941,
-    "y": 323.92931011912555,
+    "x": 14.408281545754535,
+    "y": 323.15717181192315,
     "z": 2000,
-    "height": 729.293363005629,
-    "width": 977.21691320853517,
+    "height": 730.7057069632657,
+    "width": 872.73019648570323,
     "tabOrder": 2000
   },
   "visual": {
@@ -1518,6 +1518,90 @@
         },
         "type": "Categorical",
         "howCreated": "User"
+      },
+      {
+        "name": "c258eae77f0c7be68e9f",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "L2-01-02 集团合并利润汇总表"
+              }
+            },
+            "Property": "结构"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "597fac7371c92a4e9693",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "度量值"
+              }
+            },
+            "Property": "当月YTD"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "64ae43ffb6a775813c1d",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "度量值"
+              }
+            },
+            "Property": "同比YTD"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "c18790442a4e3dac5820",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "度量值"
+              }
+            },
+            "Property": "预算YTD"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "f49ac1e7b0297ddd6010",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "度量值"
+              }
+            },
+            "Property": "预算达成率"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "8c08201a5f9fdf44b162",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "度量值"
+              }
+            },
+            "Property": "环比MTD"
+          }
+        },
+        "type": "Advanced"
       }
     ],
     "filterSortOrder": "Custom"

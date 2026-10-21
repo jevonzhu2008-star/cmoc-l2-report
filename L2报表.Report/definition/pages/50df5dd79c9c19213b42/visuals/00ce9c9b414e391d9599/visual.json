@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "00ce9c9b414e391d9599",
   "position": {
-    "x": 993.50386176201073,
-    "y": 273.25880350831261,
+    "x": 887.13847803145779,
+    "y": 273.75734936933617,
     "z": 0,
-    "height": 779.96386961644191,
-    "width": 901.21115329231577,
+    "height": 780.10552940585274,
+    "width": 1008.5797082028174,
     "tabOrder": 0
   },
   "visual": {
@@ -810,72 +810,8 @@
   "filterConfig": {
     "filters": [
       {
-        "name": "902083b41c18a2d2e419",
-        "ordinal": 0,
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "度量值"
-              }
-            },
-            "Property": "日完成"
-          }
-        },
-        "type": "Advanced",
-        "howCreated": "User"
-      },
-      {
-        "name": "8e0e19e6ae4ec64e1df7",
-        "ordinal": 1,
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "度量值"
-              }
-            },
-            "Property": "月累计"
-          }
-        },
-        "type": "Advanced",
-        "howCreated": "User"
-      },
-      {
-        "name": "f0165debddf543e47f69",
-        "ordinal": 2,
-        "field": {
-          "Column": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "L1-KFM日报"
-              }
-            },
-            "Property": "单位"
-          }
-        },
-        "type": "Categorical",
-        "howCreated": "User"
-      },
-      {
-        "name": "d525e613fe535dd2a1e9",
-        "ordinal": 3,
-        "field": {
-          "Column": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "L1-KFM日报"
-              }
-            },
-            "Property": "地域"
-          }
-        },
-        "type": "Categorical",
-        "howCreated": "User"
-      },
-      {
         "name": "f534094fa40cb5a16366",
-        "ordinal": 4,
+        "ordinal": 0,
         "field": {
           "Aggregation": {
             "Expression": {
@@ -896,7 +832,7 @@
       },
       {
         "name": "f6ede4dfa1c76dab868b",
-        "ordinal": 5,
+        "ordinal": 1,
         "field": {
           "Aggregation": {
             "Expression": {
@@ -917,7 +853,7 @@
       },
       {
         "name": "cdd370efac0ebbb692c4",
-        "ordinal": 6,
+        "ordinal": 2,
         "field": {
           "Aggregation": {
             "Expression": {
@@ -938,7 +874,7 @@
       },
       {
         "name": "b3a54691a2728e5dd439",
-        "ordinal": 7,
+        "ordinal": 3,
         "field": {
           "Aggregation": {
             "Expression": {
@@ -959,7 +895,7 @@
       },
       {
         "name": "c3184d843c3f01c3802e",
-        "ordinal": 8,
+        "ordinal": 4,
         "field": {
           "Aggregation": {
             "Expression": {
@@ -980,7 +916,7 @@
       },
       {
         "name": "3965ff2982c432cee091",
-        "ordinal": 9,
+        "ordinal": 5,
         "field": {
           "Aggregation": {
             "Expression": {
@@ -1001,7 +937,7 @@
       },
       {
         "name": "644bd6262ea5c91c9c9a",
-        "ordinal": 10,
+        "ordinal": 6,
         "field": {
           "Aggregation": {
             "Expression": {
@@ -1022,7 +958,7 @@
       },
       {
         "name": "8d6b34dc237c5773def6",
-        "ordinal": 11,
+        "ordinal": 7,
         "field": {
           "Column": {
             "Expression": {
@@ -1035,6 +971,66 @@
         },
         "type": "Categorical",
         "howCreated": "User"
+      },
+      {
+        "name": "15f20f170aef217472c8",
+        "ordinal": 8,
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "L2-01-02 集团合并利润汇总表"
+              }
+            },
+            "Property": "季度"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "30cbf1f96e7543be7105",
+        "ordinal": 9,
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "L2-01-02 集团合并利润汇总表"
+              }
+            },
+            "Property": "月份"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "d1aee2b885dd83770dc7",
+        "ordinal": 10,
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "L2-01-02 集团合并利润汇总表"
+              }
+            },
+            "Property": "结构"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "3618fbe292733b85ecd0",
+        "ordinal": 11,
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "度量值"
+              }
+            },
+            "Property": "实际值"
+          }
+        },
+        "type": "Advanced"
       }
     ],
     "filterSortOrder": "Custom"

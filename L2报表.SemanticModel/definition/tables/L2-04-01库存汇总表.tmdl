@@ -1,0 +1,108 @@
+table L2-04-01库存汇总表
+	lineageTag: 9de3caef-4aac-42f2-914d-832803c2a857
+
+	column 金额(人民币)
+		dataType: double
+		lineageTag: 4abd419e-7702-41df-b745-8ca3a132cf92
+		summarizeBy: sum
+		sourceColumn: 金额(人民币)
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 量(吨)
+		dataType: double
+		lineageTag: 73b806f3-0c53-416e-b1f5-516277c1bd99
+		summarizeBy: sum
+		sourceColumn: 量(吨)
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 分类
+		dataType: string
+		lineageTag: 085ec1ab-8624-4d3c-b500-45446ee1c4a3
+		summarizeBy: none
+		sourceColumn: 分类
+
+		annotation SummarizationSetBy = Automatic
+
+	column 结构
+		dataType: string
+		lineageTag: 0cbbd182-68b1-445e-acb8-8de584c38b22
+		summarizeBy: none
+		sourceColumn: 结构
+
+		annotation SummarizationSetBy = Automatic
+
+	column 矿体
+		dataType: string
+		lineageTag: 7d926462-de41-4be2-8fd5-7fe01e4dd316
+		summarizeBy: none
+		sourceColumn: 矿体
+
+		annotation SummarizationSetBy = Automatic
+
+	column 加载年月
+		dataType: string
+		lineageTag: 389b0a01-6c52-4653-949e-f29f51e03a7a
+		summarizeBy: none
+		sourceColumn: 加载年月
+
+		annotation SummarizationSetBy = Automatic
+
+	partition L2-04-01库存汇总表 = m
+		mode: import
+		queryGroup: 财经\多月
+		source =
+				let
+				    /*
+				    【查询名称】ZRMM_CP002 矿石成本分析BW取数
+				    【对应报表】L2-02-04 矿石成本分析
+				    【BW对象】Cube:ZRMM_CP002   Query:ZRMM_CP002_Q0001
+				    【说明】
+				        1、循环取数：从参数 p_月报起始日期 开始，一直取到当年12月，逐月查询BW后合并成长表
+				        2、BW参数[ZMSDQNY]：YYYYMM格式年月，返回截止当月YTD数据
+				        3、维度：分类、结构、矿体
+				        4、指标：金额(人民币)、量(吨)
+				        5、连接参数统一：QAS服务器、系统编号、客户端ID
+				    */
+				    // 1、连接BW QAS环境
+				    数据源 = SapBusinessWarehouse.Cubes(QAS服务器, 系统编号, 客户端ID, [LanguageCode="ZH", Implementation="2.0", EnableStructures=true, BatchSize=500000000]),
+				    // 2、定位Cube与目标BW查询
+				    立方体 = 数据源{[Name="ZRMM_CP002"]}[Data],
+				    基础查询 = 立方体{[Id="ZRMM_CP002/ZRMM_CP002_Q0001"]}[Data],
+				    // ========== 月份循环配置 ==========
+				    起始月份 = p_月报起始日期,
+				    结束月份 = p_月报终止日期,
+				    月份序列 = List.Generate(() => 起始月份, each _ <= 结束月份, each Date.AddMonths(_, 1)),
+				    月份文本列表 = List.Transform(月份序列, each Text.From(Date.Year(_) * 100 + Date.Month(_))),
+				    // 单月取数函数
+				    查询单月 = (month as text) =>
+				        let
+				            Query = Cube.Transform(基础查询, {
+				                // BW期间参数
+				                {Cube.ApplyParameter, "[ZMSDQNY]", {month}},
+				                // ========== 维度字段展开 ==========
+				                {Cube.AddAndExpandDimensionColumn, "[4ZRMM_CP002-ZKL]", {"[4ZRMM_CP002-ZKL].[LEVEL01]"}, {"分类"}},
+				                {Cube.AddAndExpandDimensionColumn, "[4VGQHR12MHZ3FVOJ91YJ55O51]", {"[4VGQHR12MHZ3FVOJ91YJ55O51]"}, {"结构"}},
+				                {Cube.AddAndExpandDimensionColumn, "[ZKT]", {"[ZKT].[LEVEL01]"}, {"矿体"}},
+				                // ========== 度量值 ==========
+				                {Cube.AddMeasureColumn, "金额(人民币)", "[4VGQHR12MHZ3FVOJ91YJ55HTH].[4VGQHR12MHZ1PLAV995LXI93I]"},
+				                {Cube.AddMeasureColumn, "量(吨)", "[4VGQHR12MHZ3FVOJ91YJ55HTH].[4VGQHR12MHZ1PLAV995LXI2RY]"}
+				            }),
+				            // 增加加载年月列
+				            附加月份 = Table.AddColumn(Query, "加载年月", each month)
+				        in
+				            附加月份,
+				    // 遍历月份，逐个查询
+				    各月结果 = List.Transform(月份文本列表, 查询单月),
+				    // 合并所有月份结果
+				    合并结果 = Table.Combine(各月结果)
+				in
+				    合并结果
+
+	annotation PBI_ResultType = Table
+
