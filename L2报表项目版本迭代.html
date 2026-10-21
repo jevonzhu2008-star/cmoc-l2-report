@@ -95,6 +95,15 @@ svg text{font-family:var(--sans)}
 <script>
 const DATA = [
   {
+    "short": "023b12f",
+    "date": "2026-10-21 10:47",
+    "msg": "重构语义模型与报告：聚焦集团财经，重建基础度量值",
+    "files": 49,
+    "add": 1323,
+    "del": 17081,
+    "ms": true
+  },
+  {
     "short": "dd34ca9",
     "date": "2026-10-20 21:06",
     "msg": "切换报告活动页到「硫磺及硫酸价格分析月报」",
@@ -179,6 +188,18 @@ const DATA = [
 
 // 完整提交备注（由 update-version-html.py 维护，去 Co-Authored-By）
 const NOTES = {
+  "023b12f": [
+    "语义模型：",
+    "- 移除选冶厂相关表：KFM选冶厂月报、L1-KFM日报、日报指标映射、月报指标映射",
+    "- 保留集团财经 5 张表（L2-01-02 集团合并利润汇总表、L2-01-03 快报-金融投资业务专属、",
+    "L2-03-01 销售管理费用预算执行汇总表、L2-03-02 财务费用汇总表、L2-05-01 硫磺及硫酸价格分析月报）",
+    "- 度量值表重建：新增 38 个基础度量值（金额/数量 SUM、百分比/单价 MAX），按表 displayFolder 分组，均带注释",
+    "报告：",
+    "- 移除选冶厂相关页面（月报、日报、月报数据导出）及图片资源",
+    "- 保留集团财经 4 个页面",
+    "文档：",
+    "- 新增 CLAUDE.md 项目说明"
+  ],
   "5bc9318": [
     "- L2-01-02 集团合并利润汇总表：步骤名 源→数据源、ZRFI_CP011→立方体（与其他表统一）",
     "- L2-03-02 财务费用汇总表：SharePoint 中间步骤名下划线命名语义化",
@@ -277,7 +298,7 @@ const NOTES = {
 const totalAdd = DATA.reduce((s,d)=>s+d.add,0);
 const totalDel = DATA.reduce((s,d)=>s+d.del,0);
 const totalFiles = DATA.reduce((s,d)=>s+d.files,0);
-const days = "0.1";
+const days = "0.7";
 
 document.getElementById('kpis').innerHTML = `
   <div class="kpi"><div class="n">${DATA.length}</div><div class="l">提交数（main）</div></div>
