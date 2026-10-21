@@ -65,16 +65,6 @@
       "type": "RegisteredResources",
       "items": [
         {
-          "name": "__20330626306597444.png",
-          "path": "__20330626306597444.png",
-          "type": "Image"
-        },
-        {
-          "name": "back36933519542215154.png",
-          "path": "back36933519542215154.png",
-          "type": "Image"
-        },
-        {
           "name": "dba7299791721089146.json",
           "path": "dba7299791721089146.json",
           "type": "CustomTheme"

@@ -936,82 +936,8 @@
         "howCreated": "User"
       },
       {
-        "name": "7835d23ed449a5d752ce",
-        "ordinal": 5,
-        "field": {
-          "Column": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "L1-KFM日报"
-              }
-            },
-            "Property": "序号"
-          }
-        },
-        "type": "Categorical",
-        "filter": {
-          "Version": 2,
-          "From": [
-            {
-              "Name": "l",
-              "Entity": "L1-KFM日报",
-              "Type": 0
-            }
-          ],
-          "Where": [
-            {
-              "Condition": {
-                "Not": {
-                  "Expression": {
-                    "In": {
-                      "Expressions": [
-                        {
-                          "Column": {
-                            "Expression": {
-                              "SourceRef": {
-                                "Source": "l"
-                              }
-                            },
-                            "Property": "序号"
-                          }
-                        }
-                      ],
-                      "Values": [
-                        [
-                          {
-                            "Literal": {
-                              "Value": "2D"
-                            }
-                          }
-                        ]
-                      ]
-                    }
-                  }
-                }
-              }
-            }
-          ]
-        },
-        "howCreated": "User",
-        "objects": {
-          "general": [
-            {
-              "properties": {
-                "isInvertedSelectionMode": {
-                  "expr": {
-                    "Literal": {
-                      "Value": "true"
-                    }
-                  }
-                }
-              }
-            }
-          ]
-        }
-      },
-      {
         "name": "9ce7beb380451e3a92a8",
-        "ordinal": 6,
+        "ordinal": 5,
         "field": {
           "Column": {
             "Expression": {
@@ -1027,7 +953,7 @@
       },
       {
         "name": "53d7eded2f29da068e80",
-        "ordinal": 7,
+        "ordinal": 6,
         "field": {
           "Measure": {
             "Expression": {
@@ -1043,7 +969,7 @@
       },
       {
         "name": "fac8778b2c8eaf0d8bf0",
-        "ordinal": 8,
+        "ordinal": 7,
         "field": {
           "Measure": {
             "Expression": {
@@ -1059,7 +985,7 @@
       },
       {
         "name": "5f7ea1c60510b0c5d08b",
-        "ordinal": 9,
+        "ordinal": 8,
         "field": {
           "Measure": {
             "Expression": {
@@ -1075,7 +1001,7 @@
       },
       {
         "name": "e7469819cad74ab25699",
-        "ordinal": 10,
+        "ordinal": 9,
         "field": {
           "Measure": {
             "Expression": {
@@ -1091,7 +1017,7 @@
       },
       {
         "name": "6fd02b7a9b65b5350a5e",
-        "ordinal": 11,
+        "ordinal": 10,
         "field": {
           "Measure": {
             "Expression": {

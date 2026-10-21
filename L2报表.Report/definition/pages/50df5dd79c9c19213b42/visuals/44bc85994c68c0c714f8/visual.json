@@ -23,11 +23,11 @@
                       "Entity": "L2-01-02 集团合并利润汇总表"
                     }
                   },
-                  "Property": "结构.结构"
+                  "Property": "结构"
                 }
               },
-              "queryRef": "L2-01-02 集团合并利润汇总表.结构.结构",
-              "nativeQueryRef": "结构.结构",
+              "queryRef": "L2-01-02 集团合并利润汇总表.结构",
+              "nativeQueryRef": "结构",
               "active": true
             }
           ]
@@ -36,98 +36,73 @@
           "projections": [
             {
               "field": {
-                "Aggregation": {
+                "Measure": {
                   "Expression": {
-                    "Column": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "L2-01-02 集团合并利润汇总表"
-                        }
-                      },
-                      "Property": "当月YTD"
+                    "SourceRef": {
+                      "Entity": "度量值"
                     }
                   },
-                  "Function": 0
+                  "Property": "当月YTD"
                 }
               },
-              "queryRef": "Sum(L2-01-02 集团合并利润汇总表.当月YTD)",
-              "nativeQueryRef": "当月YTD 的总和"
+              "queryRef": "度量值.当月YTD",
+              "nativeQueryRef": "当月YTD"
             },
             {
               "field": {
-                "Aggregation": {
+                "Measure": {
                   "Expression": {
-                    "Column": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "L2-01-02 集团合并利润汇总表"
-                        }
-                      },
-                      "Property": "同比YTD"
+                    "SourceRef": {
+                      "Entity": "度量值"
                     }
                   },
-                  "Function": 0
+                  "Property": "同比YTD"
                 }
               },
-              "queryRef": "Sum(L2-01-02 集团合并利润汇总表.同比YTD)",
-              "nativeQueryRef": "同比YTD 的总和"
+              "queryRef": "度量值.同比YTD",
+              "nativeQueryRef": "同比YTD"
             },
             {
               "field": {
-                "Aggregation": {
+                "Measure": {
                   "Expression": {
-                    "Column": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "L2-01-02 集团合并利润汇总表"
-                        }
-                      },
-                      "Property": "预算YTD"
+                    "SourceRef": {
+                      "Entity": "度量值"
                     }
                   },
-                  "Function": 0
+                  "Property": "预算YTD"
                 }
               },
-              "queryRef": "Sum(L2-01-02 集团合并利润汇总表.预算YTD)",
-              "nativeQueryRef": "预算YTD 的总和"
+              "queryRef": "度量值.预算YTD",
+              "nativeQueryRef": "预算YTD"
             },
             {
               "field": {
-                "Aggregation": {
+                "Measure": {
                   "Expression": {
-                    "Column": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "L2-01-02 集团合并利润汇总表"
-                        }
-                      },
-                      "Property": "预算达成率"
+                    "SourceRef": {
+                      "Entity": "度量值"
                     }
                   },
-                  "Function": 0
+                  "Property": "预算达成率"
                 }
               },
-              "queryRef": "Sum(L2-01-02 集团合并利润汇总表.预算达成率)",
-              "nativeQueryRef": "预算达成率 的总和"
+              "queryRef": "度量值.预算达成率",
+              "nativeQueryRef": "预算达成率"
             },
             {
               "field": {
-                "Aggregation": {
+                "Measure": {
                   "Expression": {
-                    "Column": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "L2-01-02 集团合并利润汇总表"
-                        }
-                      },
-                      "Property": "环比MTD"
+                    "SourceRef": {
+                      "Entity": "度量值"
                     }
                   },
-                  "Function": 0
+                  "Property": "环比MTD"
                 }
               },
-              "queryRef": "Sum(L2-01-02 集团合并利润汇总表.环比MTD)",
-              "nativeQueryRef": "环比MTD 的总和"
+              "queryRef": "度量值.环比MTD",
+              "nativeQueryRef": "环比MTD"
             }
           ]
         }

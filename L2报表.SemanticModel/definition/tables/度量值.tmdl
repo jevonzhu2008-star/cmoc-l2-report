@@ -11,523 +11,233 @@ table 度量值
 		displayFolder: 00辅助
 		lineageTag: e7a3b12a-83a8-4420-b280-443476456db1
 
-	/// 月计划：当月计划值（预测数求和）
-	measure 月计划 = SUM('KFM选冶厂月报'[预测数])
-		displayFolder: 02月报
-		lineageTag: 9574da2d-1ff7-44e7-a7e0-cccdc3fc916d
+	/// 当月YTD：实际归母净利 YTD 累计（求和）
+	measure 当月YTD = SUM('L2-01-02 集团合并利润汇总表'[当月YTD])
+		formatString: #,0
+		displayFolder: L2-01-02 集团合并利润汇总表
+		lineageTag: 1cbef3dd-9b3f-435a-8289-8e0727b70953
 
-		formatStringDefinition = FormatAmount()
+	/// 去年同期YTD：上一年同期 YTD 实际（求和）
+	measure 去年同期YTD = SUM('L2-01-02 集团合并利润汇总表'[去年同期YTD])
+		formatString: #,0
+		displayFolder: L2-01-02 集团合并利润汇总表
+		lineageTag: a027d72c-8a9b-4a49-b35c-7eefdb7d3199
 
-	/// 月完成：当月实际完成值（实际数求和）
-	measure 月完成 = SUM('KFM选冶厂月报'[实际数])
-		displayFolder: 02月报
-		lineageTag: fc665243-de9e-44cf-b181-787dafd11401
+	/// 预算YTD：YTD 预算（求和）
+	measure 预算YTD = SUM('L2-01-02 集团合并利润汇总表'[预算YTD])
+		formatString: #,0
+		displayFolder: L2-01-02 集团合并利润汇总表
+		lineageTag: 5d7a5fe6-a499-4bf6-b542-21b328e441d5
 
-		formatStringDefinition = FormatAmount()
+	/// 当月MTD：所选月份当月实际（求和）
+	measure 当月MTD = SUM('L2-01-02 集团合并利润汇总表'[当月MTD])
+		formatString: #,0
+		displayFolder: L2-01-02 集团合并利润汇总表
+		lineageTag: 0c9655c7-95b3-4e79-aeb3-3f0ac5b5435d
 
-	/// 月比计划：当月完成率 = 月完成 ÷ 月计划（比率口径）
-	measure 月比计划 = DIVIDE ( [月完成], [月计划] )
-		formatString: 0.00%;-0.00%;0.00%
-		displayFolder: 02月报
-		lineageTag: 4aed6c08-0b00-428f-b3cd-ba9f26db2ecd
+	/// 上月MTD：所选月份上一个月实际（求和）
+	measure 上月MTD = SUM('L2-01-02 集团合并利润汇总表'[上月MTD])
+		formatString: #,0
+		displayFolder: L2-01-02 集团合并利润汇总表
+		lineageTag: d38a293a-f67e-467d-a90b-f1ae93af92ca
 
-	/// 月计划累计：年初至今计划累计值（累计预测数求和）
-	measure 月计划累计 = SUM('KFM选冶厂月报'[累计预测数])
-		displayFolder: 02月报
-		lineageTag: 6f628e6c-6fff-4107-86a4-f4559811f6cd
+	/// 实际值：1-12 月分月实际值（求和）
+	measure 实际值 = SUM('L2-01-02 集团合并利润汇总表'[实际值])
+		formatString: #,0
+		displayFolder: L2-01-02 集团合并利润汇总表
+		lineageTag: 7713e5cb-7ef8-4a1e-9c02-103d98de1f32
 
-		formatStringDefinition = FormatAmount()
+	/// 同比YTD：YTD 同比变化（百分比，取单值）
+	measure 同比YTD = MAX('L2-01-02 集团合并利润汇总表'[同比YTD])
+		formatString: 0.00%
+		displayFolder: L2-01-02 集团合并利润汇总表
+		lineageTag: e3c8e2a2-af68-4765-8762-68f989a8358e
 
-	/// 年累计完成：年初至今实际完成累计值（累计实际数求和）
-	measure 年累计完成 = SUM('KFM选冶厂月报'[累计实际数])
-		displayFolder: 02月报
-		lineageTag: 9d700dd8-e4b0-4c57-ade7-61e2320d01fd
+	/// 预算达成率：YTD 预算达成率（百分比，取单值）
+	measure 预算达成率 = MAX('L2-01-02 集团合并利润汇总表'[预算达成率])
+		formatString: 0.00%
+		displayFolder: L2-01-02 集团合并利润汇总表
+		lineageTag: 26ab2870-27e9-402e-b6db-2e3872777872
 
-		formatStringDefinition = FormatAmount()
+	/// 环比MTD：当月 MTD 环比上月 MTD（百分比，取单值）
+	measure 环比MTD = MAX('L2-01-02 集团合并利润汇总表'[环比MTD])
+		formatString: 0.00%
+		displayFolder: L2-01-02 集团合并利润汇总表
+		lineageTag: 477af208-18aa-46b7-829c-7c26486843a6
 
-	/// 年比计划：年累计完成率 = 年累计完成 ÷ 月计划累计
-	measure 年比计划 = DIVIDE ( [年累计完成], [月计划累计] )
-		formatString: 0.00%;-0.00%;0.00%
-		displayFolder: 02月报
-		lineageTag: 3a615cd9-4013-4269-b999-3c8186c5b5fd
+	/// 年净值-成本（求和）
+	measure 年净值-成本 = SUM('L2-01-03 快报-金融投资业务专属'[年净值-成本])
+		formatString: #,0
+		displayFolder: L2-01-03 快报-金融投资业务专属
+		lineageTag: bdbf7cce-277a-4bb3-942d-9078ebe86db1
 
-	/// 同期年累计完成：去年同期（去年同月时点）累计完成
-	measure 同期年累计完成 = SameMonthPriorYear([年累计完成])
-		displayFolder: 02月报
-		lineageTag: 767269f6-7d34-4e30-988f-00f03d46e4a7
+	/// 年净值-公允价值变动（求和）
+	measure 年净值-公允价值变动 = SUM('L2-01-03 快报-金融投资业务专属'[年净值-公允价值变动])
+		formatString: #,0
+		displayFolder: L2-01-03 快报-金融投资业务专属
+		lineageTag: f9a16848-e965-4b4d-bc20-80965d8965bc
 
-		formatStringDefinition = FormatAmount()
+	/// 年净值-合计（求和）
+	measure 年净值-合计 = SUM('L2-01-03 快报-金融投资业务专属'[年净值-合计])
+		formatString: #,0
+		displayFolder: L2-01-03 快报-金融投资业务专属
+		lineageTag: 86b47614-5e37-42e8-b728-6862b0bc7204
 
-	/// 年计划：全年计划/预算值（全年预算数求和）
-	measure 年计划 = SUM('KFM选冶厂月报'[全年预算数])
-		displayFolder: 02月报
-		lineageTag: 38cd5c00-3ece-4b80-90cc-39620cdaf36a
+	/// 本年-新增投资（求和）
+	measure 本年-新增投资 = SUM('L2-01-03 快报-金融投资业务专属'[本年-新增投资])
+		formatString: #,0
+		displayFolder: L2-01-03 快报-金融投资业务专属
+		lineageTag: ac2b77aa-a25f-4df9-abf1-efa08ddb003c
 
-		formatStringDefinition = FormatAmount()
+	/// 本年利润-累计公允价值变动（求和）
+	measure 本年利润-累计公允价值变动 = SUM('L2-01-03 快报-金融投资业务专属'[本年利润-累计公允价值变动])
+		formatString: #,0
+		displayFolder: L2-01-03 快报-金融投资业务专属
+		lineageTag: af671ee9-dca8-4b81-82f8-0f565dc05f88
 
-	/// 年累计完成比计划：全年达成率 = 年累计完成 ÷ 年计划
-	measure 年累计完成比计划 = DIVIDE ( [年累计完成], [年计划] )
-		formatString: 0.00%;-0.00%;0.00%
-		displayFolder: 02月报
-		lineageTag: c405995a-f7b8-49e5-abcc-4940f06860bc
+	/// 本年利润-累计投资收益（求和）
+	measure 本年利润-累计投资收益 = SUM('L2-01-03 快报-金融投资业务专属'[本年利润-累计投资收益])
+		formatString: #,0
+		displayFolder: L2-01-03 快报-金融投资业务专属
+		lineageTag: c5434ddc-608d-4a6e-bf8a-94c0f11eb010
 
-	/// 标题-月报：动态生成月报头部标题（报表名 + 统计年月 + 年度时间进度）
-	measure 标题-月报 =
-			// ------------------------------------------------------------
-			// 标题 —— 动态生成月报头部标题
-			// 输出示例：KFM月度生产指标完成情况（2026年8月）年时间进度66.67%
-			// 实现：读取筛选上下文内的最大日期，拼接「报表名 + 统计年月 + 年度时间进度」
-			// ------------------------------------------------------------
-			VAR MaxReportDate =
-			    // 筛选上下文内的报表最大日期
-			    MAX('KFM选冶厂月报'[日期])
-			VAR ReportYearMonthText =
-			    // 统计年月文本，如 2026年8月
-			    FORMAT(MaxReportDate, "yyyy年M月")
-			VAR MaxMonthNum =
-			    // 最大日期对应的月份序号（1-12）
-			    MONTH(MaxReportDate)
-			VAR YearProgressDecimal =
-			    // 年度时间进度小数 = 月份 ÷ 12
-			    DIVIDE(MaxMonthNum, 12, BLANK())
-			VAR YearProgressText =
-			    // 进度百分比文本，如 66.67%
-			    FORMAT(YearProgressDecimal, "0.00%")
-			VAR TitlePrefix =
-			    // 标题前缀
-			    "KFM月度生产指标完成情况（"
-			VAR TitleSuffix =
-			    // 标题后缀
-			    "）年时间进度"
-			RETURN
-			    // 无日期数据时返回空，避免拼出错误标题
-			    IF(
-			        NOT ISBLANK(MaxReportDate),
-			        TitlePrefix & ReportYearMonthText & TitleSuffix & YearProgressText,
-			        BLANK()
-			    )
-		displayFolder: 00辅助
-		lineageTag: 2d7d98c3-f3c4-4c3f-bf40-b5153ee09089
+	/// 本年利润-累计所得税费用影响（求和）
+	measure 本年利润-累计所得税费用影响 = SUM('L2-01-03 快报-金融投资业务专属'[本年利润-累计所得税费用影响])
+		formatString: #,0
+		displayFolder: L2-01-03 快报-金融投资业务专属
+		lineageTag: 69e2d58c-9031-4e23-bd79-7806416b4530
 
-	/// 标题-月份：报表月份短文本表头（如「8月」）
-	measure 标题-月份 =
-			// ------------------------------------------------------------
-			// 标题-月份 —— 报表月份的短文本表头，如「8月」
-			// 用途：KFM 月报中「本月」列的分组标题
-			// ------------------------------------------------------------
-			VAR MaxReportDate =
-			    // 筛选上下文内的报表最大日期
-			    MAX('KFM选冶厂月报'[日期])
-			VAR ReportMonth =
-			    // 最大日期对应的月份序号
-			    MONTH(MaxReportDate)
-			RETURN
-			    IF(
-			        NOT ISBLANK(MaxReportDate),
-			        //「&」会把数字隐式转为文本，故结果为「8月」
-			        ReportMonth & "月",
-			        BLANK()
-			    )
-		displayFolder: 00辅助
-		lineageTag: f9fef871-800a-41ad-81bc-1dbd349b2cd9
+	/// 本年利润-退出成本（求和）
+	measure 本年利润-退出成本 = SUM('L2-01-03 快报-金融投资业务专属'[本年利润-退出成本])
+		formatString: #,0
+		displayFolder: L2-01-03 快报-金融投资业务专属
+		lineageTag: 5e555ef0-db98-45b8-a4f6-3e7a15786ab1
 
-	/// 标题-年累计：年累计表头（如「2026年累计」）
-	measure 标题-年累计 =
-			// ------------------------------------------------------------
-			// 标题-年累计 —— 年累计表头，如「2026年累计」
-			// 用途：KFM 月报中「年累计」列的分组标题
-			// ------------------------------------------------------------
-			VAR MaxReportDate =
-			    // 筛选上下文内的报表最大日期
-			    MAX('KFM选冶厂月报'[日期])
-			VAR ReportYear =
-			    // 最大日期对应的年份
-			    YEAR(MaxReportDate)
-			RETURN
-			    IF(
-			        NOT ISBLANK(MaxReportDate),
-			        ReportYear & "年累计",
-			        BLANK()
-			    )
-		displayFolder: 00辅助
-		lineageTag: 1baff191-cc54-4823-9cb5-309556a487fe
+	/// 本年利润-退出持有收益（求和）
+	measure 本年利润-退出持有收益 = SUM('L2-01-03 快报-金融投资业务专属'[本年利润-退出持有收益])
+		formatString: #,0
+		displayFolder: L2-01-03 快报-金融投资业务专属
+		lineageTag: 6859cd61-77ed-4871-b6fa-32362bd98a34
 
-	/// 标题-年全年：全年表头（如「2026年全年」）
-	measure 标题-年全年 =
-			// ------------------------------------------------------------
-			// 标题-年全年 —— 全年表头，如「2026年全年」
-			// 用途：KFM 月报中「全年计划/预算」列的分组标题
-			// ------------------------------------------------------------
-			VAR MaxReportDate =
-			    // 筛选上下文内的报表最大日期
-			    MAX('KFM选冶厂月报'[日期])
-			VAR ReportYear =
-			    // 最大日期对应的年份
-			    YEAR(MaxReportDate)
-			RETURN
-			    IF(
-			        NOT ISBLANK(MaxReportDate),
-			        ReportYear & "年全年",
-			        BLANK()
-			    )
-		displayFolder: 00辅助
-		lineageTag: 9851be14-e662-4a51-b980-90e1477f7348
+	/// 本年利润-累计公允价值变动(上月累计)（求和）
+	measure 本年利润-累计公允价值变动(上月累计) = SUM('L2-01-03 快报-金融投资业务专属'[本年利润-累计公允价值变动(上月累计)])
+		formatString: #,0
+		displayFolder: L2-01-03 快报-金融投资业务专属
+		lineageTag: 5ce90b64-143b-4631-bab8-8cf1c17601a2
 
-	/// 标题-同期年：去年同期年份表头（如「2025年」）
-	measure 标题-同期年 =
-			// ------------------------------------------------------------
-			// 标题-同期年 —— 去年同期年份表头，如「2025年」
-			// 用途：KFM 月报中「同期年累计」列的分组标题
-			// ------------------------------------------------------------
-			VAR MaxReportDate =
-			    // 筛选上下文内的报表最大日期
-			    MAX('KFM选冶厂月报'[日期])
-			VAR ReportYear =
-			    // 最大日期对应的年份
-			    YEAR(MaxReportDate)
-			RETURN
-			    IF(
-			        NOT ISBLANK(MaxReportDate),
-			        // 当前年份减 1 即为去年同期年份
-			        (ReportYear - 1) & "年",
-			        BLANK()
-			    )
-		displayFolder: 00辅助
-		lineageTag: 2edb1f3d-5ab9-4b52-915b-9691edcd9664
+	/// 本年利润-累计投资收益(上月累计)（求和）
+	measure 本年利润-累计投资收益(上月累计) = SUM('L2-01-03 快报-金融投资业务专属'[本年利润-累计投资收益(上月累计)])
+		formatString: #,0
+		displayFolder: L2-01-03 快报-金融投资业务专属
+		lineageTag: c834efee-c905-4127-a630-0320d0a1fa82
 
-	/// 日完成：当日实际完成值（当日实际数求和）
-	measure 日完成 = SUM('L1-KFM日报'[当日实际数])
-		displayFolder: 03日报
-		lineageTag: 56ceea6a-68ff-47c5-b883-f01003950497
+	/// 本年利润-累计所得税费用影响(上月累计)（求和）
+	measure 本年利润-累计所得税费用影响(上月累计) = SUM('L2-01-03 快报-金融投资业务专属'[本年利润-累计所得税费用影响(上月累计)])
+		formatString: #,0
+		displayFolder: L2-01-03 快报-金融投资业务专属
+		lineageTag: e588ed20-8128-4135-91f0-eea1f307d9a1
 
-		formatStringDefinition = FormatAmount()
+	/// 本年利润-当月数（求和）
+	measure 本年利润-当月数 = SUM('L2-01-03 快报-金融投资业务专属'[本年利润-当月数])
+		formatString: #,0
+		displayFolder: L2-01-03 快报-金融投资业务专属
+		lineageTag: 2572e682-94a1-47d7-8473-3b9abab8e863
 
-	/// 月累计：当月累计实际完成值（当月累计实际数求和）
-	measure 月累计 = SUM('L1-KFM日报'[当月累计实际数])
-		displayFolder: 03日报
-		lineageTag: 883aa15e-6a38-48b6-ae74-9e95cda00f40
+	/// 期末净值-成本（求和）
+	measure 期末净值-成本 = SUM('L2-01-03 快报-金融投资业务专属'[期末净值-成本])
+		formatString: #,0
+		displayFolder: L2-01-03 快报-金融投资业务专属
+		lineageTag: 7487e26f-64f7-41ba-bf2f-54dc5c77fa73
 
-		formatStringDefinition = FormatAmount()
+	/// 期末净值-公允价值变动（求和）
+	measure 期末净值-公允价值变动 = SUM('L2-01-03 快报-金融投资业务专属'[期末净值-公允价值变动])
+		formatString: #,0
+		displayFolder: L2-01-03 快报-金融投资业务专属
+		lineageTag: 71281729-894e-4762-84c8-ed62ef8f1b8a
 
-	/// 月计划L1：日报当月计划值（月计划求和）
-	measure 月计划L1 = SUM('L1-KFM日报'[月计划])
-		displayFolder: 03日报
-		lineageTag: 3042fb7d-44b9-4294-a4ec-abb88a9ccae6
+	/// 期末净值-合计（求和）
+	measure 期末净值-合计 = SUM('L2-01-03 快报-金融投资业务专属'[期末净值-合计])
+		formatString: #,0
+		displayFolder: L2-01-03 快报-金融投资业务专属
+		lineageTag: d72c5d7c-04b0-4852-a019-897e9c5d3142
 
-		formatStringDefinition = FormatAmount()
+	/// 当月汇率变动影响-币种（CNY)（求和）
+	measure 当月汇率变动影响-币种（CNY) = SUM('L2-01-03 快报-金融投资业务专属'[当月汇率变动影响-币种（CNY)])
+		formatString: #,0
+		displayFolder: L2-01-03 快报-金融投资业务专属
+		lineageTag: 8462465d-2672-45ca-8765-2bfeb5a6998e
 
-	/// 月比计划L1：日报当月完成率——% 单位返回差额（百分点差），数量单位返回比率
-	measure 月比计划L1 = ```
-			
-			 // 比率单位（%）→ 差额（百分点差）；数量单位 → 比率
-			 IF(
-			    SELECTEDVALUE('L1-KFM日报'[单位]) = "%" ,
-			    [月累计] - [月计划L1] ,
-			    DIVIDE([月累计],[月计划L1])
-			 )
-			```
-		displayFolder: 03日报
-		lineageTag: 92bf0f52-a549-4cdb-a15a-b6b5ce619bf6
+	/// 累计实际：YTD 累计实际金额（求和）
+	measure 累计实际 = SUM('L2-03-01 销售管理费用预算执行汇总表'[累计实际])
+		formatString: #,0
+		displayFolder: L2-03-01 销售管理费用预算执行汇总表
+		lineageTag: 780f0daa-b695-4240-ad7a-e3aba258ce48
 
-		formatStringDefinition = FormatRatio()
+	/// 累计实际(千人民币)：YTD 累计实际千元（求和）
+	measure 累计实际(千人民币) = SUM('L2-03-01 销售管理费用预算执行汇总表'[累计实际(千人民币)])
+		formatString: #,0
+		displayFolder: L2-03-01 销售管理费用预算执行汇总表
+		lineageTag: d8a9dbec-ffe4-45c6-b97a-85d82e6610f9
 
-	/// 标题-日报：动态生成日报头部标题（年月日+星期+月时间进度）
-	measure 标题-日报 =
-			
-			
-			VAR v_SelectedDate = SELECTEDVALUE('L1-KFM日报'[标准日期])
-			VAR v_FirstDayOfMonth = DATE(YEAR(v_SelectedDate), MONTH(v_SelectedDate), 1)
-			VAR v_LastDayOfMonth = EOMONTH(v_SelectedDate, 0)
-			VAR v_DaysPassed = DATEDIFF(v_FirstDayOfMonth, v_SelectedDate, DAY) + 1
-			VAR v_TotalDays = DATEDIFF(v_FirstDayOfMonth, v_LastDayOfMonth, DAY) + 1
-			VAR v_Progress = DIVIDE(v_DaysPassed, v_TotalDays)
-			VAR v_Progress2 = IF(NOT ISBLANK(v_SelectedDate), v_Progress, BLANK())
-			// 进度百分比文本，如 66.67%
-			VAR YearProgressText = FORMAT(v_Progress2, "0.00%")
-			VAR ReportYearMonthDayText =
-			    // 统计年月+日期+星期，示例：2026年8月05日 星期三
-			    FORMAT(v_SelectedDate, "yyyy年M月dd日 ") & FORMAT(v_SelectedDate, "aaaa")
-			
-			VAR TitlePrefix =
-			    // 标题前缀
-			    "KFM日度生产指标完成情况（"
-			VAR TitleSuffix =
-			    // 标题后缀
-			    "）月时间进度"
-			RETURN
-			    // 无日期数据时返回空，避免拼出错误标题
-			    IF(
-			        NOT ISBLANK(v_SelectedDate),
-			        TitlePrefix & ReportYearMonthDayText & TitleSuffix & YearProgressText,
-			        BLANK()
-			    )
-		displayFolder: 00辅助
-		lineageTag: dc30c013-90ab-409b-bc39-fdbc3568ba9d
+	/// 累计预算：YTD 累计预算金额（求和）
+	measure 累计预算 = SUM('L2-03-01 销售管理费用预算执行汇总表'[累计预算])
+		formatString: #,0
+		displayFolder: L2-03-01 销售管理费用预算执行汇总表
+		lineageTag: 2e0f7e24-a57a-4b77-878d-c1625bf1dd43
 
-	/// 年计划L1：日报全年预算值（全年预算数求和）
-	measure 年计划L1 = SUM('L1-KFM日报'[全年预算数])
-		displayFolder: 03日报
-		lineageTag: e42cd4f5-5fbe-426a-85cb-178d99dd60cf
+	/// 累计执行%：YTD 预算执行率（百分比，取单值）
+	measure 累计执行% = MAX('L2-03-01 销售管理费用预算执行汇总表'[累计执行%])
+		formatString: 0.00%
+		displayFolder: L2-03-01 销售管理费用预算执行汇总表
+		lineageTag: 8ce40fec-ae04-4341-8207-464e656cb996
 
-		formatStringDefinition = FormatAmount()
+	/// 指标值：财务费用分项金额（求和）
+	measure 指标值 = SUM('L2-03-02 财务费用汇总表'[指标值])
+		formatString: #,0
+		displayFolder: L2-03-02 财务费用汇总表
+		lineageTag: fb0f769c-a919-47cc-a43e-bb2e3aa98866
 
-	/// 年比计划L1：日报年累计完成率——% 单位返回差额（百分点差），数量单位返回比率
-	measure 年比计划L1 = ```
-			
-			 // 比率单位（%）→ 差额（百分点差）；数量单位 → 比率
-			 IF(
-			    SELECTEDVALUE('L1-KFM日报'[单位]) = "%" ,
-			    [年累计完成L1] - [年计划L1] ,
-			    DIVIDE([年累计完成L1],[年计划L1])
-			 )
-			```
-		displayFolder: 03日报
-		lineageTag: 7c4b1d22-9343-4f52-8f26-cbb150ca8d11
+	/// 硫磺-采购价(单价)：硫磺采购单价（单价，取单值）
+	measure 硫磺-采购价(单价) = MAX('L2-05-01 硫磺及硫酸价格分析月报'[硫磺-采购价(单价)])
+		formatString: #,0.00
+		displayFolder: L2-05-01 硫磺及硫酸价格分析月报
+		lineageTag: 321442b2-0168-4633-bce9-36ae2effbab6
 
-		formatStringDefinition = FormatRatio()
+	/// 硫磺-陆运费(单价)：硫磺陆路运费单价（单价，取单值）
+	measure 硫磺-陆运费(单价) = MAX('L2-05-01 硫磺及硫酸价格分析月报'[硫磺-陆运费(单价)])
+		formatString: #,0.00
+		displayFolder: L2-05-01 硫磺及硫酸价格分析月报
+		lineageTag: cf4a6880-db72-4248-92ef-6b0ce91b680e
 
-	/// 钴入矿品位（新口径）：累计入磨金属量[钴] ÷ 累计原矿处理量
-	measure 钴入矿品位_新口径 = ```
-			
-			VAR v_CobaltMetal =
-			    CALCULATE(
-			        SUM('L1-KFM日报'[当月累计实际数]), 
-			        'L1-KFM日报'[指标名称] = "入磨金属量", 
-			        'L1-KFM日报'[产品分类] = "全钴TCo"
-			    ) +
-			    CALCULATE(
-			        SUM('L1-KFM日报'[累计实际数]),       
-			        'L1-KFM日报'[指标名称] = "入磨金属量", 
-			        'L1-KFM日报'[产品分类] = "全钴TCo"
-			    )
-			VAR v_RawOreTonnage =
-			    CALCULATE(
-			        SUM('L1-KFM日报'[当月累计实际数]), 
-			        'L1-KFM日报'[指标名称] = "原矿处理量"
-			    ) +
-			    CALCULATE(
-			        SUM('L1-KFM日报'[累计实际数]),       
-			        'L1-KFM日报'[指标名称] = "原矿处理量"
-			    )
-			RETURN
-			    DIVIDE(v_CobaltMetal, v_RawOreTonnage)
-			
-			```
-		displayFolder: 01新口径
-		lineageTag: 3bfb8e2b-807a-48d9-8d3e-fe24332e795e
+	/// 硫磺-清关税费(单价)：硫磺清关税费单价（单价，取单值）
+	measure 硫磺-清关税费(单价) = MAX('L2-05-01 硫磺及硫酸价格分析月报'[硫磺-清关税费(单价)])
+		formatString: #,0.00
+		displayFolder: L2-05-01 硫磺及硫酸价格分析月报
+		lineageTag: 2f3ec81f-f88b-48ff-ad59-7d37df0bc553
 
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
+	/// 硫磺-DDP(单价)：硫磺 DDP 全成本单价（单价，取单值）
+	measure 硫磺-DDP(单价) = MAX('L2-05-01 硫磺及硫酸价格分析月报'[硫磺-DDP(单价)])
+		formatString: #,0.00
+		displayFolder: L2-05-01 硫磺及硫酸价格分析月报
+		lineageTag: a2003ce3-fd32-4e95-9977-2142f7a49b75
 
-	/// 铜入矿品位（新口径）：累计入磨金属量[铜] ÷ 累计原矿处理量
-	measure 铜入矿品位_新口径 = ```
-			
-			VAR v_CopperMetal =
-			    CALCULATE(
-			        SUM('L1-KFM日报'[当月累计实际数]), 
-			        'L1-KFM日报'[指标名称] = "入磨金属量", 
-			        'L1-KFM日报'[产品分类] = "全铜TCu"
-			    ) +
-			    CALCULATE(
-			        SUM('L1-KFM日报'[累计实际数]),       
-			        'L1-KFM日报'[指标名称] = "入磨金属量", 
-			        'L1-KFM日报'[产品分类] = "全铜TCu"
-			    )
-			VAR v_RawOreTonnage =
-			    CALCULATE(
-			        SUM('L1-KFM日报'[当月累计实际数]), 
-			        'L1-KFM日报'[指标名称] = "原矿处理量"
-			    ) +
-			    CALCULATE(
-			        SUM('L1-KFM日报'[累计实际数]),       
-			        'L1-KFM日报'[指标名称] = "原矿处理量"
-			    )
-			RETURN
-			    DIVIDE(v_CopperMetal, v_RawOreTonnage)
-			
-			```
-		displayFolder: 01新口径
-		lineageTag: 9c0d477a-04b5-4db2-aea1-d1d80b6ebbe0
+	/// 硫磺-采购量：硫磺采购数量（求和）
+	measure 硫磺-采购量 = SUM('L2-05-01 硫磺及硫酸价格分析月报'[硫磺-采购量])
+		formatString: #,0
+		displayFolder: L2-05-01 硫磺及硫酸价格分析月报
+		lineageTag: 70e4952a-e4f3-4414-bb80-03a3f0ce7c15
 
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
+	/// 硫酸-DDP(单价)：硫酸 DDP 全成本单价（单价，取单值）
+	measure 硫酸-DDP(单价) = MAX('L2-05-01 硫磺及硫酸价格分析月报'[硫酸-DDP(单价)])
+		formatString: #,0.00
+		displayFolder: L2-05-01 硫磺及硫酸价格分析月报
+		lineageTag: 4c3947d2-3924-4007-81e4-3f2752d2831f
 
-	/// 年累计完成（日报）：按「二级指标」路由口径——原矿钴/铜品位、铜/钴选冶回收率走内联计算，其他指标为空，兜底为当月累计 + 前期累计
-	measure 年累计完成L1 = ```
-			
-			VAR MonthAccActual = SUM('L1-KFM日报'[当月累计实际数])
-			VAR YearToPreMonthAccActual = SUM('L1-KFM日报'[累计实际数])
-			VAR Res =
-			    SWITCH(
-			        TRUE(),
-			        // 原矿钴品位TCo
-			        SELECTEDVALUE('L1-KFM日报'[二级指标]) = "原矿钴品位TCo",
-			        CALCULATE(
-			            VAR v_CobaltMetal =
-			                CALCULATE(SUM('L1-KFM日报'[当月累计实际数]), 'L1-KFM日报'[指标名称] = "入磨金属量", 'L1-KFM日报'[产品分类] = "全钴TCo") +
-			                CALCULATE(SUM('L1-KFM日报'[累计实际数]), 'L1-KFM日报'[指标名称] = "入磨金属量", 'L1-KFM日报'[产品分类] = "全钴TCo")
-			            VAR v_RawOreTonnage =
-			                CALCULATE(SUM('L1-KFM日报'[当月累计实际数]), 'L1-KFM日报'[指标名称] = "原矿处理量") +
-			                CALCULATE(SUM('L1-KFM日报'[累计实际数]), 'L1-KFM日报'[指标名称] = "原矿处理量")
-			            RETURN
-			                DIVIDE(v_CobaltMetal, v_RawOreTonnage)*100,
-			            ALLEXCEPT('L1-KFM日报','L1-KFM日报'[日期筛选器])
-			        ),
-			
-			        // 原矿铜品位TCu
-			        SELECTEDVALUE('L1-KFM日报'[二级指标]) = "原矿铜品位TCu",
-			        CALCULATE(
-			            VAR v_CopperMetal =
-			                CALCULATE(SUM('L1-KFM日报'[当月累计实际数]), 'L1-KFM日报'[指标名称] = "入磨金属量", 'L1-KFM日报'[产品分类] = "全铜TCu") +
-			                CALCULATE(SUM('L1-KFM日报'[累计实际数]), 'L1-KFM日报'[指标名称] = "入磨金属量", 'L1-KFM日报'[产品分类] = "全铜TCu")
-			            VAR v_RawOreTonnage =
-			                CALCULATE(SUM('L1-KFM日报'[当月累计实际数]), 'L1-KFM日报'[指标名称] = "原矿处理量") +
-			                CALCULATE(SUM('L1-KFM日报'[累计实际数]), 'L1-KFM日报'[指标名称] = "原矿处理量")
-			            RETURN
-			                DIVIDE(v_CopperMetal, v_RawOreTonnage)*100,
-			            ALLEXCEPT('L1-KFM日报','L1-KFM日报'[日期筛选器])
-			        ),
-			
-			        // 铜选冶综合回收率TCu
-			        SELECTEDVALUE('L1-KFM日报'[二级指标]) = "铜选冶综合回收率TCu",
-			        // CALCULATE(
-			        //     VAR v_OreCuMetal_MTD = CALCULATE(SUM('L1-KFM日报'[当月累计实际数]), 'L1-KFM日报'[指标名称]="矿产品产量(金属量)")
-			        //     VAR v_LeachRate_MTD = CALCULATE(SUM('L1-KFM日报'[当月累计实际数])/100, 'L1-KFM日报'[指标名称]="浸出率",'L1-KFM日报'[产品分类]="全铜TCu")
-			        //     VAR v_WashRate_MTD = CALCULATE(SUM('L1-KFM日报'[当月累计实际数])/100, 'L1-KFM日报'[指标名称]="CCD洗涤效率",'L1-KFM日报'[产品分类]="全铜TCu")
-			        //     VAR v_LeachRecMetal_MTD = v_OreCuMetal_MTD * v_LeachRate_MTD
-			        //     VAR v_WashRecMetal_MTD = v_OreCuMetal_MTD * v_WashRate_MTD
-			
-			        //     VAR v_OreCuMetal_YTD = CALCULATE(SUM('L1-KFM日报'[累计实际数]), 'L1-KFM日报'[指标名称]="矿产品产量(金属量)")
-			        //     VAR v_LeachRate_YTD = CALCULATE(SUM('L1-KFM日报'[累计实际数])/100, 'L1-KFM日报'[指标名称]="浸出率",'L1-KFM日报'[产品分类]="全铜TCu")
-			        //     VAR v_WashRate_YTD = CALCULATE(SUM('L1-KFM日报'[累计实际数])/100, 'L1-KFM日报'[指标名称]="CCD洗涤效率",'L1-KFM日报'[产品分类]="全铜TCu")
-			        //     VAR v_LeachRecMetal_YTD = v_OreCuMetal_YTD * v_LeachRate_YTD
-			        //     VAR v_WashRecMetal_YTD = v_OreCuMetal_YTD * v_WashRate_YTD
-			
-			        //     VAR v_TotalOreCuMetal = v_OreCuMetal_MTD + v_OreCuMetal_YTD
-			        //     VAR v_TotalLeachRecMetal = v_LeachRecMetal_MTD + v_LeachRecMetal_YTD
-			        //     VAR v_TotalWashRecMetal = v_WashRecMetal_MTD + v_WashRecMetal_YTD
-			
-			        //     VAR v_LeachRate_Weighted = DIVIDE(v_TotalLeachRecMetal, v_TotalOreCuMetal)
-			        //     VAR v_WashRate_Weighted = DIVIDE(v_TotalWashRecMetal, v_TotalOreCuMetal)
-			        //     VAR v_CuFinalRecovery = v_LeachRate_Weighted * v_WashRate_Weighted * 0.995 * 100
-			
-			        //     RETURN
-			        //         IF(NOT ISBLANK(v_TotalOreCuMetal) && v_TotalOreCuMetal > 0, v_CuFinalRecovery, BLANK()),
-			        //     ALLEXCEPT('L1-KFM日报','L1-KFM日报'[日期筛选器])
-			        // ),
-			            BLANK(),
-			
-			        // 钴选冶综合回收率TCo
-			        SELECTEDVALUE('L1-KFM日报'[二级指标]) = "钴选冶综合回收率TCo",
-			        // CALCULATE(
-			        //     VAR v_OreCoMetal_MTD = CALCULATE(SUM('L1-KFM日报'[当月累计实际数]), 'L1-KFM日报'[指标名称]="矿产品产量(金属量)")
-			        //     VAR v_LeachRate_MTD = CALCULATE(SUM('L1-KFM日报'[当月累计实际数])/100, 'L1-KFM日报'[指标名称]="浸出率",'L1-KFM日报'[产品分类]="全钴TCo")
-			        //     VAR v_WashRate_MTD = CALCULATE(SUM('L1-KFM日报'[当月累计实际数])/100, 'L1-KFM日报'[指标名称]="CCD洗涤效率",'L1-KFM日报'[产品分类]="全钴TCo")
-			        //     VAR v_LeachRecMetal_MTD = v_OreCoMetal_MTD * v_LeachRate_MTD
-			        //     VAR v_WashRecMetal_MTD = v_OreCoMetal_MTD * v_WashRate_MTD
-			
-			        //     VAR v_OreCoMetal_YTD = CALCULATE(SUM('L1-KFM日报'[累计实际数]), 'L1-KFM日报'[指标名称]="矿产品产量(金属量)")
-			        //     VAR v_LeachRate_YTD = CALCULATE(SUM('L1-KFM日报'[累计实际数])/100, 'L1-KFM日报'[指标名称]="浸出率",'L1-KFM日报'[产品分类]="全钴TCo")
-			        //     VAR v_WashRate_YTD = CALCULATE(SUM('L1-KFM日报'[累计实际数])/100, 'L1-KFM日报'[指标名称]="CCD洗涤效率",'L1-KFM日报'[产品分类]="全钴TCo")
-			        //     VAR v_LeachRecMetal_YTD = v_OreCoMetal_YTD * v_LeachRate_YTD
-			        //     VAR v_WashRecMetal_YTD = v_OreCoMetal_YTD * v_WashRate_YTD
-			
-			        //     VAR v_TotalOreCoMetal = v_OreCoMetal_MTD + v_OreCoMetal_YTD
-			        //     VAR v_TotalLeachRecMetal = v_LeachRecMetal_MTD + v_LeachRecMetal_YTD
-			        //     VAR v_TotalWashRecMetal = v_WashRecMetal_MTD + v_WashRecMetal_YTD
-			
-			        //     VAR v_LeachRate_Weighted = DIVIDE(v_TotalLeachRecMetal, v_TotalOreCoMetal)
-			        //     VAR v_WashRate_Weighted = DIVIDE(v_TotalWashRecMetal, v_TotalOreCoMetal)
-			        //     VAR v_CoFinalRecovery = v_LeachRate_Weighted * v_WashRate_Weighted * 0.98 * 100
-			
-			        //     RETURN
-			        //         IF(NOT ISBLANK(v_TotalOreCoMetal) && v_TotalOreCoMetal > 0, v_CoFinalRecovery, BLANK()),
-			        //     ALLEXCEPT('L1-KFM日报','L1-KFM日报'[日期筛选器])
-			        // ),
-			            BLANK(),
-			            
-			        SELECTEDVALUE('L1-KFM日报'[总类别]) = "其他指标" ,
-			        BLANK(),
-			
-			        // 兜底：其余二级指标
-			        MonthAccActual + YearToPreMonthAccActual
-			    )
-			RETURN
-			    Res
-			```
-		displayFolder: 03日报
-		lineageTag: 1720b4a2-48a1-4943-a9cc-a2cc31ebf037
-
-		formatStringDefinition = FormatAmount()
-
-	/// 铜选冶综合回收率（新口径）：加权浸出率 × 加权洗涤效率 × 0.995
-	measure 铜回收率_新口径 = ```
-			
-			-- ========== MTD 当月累计 ==========
-			VAR v_OreCuMetal_MTD = CALCULATE(SUM('L1-KFM日报'[当月累计实际数]), 'L1-KFM日报'[指标名称]="矿产品产量(金属量)")
-			VAR v_LeachRate_MTD = CALCULATE(SUM('L1-KFM日报'[当月累计实际数])/100, 'L1-KFM日报'[指标名称]="浸出率",'L1-KFM日报'[产品分类]="全铜TCu")
-			VAR v_WashRate_MTD = CALCULATE(SUM('L1-KFM日报'[当月累计实际数])/100, 'L1-KFM日报'[指标名称]="CCD洗涤效率",'L1-KFM日报'[产品分类]="全铜TCu")
-			-- MTD：反推回收金属分子
-			VAR v_LeachRecMetal_MTD = v_OreCuMetal_MTD * v_LeachRate_MTD
-			VAR v_WashRecMetal_MTD = v_OreCuMetal_MTD * v_WashRate_MTD
-			-- ========== YTD 年度累计 ==========
-			VAR v_OreCuMetal_YTD = CALCULATE(SUM('L1-KFM日报'[累计实际数]), 'L1-KFM日报'[指标名称]="矿产品产量(金属量)")
-			VAR v_LeachRate_YTD = CALCULATE(SUM('L1-KFM日报'[累计实际数])/100, 'L1-KFM日报'[指标名称]="浸出率",'L1-KFM日报'[产品分类]="全铜TCu")
-			VAR v_WashRate_YTD = CALCULATE(SUM('L1-KFM日报'[累计实际数])/100, 'L1-KFM日报'[指标名称]="CCD洗涤效率",'L1-KFM日报'[产品分类]="全铜TCu")
-			-- YTD：反推回收金属分子
-			VAR v_LeachRecMetal_YTD = v_OreCuMetal_YTD * v_LeachRate_YTD
-			VAR v_WashRecMetal_YTD = v_OreCuMetal_YTD * v_WashRate_YTD
-			-- ========== 合并：分子相加，分母相加 ==========
-			VAR v_TotalOreCuMetal = v_OreCuMetal_MTD + v_OreCuMetal_YTD
-			VAR v_TotalLeachRecMetal = v_LeachRecMetal_MTD + v_LeachRecMetal_YTD
-			VAR v_TotalWashRecMetal = v_WashRecMetal_MTD + v_WashRecMetal_YTD
-			-- 加权浸出率 & 加权洗涤效率
-			VAR v_LeachRate_Weighted = DIVIDE(v_TotalLeachRecMetal, v_TotalOreCuMetal)
-			VAR v_WashRate_Weighted = DIVIDE(v_TotalWashRecMetal, v_TotalOreCuMetal)
-			-- 铜最终回收率，系数0.995
-			VAR v_CuFinalRecovery = v_LeachRate_Weighted * v_WashRate_Weighted * 0.995
-			RETURN
-			    IF(NOT ISBLANK(v_TotalOreCuMetal) && v_TotalOreCuMetal > 0, v_CuFinalRecovery, BLANK())
-			
-			```
-		displayFolder: 01新口径
-		lineageTag: e677d72d-d811-4e68-a608-e9dc4891a350
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// 钴选冶综合回收率（新口径）：加权浸出率 × 加权洗涤效率 × 0.98
-	measure 钴回收率_新口径 = ```
-			
-			-- ========== MTD 当月累计 ==========
-			VAR v_OreCoMetal_MTD = CALCULATE(SUM('L1-KFM日报'[当月累计实际数]), 'L1-KFM日报'[指标名称]="矿产品产量(金属量)")
-			VAR v_LeachRate_MTD = CALCULATE(SUM('L1-KFM日报'[当月累计实际数])/100, 'L1-KFM日报'[指标名称]="浸出率",'L1-KFM日报'[产品分类]="全钴TCo")
-			VAR v_WashRate_MTD = CALCULATE(SUM('L1-KFM日报'[当月累计实际数])/100, 'L1-KFM日报'[指标名称]="CCD洗涤效率",'L1-KFM日报'[产品分类]="全钴TCo")
-			-- MTD：反推回收金属分子
-			VAR v_LeachRecMetal_MTD = v_OreCoMetal_MTD * v_LeachRate_MTD
-			VAR v_WashRecMetal_MTD = v_OreCoMetal_MTD * v_WashRate_MTD
-			-- ========== YTD 年度累计 ==========
-			VAR v_OreCoMetal_YTD = CALCULATE(SUM('L1-KFM日报'[累计实际数]), 'L1-KFM日报'[指标名称]="矿产品产量(金属量)")
-			VAR v_LeachRate_YTD = CALCULATE(SUM('L1-KFM日报'[累计实际数])/100, 'L1-KFM日报'[指标名称]="浸出率",'L1-KFM日报'[产品分类]="全钴TCo")
-			VAR v_WashRate_YTD = CALCULATE(SUM('L1-KFM日报'[累计实际数])/100, 'L1-KFM日报'[指标名称]="CCD洗涤效率",'L1-KFM日报'[产品分类]="全钴TCo")
-			-- YTD：反推回收金属分子
-			VAR v_LeachRecMetal_YTD = v_OreCoMetal_YTD * v_LeachRate_YTD
-			VAR v_WashRecMetal_YTD = v_OreCoMetal_YTD * v_WashRate_YTD
-			-- ========== 合并：分子相加，分母相加 ==========
-			VAR v_TotalOreCoMetal = v_OreCoMetal_MTD + v_OreCoMetal_YTD
-			VAR v_TotalLeachRecMetal = v_LeachRecMetal_MTD + v_LeachRecMetal_YTD
-			VAR v_TotalWashRecMetal = v_WashRecMetal_MTD + v_WashRecMetal_YTD
-			-- 加权浸出率 & 加权洗涤效率
-			VAR v_LeachRate_Weighted = DIVIDE(v_TotalLeachRecMetal, v_TotalOreCoMetal)
-			VAR v_WashRate_Weighted = DIVIDE(v_TotalWashRecMetal, v_TotalOreCoMetal)
-			-- 钴最终回收率，系数0.98
-			VAR v_CoFinalRecovery = v_LeachRate_Weighted * v_WashRate_Weighted * 0.98
-			RETURN
-			    IF(NOT ISBLANK(v_TotalOreCoMetal) && v_TotalOreCoMetal > 0, v_CoFinalRecovery, BLANK())
-			
-			
-			```
-		displayFolder: 01新口径
-		lineageTag: 366b99f8-b369-44d7-a931-e6464758384c
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
+	/// 硫酸-采购量：硫酸采购数量（求和）
+	measure 硫酸-采购量 = SUM('L2-05-01 硫磺及硫酸价格分析月报'[硫酸-采购量])
+		formatString: #,0
+		displayFolder: L2-05-01 硫磺及硫酸价格分析月报
+		lineageTag: f6fbc4fd-92b9-4407-90bf-3f246dfd8e60
 
 	partition 度量值 = m
 		mode: import

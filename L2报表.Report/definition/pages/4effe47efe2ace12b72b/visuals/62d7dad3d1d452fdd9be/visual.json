@@ -23,11 +23,11 @@
                       "Entity": "L2-03-02 财务费用汇总表"
                     }
                   },
-                  "Property": "结构.结构"
+                  "Property": "结构"
                 }
               },
-              "queryRef": "L2-03-02 财务费用汇总表.结构.结构",
-              "nativeQueryRef": "结构.结构",
+              "queryRef": "L2-03-02 财务费用汇总表.结构",
+              "nativeQueryRef": "结构",
               "active": true
             }
           ]
@@ -983,20 +983,6 @@
           }
         },
         "type": "Advanced"
-      },
-      {
-        "name": "29bdc4cfdd88a21f668a",
-        "field": {
-          "Column": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "L2-03-02 财务费用汇总表"
-              }
-            },
-            "Property": "结构.结构"
-          }
-        },
-        "type": "Categorical"
       },
       {
         "name": "b9b98a8723ab3afb6944",

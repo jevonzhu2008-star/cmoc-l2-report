@@ -23,6 +23,21 @@
                       "Entity": "L2-01-02 集团合并利润汇总表"
                     }
                   },
+                  "Property": "季度"
+                }
+              },
+              "queryRef": "L2-01-02 集团合并利润汇总表.季度",
+              "nativeQueryRef": "季度",
+              "active": true
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "L2-01-02 集团合并利润汇总表"
+                    }
+                  },
                   "Property": "月份"
                 }
               },
@@ -42,11 +57,11 @@
                       "Entity": "L2-01-02 集团合并利润汇总表"
                     }
                   },
-                  "Property": "结构.结构"
+                  "Property": "结构"
                 }
               },
-              "queryRef": "L2-01-02 集团合并利润汇总表.结构.结构",
-              "nativeQueryRef": "结构.结构",
+              "queryRef": "L2-01-02 集团合并利润汇总表.结构",
+              "nativeQueryRef": "结构",
               "active": true
             }
           ]
@@ -55,22 +70,17 @@
           "projections": [
             {
               "field": {
-                "Aggregation": {
+                "Measure": {
                   "Expression": {
-                    "Column": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "L2-01-02 集团合并利润汇总表"
-                        }
-                      },
-                      "Property": "实际值"
+                    "SourceRef": {
+                      "Entity": "度量值"
                     }
                   },
-                  "Function": 0
+                  "Property": "实际值"
                 }
               },
-              "queryRef": "Sum(L2-01-02 集团合并利润汇总表.实际值)",
-              "nativeQueryRef": "实际值 的总和"
+              "queryRef": "度量值.实际值",
+              "nativeQueryRef": "实际值"
             }
           ]
         }
@@ -962,39 +972,6 @@
           }
         },
         "type": "Advanced"
-      },
-      {
-        "name": "2689bfebe17e4d0f0b45",
-        "field": {
-          "Aggregation": {
-            "Expression": {
-              "Column": {
-                "Expression": {
-                  "SourceRef": {
-                    "Entity": "L2-01-02 集团合并利润汇总表"
-                  }
-                },
-                "Property": "实际值"
-              }
-            },
-            "Function": 0
-          }
-        },
-        "type": "Advanced"
-      },
-      {
-        "name": "05fc6d8080d5974315d8",
-        "field": {
-          "Column": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "L2-01-02 集团合并利润汇总表"
-              }
-            },
-            "Property": "结构.结构"
-          }
-        },
-        "type": "Categorical"
       }
     ],
     "filterSortOrder": "Custom"

@@ -1,120 +1,11 @@
 table 'L2-01-02 集团合并利润汇总表'
 	lineageTag: 3c5faa89-4ba7-465c-b07a-3af108aba99c
 
-	column 当月YTD
-		dataType: double
-		lineageTag: 941247d0-6e05-4ea2-8abf-fa49308ba82f
-		summarizeBy: sum
-		sourceColumn: 当月YTD
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	column 同比YTD
-		dataType: double
-		lineageTag: c96bb21f-4bef-4cea-b257-53a904ac9172
-		summarizeBy: sum
-		sourceColumn: 同比YTD
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	column 去年同期YTD
-		dataType: double
-		lineageTag: 8eb69d8c-052c-48c2-b14d-9c98701bfd93
-		summarizeBy: sum
-		sourceColumn: 去年同期YTD
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	column 预算YTD
-		dataType: double
-		lineageTag: 10c2acf3-5efe-4042-98be-65185d631a09
-		summarizeBy: sum
-		sourceColumn: 预算YTD
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	column 预算达成率
-		dataType: double
-		lineageTag: f4328fcc-c018-4af7-a990-85c6c59d7957
-		summarizeBy: sum
-		sourceColumn: 预算达成率
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	column 环比MTD
-		dataType: double
-		lineageTag: 3886f6c4-6917-496e-aa7d-2319aaf06d30
-		summarizeBy: sum
-		sourceColumn: 环比MTD
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	column 当月MTD
-		dataType: double
-		lineageTag: 692fcdd3-94c4-4de0-94a9-4087a8e290f7
-		summarizeBy: sum
-		sourceColumn: 当月MTD
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	column 上月MTD
-		dataType: double
-		lineageTag: 408442cb-0a71-4ac1-9ef3-65e75e396a3f
-		summarizeBy: sum
-		sourceColumn: 上月MTD
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
 	column 加载年月
 		dataType: string
 		lineageTag: a479603b-cf29-4603-b57b-fdec92cbeeac
 		summarizeBy: none
 		sourceColumn: 加载年月
-
-		annotation SummarizationSetBy = Automatic
-
-	column 月份
-		dataType: string
-		lineageTag: 6323971b-84d7-437d-b1b2-e7e1b711be16
-		summarizeBy: none
-		sourceColumn: 月份
-		sortByColumn: 月份排序
-
-		changedProperty = SortByColumn
-
-		annotation SummarizationSetBy = Automatic
-
-	column 实际值
-		dataType: double
-		lineageTag: 90e96769-bba2-41ab-9edc-62144e52d8e1
-		summarizeBy: sum
-		sourceColumn: 实际值
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	column '结构.结构'
-		dataType: string
-		lineageTag: ba130495-e0b3-4c3b-a23b-69a03fe7587f
-		summarizeBy: none
-		sourceColumn: 结构.结构
 
 		annotation SummarizationSetBy = Automatic
 
@@ -126,18 +17,145 @@ table 'L2-01-02 集团合并利润汇总表'
 
 		annotation SummarizationSetBy = Automatic
 
+	column 季度
+		dataType: string
+		lineageTag: b5c59b9f-3a72-429e-912c-aa204adcfd65
+		summarizeBy: none
+		sourceColumn: 季度
+
+		annotation SummarizationSetBy = Automatic
+
+	column 当月YTD
+		dataType: double
+		lineageTag: def87bfa-7341-4cc0-84ea-ff4b56ddf4d4
+		summarizeBy: sum
+		sourceColumn: 当月YTD
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 同比YTD
+		dataType: double
+		lineageTag: 3ef97267-103b-406e-8082-94e6c0558f52
+		summarizeBy: sum
+		sourceColumn: 同比YTD
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 去年同期YTD
+		dataType: double
+		lineageTag: b009c7b2-c87c-4549-b69c-27742f35400a
+		summarizeBy: sum
+		sourceColumn: 去年同期YTD
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 预算YTD
+		dataType: double
+		lineageTag: fc2f9816-d535-4cd9-a0d8-2385ac4fb818
+		summarizeBy: sum
+		sourceColumn: 预算YTD
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 预算达成率
+		dataType: double
+		lineageTag: 8821af94-eb8c-41e5-bfb2-65bbc2a934c8
+		summarizeBy: sum
+		sourceColumn: 预算达成率
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 环比MTD
+		dataType: double
+		lineageTag: 2fa4d5a4-1781-40f8-a77d-2f25b1a586b0
+		summarizeBy: sum
+		sourceColumn: 环比MTD
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 当月MTD
+		dataType: double
+		lineageTag: 1cf7f5c9-86fe-4266-b255-1b28125ff627
+		summarizeBy: sum
+		sourceColumn: 当月MTD
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 上月MTD
+		dataType: double
+		lineageTag: ad2465c2-ae1e-45a7-a607-030d0173db58
+		summarizeBy: sum
+		sourceColumn: 上月MTD
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 月份
+		dataType: string
+		lineageTag: 5ebc9707-57d6-4a21-be34-615e53bdfdd9
+		summarizeBy: none
+		sourceColumn: 月份
+
+		annotation SummarizationSetBy = Automatic
+
+	column 实际值
+		dataType: double
+		lineageTag: 2f02a163-b00c-48db-b7e6-438749742750
+		summarizeBy: sum
+		sourceColumn: 实际值
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
 	column 月份排序
 		dataType: int64
 		formatString: 0
-		lineageTag: 16e46ba7-6928-4365-81f3-357bc87dc9b0
+		lineageTag: 5acdf999-f565-4a65-a648-681dfd6f9d32
 		summarizeBy: sum
 		sourceColumn: 月份排序
 
 		annotation SummarizationSetBy = Automatic
 
+	column 结构
+		dataType: string
+		lineageTag: f2038fb0-f293-46f8-8497-1a8eaaaec0eb
+		summarizeBy: none
+		sourceColumn: 结构
+		sortByColumn: 结构排序
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column 结构排序
+		dataType: double
+		lineageTag: 3c6c65cf-49fa-419b-a6ea-05f52fef775f
+		summarizeBy: sum
+		sourceColumn: 结构排序
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
 	partition 'L2-01-02 集团合并利润汇总表' = m
 		mode: import
-		queryGroup: 财经\单月
+		queryGroup: 财经\多月
 		source =
 				let
 				    /*
@@ -145,78 +163,115 @@ table 'L2-01-02 集团合并利润汇总表'
 				    【对应报表】L2‑01‑02 集团合并利润汇总表
 				    【BW对象】Cube:ZRFI_CP011   Query:ZRFI_CP011_Q0001
 				    【说明】
-				        1、该BW Query启用Structure，行维度（利润表项目）由Query内置输出，不需要手动展开维度
-				        2、返回宽表结构：YTD累计指标 + 1‑12月分月度量列 + MTD当月/上月/环比指标
-				        3、参数[ZMSDQNY]：年月 YYYYMM格式，BW根据该参数自动返回截止该月的YTD数据
-				        4、EnableStructures=true 必须开启，否则内置Structure行维度无法解析
-				        5、动态年月：获取UTC时间转为东八区，自动取【上一个自然月】，生成YYYYMM文本传入BW
-				        6、新增【加载年月】字段，标记本次BW查询的期间，用于PowerBI建模关联筛选
-				        7、新增【月份排序】用于矩阵按正确顺序排序，解决PowerBI文本月份"10月排在2月前面"的排序问题
+				        1、循环取数：从参数 p_月报起始日期 开始，一直取到当年12月，逐月查询BW后合并成长表
+				        2、BW参数[ZMSDQNY]：YYYYMM格式年月，BW根据该参数自动返回截止该月的YTD数据
+				        3、维度：利润表项目（Structure内置）
+				        4、指标：YTD累计指标 + 1‑12月分月度量 + MTD当月/上月/环比指标
+				        5、连接参数统一：QAS服务器、系统编号、客户端ID，和项目其他BW查询保持一套参数规范
+				        6、EnableStructures=true 必须开启，否则内置Structure行维度无法解析
+				        7、末尾逆透视分月列、添加月份排序，统一长表结构，方便矩阵报表排序展示
+				        8、【季度】由【月份排序】1~12计算，代表该行分月所属季度
+				        9、新增：读取SharePoint指标映射表，左连接【结构】字段，带出【结构排序】
 				    */
+				    // ========== 读取SharePoint上的结构排序映射表 ==========
+				    源 = SharePoint.Files(财经SharePoint站点, [ApiVersion = 15]),
+				    指标映射文件 = Table.SelectRows(源, each Text.Contains([Name], "L2-01-02 集团合并利润汇总表指标映射") and [Extension] = ".xlsx"){0}[Content],
+				    结构排序映射表 = Excel.Workbook(指标映射文件, true){[Item = "结构排序", Kind = "Sheet"]}[Data],
 				    // 1、连接BW QAS环境
-				    数据源 = SapBusinessWarehouse.Cubes(QAS服务器, 系统编号, 客户端ID, [Implementation="2.0", LanguageCode="ZH", EnableStructures=true]),
-				    // 2、定位Cube与目标Query
+				    数据源 = SapBusinessWarehouse.Cubes(QAS服务器, 系统编号, 客户端ID, [Implementation="2.0", LanguageCode="ZH", EnableStructures=true, BatchSize=500000000]),
+				    // 2、定位Cube与目标BW查询
 				    立方体 = 数据源{[Name="ZRFI_CP011"]}[Data],
 				    基础查询 = 立方体{[Id="ZRFI_CP011/ZRFI_CP011_Q0001"]}[Data],
-				    // 动态年月：UTC转东八区，取上月日期（自动处理跨年，1月会变成上一年12月）
-				    当前东八时间 = DateTimeZone.SwitchZone(DateTimeZone.UtcNow(),8),
-				    上月日期 = Date.AddMonths(Date.From(当前东八时间),动态年月偏移),
-				    动态年月文本 = Text.From(Date.Year(上月日期)*100 + Date.Month(上月日期)),
-				    // 3、BW查询转换：传入期间参数，批量拉取度量值
-				    BW查询转换 = Cube.Transform(基础查询, {
-				        // 设置BW查询年月参数 ZMSDQNY，使用动态年月文本
-				        {Cube.ApplyParameter, "[ZMSDQNY]", {动态年月文本}},
-				        // ========== 新增：展开内置结构维度 利润表项目 ==========
-				        {Cube.AddAndExpandDimensionColumn, "[4VGQHR12MHZ3FU4L96KDFQ9OO]", {"[4VGQHR12MHZ3FU4L96KDFQ9OO]"}, {"结构.结构"}},
-				        // ========== YTD累计类指标（截止参数所选月份） ==========
-				        {Cube.AddMeasureColumn, "当月YTD", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4L96KDFR5AG]"},     // 实际归母净利 YTD
-				        {Cube.AddMeasureColumn, "同比YTD", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4L96KDFRO94]"},     // YTD同比变化%
-				        {Cube.AddMeasureColumn, "去年同期YTD", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4L96KDFRUKO]"},  // 上一年同期YTD实际
-				        {Cube.AddMeasureColumn, "预算YTD", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4L96KDFS0W8]"},     // YTD预算
-				        {Cube.AddMeasureColumn, "预算达成率", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4L96KDFS77S]"},   // YTD预算达成率
-				        // ========== 1‑12月分月度量列（BW预生成宽表列，用于报表Q1/Q2分月展示） ==========
-				        {Cube.AddMeasureColumn, "1月", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4L96KDFSDJC]"},
-				        {Cube.AddMeasureColumn, "2月", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4MVP8LMNFB7]"},
-				        {Cube.AddMeasureColumn, "3月", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4MVP8LMNLMR]"},
-				        {Cube.AddMeasureColumn, "4月", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4MVP8LMNRYB]"},
-				        {Cube.AddMeasureColumn, "5月", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4MVP8LMNY9V]"},
-				        {Cube.AddMeasureColumn, "6月", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4MVP8LMO4LF]"},
-				        {Cube.AddMeasureColumn, "7月", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4MVP8LMOAWZ]"},
-				        {Cube.AddMeasureColumn, "8月", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4MVP8LMOH8J]"},
-				        {Cube.AddMeasureColumn, "9月", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4MVP8LMONK3]"},
-				        {Cube.AddMeasureColumn, "10月", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4MVP8LMOTVN]"},
-				        {Cube.AddMeasureColumn, "11月", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4MVP8LMP077]"},
-				        {Cube.AddMeasureColumn, "12月", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4MVP8LMP6IR]"},
-				        // ========== MTD当月环比类指标 ==========
-				        {Cube.AddMeasureColumn, "环比MTD", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4MVP8LMPCUB]"},     // 当月MTD相对上月MTD环比%
-				        {Cube.AddMeasureColumn, "当月MTD", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4MVP8LMPJ5V]"},     // 参数所选月份当月实际
-				        {Cube.AddMeasureColumn, "上月MTD", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4MVP8LMPPHF]"}      // 参数所选月份的上一个月实际
-				    }),
-				    // 【可选】获取维度成员唯一ID MEMBER_UNIQUE_NAME（放在Cube.Transform之后）
-				    添加结构唯一ID = Table.AddColumn(BW查询转换, "结构唯一ID", each Cube.AttributeMemberProperty([结构.结构], "[MEMBER_UNIQUE_NAME]")),
-				    // 增加加载年月字段，标记本次取数对应的BW查询期间（YYYYMM文本），用于建模关联
-				    添加加载年月 = Table.AddColumn(添加结构唯一ID, "加载年月", each 动态年月文本),
-				    空值替换为0 = Table.ReplaceValue(添加加载年月, null, 0, Replacer.ReplaceValue, {"结构.结构","结构唯一ID","当月YTD", "同比YTD", "去年同期YTD", "预算YTD", "预算达成率", "1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月", "环比MTD", "当月MTD", "上月MTD", "加载年月"}),
-				    逆透视分月列 = Table.UnpivotOtherColumns(空值替换为0, {"结构.结构","结构唯一ID","环比MTD", "当月MTD", "上月MTD", "加载年月", "预算达成率", "预算YTD", "去年同期YTD", "同比YTD", "当月YTD"}, "月份", "实际值"),
-				    // ========= 新增：月份排序列 =========
-				    添加月份排序 = Table.AddColumn(逆透视分月列, "月份排序", each
-				        if [月份] = "1月" then 1
-				        else if [月份] = "2月" then 2
-				        else if [月份] = "3月" then 3
-				        else if [月份] = "4月" then 4
-				        else if [月份] = "5月" then 5
-				        else if [月份] = "6月" then 6
-				        else if [月份] = "7月" then 7
-				        else if [月份] = "8月" then 8
-				        else if [月份] = "9月" then 9
-				        else if [月份] = "10月" then 10
-				        else if [月份] = "11月" then 11
-				        else if [月份] = "12月" then 12
-				        else 999
-				    , Int64.Type),
-				  零替换为空值 = Table.ReplaceValue(添加月份排序, 0, null, Replacer.ReplaceValue, {"实际值"})
+				    // ========== 月份循环配置 ==========
+				    // 月报起始月份，取自PowerBI参数 p_月报起始日期
+				    起始月份 = p_月报起始日期,
+				    // 结束月份：当年12月1日
+				    结束月份 = p_月报终止日期,
+				    // 生成连续月份序列
+				    月份序列 = List.Generate(() => 起始月份, each _ <= 结束月份, each Date.AddMonths(_, 1)),
+				    // 转换为BW要求的 YYYYMM 文本格式
+				    月份文本列表 = List.Transform(月份序列, each Text.From(Date.Year(_) * 100 + Date.Month(_))),
+				    // 单月取数函数：输入年月文本，返回当月BW查询结果，并追加月份标记列
+				    查询单月 = (month as text) =>
+				        let
+				            Query = Cube.Transform(基础查询, {
+				                // BW期间参数，传入当前循环年月
+				                {Cube.ApplyParameter, "[ZMSDQNY]", {month}},
+				                // ========== 展开内置结构维度 利润表项目，输出列名：结构 ==========
+				                {Cube.AddAndExpandDimensionColumn, "[4VGQHR12MHZ3FU4L96KDFQ9OO]", {"[4VGQHR12MHZ3FU4L96KDFQ9OO]"}, {"结构"}},
+				                // ========== YTD累计类指标（截止参数所选月份） ==========
+				                {Cube.AddMeasureColumn, "当月YTD", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4L96KDFR5AG]"},     // 实际归母净利 YTD
+				                {Cube.AddMeasureColumn, "同比YTD", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4L96KDFRO94]"},     // YTD同比变化%
+				                {Cube.AddMeasureColumn, "去年同期YTD", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4L96KDFRUKO]"},  // 上一年同期YTD实际
+				                {Cube.AddMeasureColumn, "预算YTD", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4L96KDFS0W8]"},     // YTD预算
+				                {Cube.AddMeasureColumn, "预算达成率", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4L96KDFS77S]"},   // YTD预算达成率
+				                // ========== 1‑12月分月度量列（BW预生成宽表列，用于报表Q1/Q2分月展示） ==========
+				                {Cube.AddMeasureColumn, "1月", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4L96KDFSDJC]"},
+				                {Cube.AddMeasureColumn, "2月", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4MVP8LMNFB7]"},
+				                {Cube.AddMeasureColumn, "3月", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4MVP8LMNLMR]"},
+				                {Cube.AddMeasureColumn, "4月", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4MVP8LMNRYB]"},
+				                {Cube.AddMeasureColumn, "5月", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4MVP8LMNY9V]"},
+				                {Cube.AddMeasureColumn, "6月", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4MVP8LMO4LF]"},
+				                {Cube.AddMeasureColumn, "7月", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4MVP8LMOAWZ]"},
+				                {Cube.AddMeasureColumn, "8月", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4MVP8LMOH8J]"},
+				                {Cube.AddMeasureColumn, "9月", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4MVP8LMONK3]"},
+				                {Cube.AddMeasureColumn, "10月", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4MVP8LMOTVN]"},
+				                {Cube.AddMeasureColumn, "11月", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4MVP8LMP077]"},
+				                {Cube.AddMeasureColumn, "12月", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4MVP8LMP6IR]"},
+				                // ========== MTD当月环比类指标 ==========
+				                {Cube.AddMeasureColumn, "环比MTD", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4MVP8LMPCUB]"},     // 当月MTD相对上月MTD环比%
+				                {Cube.AddMeasureColumn, "当月MTD", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4MVP8LMPJ5V]"},     // 参数所选月份当月实际
+				                {Cube.AddMeasureColumn, "上月MTD", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4MVP8LMPPHF]"}      // 参数所选月份的上一个月实际
+				            }),
+				            // 【可选】获取维度成员唯一ID MEMBER_UNIQUE_NAME
+				            添加结构唯一ID = Table.AddColumn(Query, "结构唯一ID", each Cube.AttributeMemberProperty([结构], "[MEMBER_UNIQUE_NAME]")),
+				            // 增加加载年月字段（YYYYMM），标记本条数据对应的查询期间
+				            附加月份 = Table.AddColumn(添加结构唯一ID, "加载年月", each month),
+				            // 空值替换为0
+				            空值替换为0 = Table.ReplaceValue(附加月份, null, 0, Replacer.ReplaceValue, {"结构","结构唯一ID","当月YTD", "同比YTD", "去年同期YTD", "预算YTD", "预算达成率", "1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月", "环比MTD", "当月MTD", "上月MTD", "加载年月"}),
+				            // 逆透视分月列，1~12月转为行
+				            逆透视分月列 = Table.UnpivotOtherColumns(空值替换为0, {"结构","结构唯一ID","环比MTD", "当月MTD", "上月MTD", "加载年月", "预算达成率", "预算YTD", "去年同期YTD", "同比YTD", "当月YTD"}, "月份", "实际值"),
+				            // 月份排序
+				            添加月份排序 = Table.AddColumn(逆透视分月列, "月份排序", each
+				                if [月份] = "1月" then 1
+				                else if [月份] = "2月" then 2
+				                else if [月份] = "3月" then 3
+				                else if [月份] = "4月" then 4
+				                else if [月份] = "5月" then 5
+				                else if [月份] = "6月" then 6
+				                else if [月份] = "7月" then 7
+				                else if [月份] = "8月" then 8
+				                else if [月份] = "9月" then 9
+				                else if [月份] = "10月" then 10
+				                else if [月份] = "11月" then 11
+				                else if [月份] = "12月" then 12
+				                else 999
+				            , Int64.Type),
+				            // ✅ 根据【月份排序】计算季度 Q1/Q2/Q3/Q4
+				            添加季度 = Table.AddColumn(添加月份排序, "季度", each
+				                let
+				                    mSort = [月份排序]
+				                in
+				                    if mSort <= 3 then "Q1"
+				                    else if mSort <= 6 then "Q2"
+				                    else if mSort <= 9 then "Q3"
+				                    else if mSort <= 12 then "Q4"
+				                    else null
+				            , type text),
+				            // 把0还原为空，避免报表展示0干扰
+				            零替换为空值 = Table.ReplaceValue(添加季度, 0, null, Replacer.ReplaceValue, {"实际值"})
+				        in
+				            零替换为空值,
+				    // 遍历月份列表，逐个执行单月查询
+				    各月结果 = List.Transform(月份文本列表, 查询单月),
+				    // 将所有月份结果合并为一张长表
+				    合并结果 = Table.Combine(各月结果),
+				    // ========== 左连接映射表，带出【结构排序】 ==========
+				    // 关联键：[结构]（利润项目名称）
+				    左连接结构排序 = Table.NestedJoin(合并结果, {"结构唯一ID"}, 结构排序映射表, {"结构UniqueName"}, "映射临时", JoinKind.LeftOuter),
+				    展开结构排序 = Table.ExpandTableColumn(左连接结构排序, "映射临时", {"结构排序"}, {"结构排序"})
 				in
-				    零替换为空值
+				    展开结构排序
 
 	annotation PBI_ResultType = Table
 

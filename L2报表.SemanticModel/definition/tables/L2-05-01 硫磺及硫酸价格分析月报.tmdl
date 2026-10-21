@@ -162,7 +162,7 @@ table 'L2-05-01 硫磺及硫酸价格分析月报'
 				    // 月报起始月份，取自PowerBI参数 p_月报起始日期
 				    起始月份 = p_月报起始日期,
 				    // 结束月份：当年12月1日
-				    结束月份 = #date(Date.Year(DateTimeZone.SwitchZone(DateTimeZone.UtcNow(), 8)), 12, 1),
+				    结束月份 = p_月报终止日期,
 				    // 生成连续月份序列
 				    月份序列 = List.Generate(() => 起始月份, each _ <= 结束月份, each Date.AddMonths(_, 1)),
 				    // 转换为BW要求的 YYYYMM 文本格式

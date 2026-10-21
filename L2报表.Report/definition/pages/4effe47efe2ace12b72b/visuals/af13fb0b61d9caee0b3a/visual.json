@@ -2,8 +2,8 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "af13fb0b61d9caee0b3a",
   "position": {
-    "x": 15.378502260532201,
-    "y": 40.368568433897032,
+    "x": 23.213972899170486,
+    "y": 23.213972899170486,
     "z": 1,
     "height": 94.193326345759729,
     "width": 301.80310686294445,
@@ -138,62 +138,5 @@
       ]
     },
     "drillFilterOtherVisuals": true
-  },
-  "filterConfig": {
-    "filters": [
-      {
-        "name": "bbdf8986e092e31c2ead",
-        "field": {
-          "Column": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "KFM选冶厂月报"
-              }
-            },
-            "Property": "实际数"
-          }
-        },
-        "type": "Advanced",
-        "filter": {
-          "Version": 2,
-          "From": [
-            {
-              "Name": "k",
-              "Entity": "KFM选冶厂月报",
-              "Type": 0
-            }
-          ],
-          "Where": [
-            {
-              "Condition": {
-                "Not": {
-                  "Expression": {
-                    "Comparison": {
-                      "ComparisonKind": 0,
-                      "Left": {
-                        "Column": {
-                          "Expression": {
-                            "SourceRef": {
-                              "Source": "k"
-                            }
-                          },
-                          "Property": "实际数"
-                        }
-                      },
-                      "Right": {
-                        "Literal": {
-                          "Value": "0L"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          ]
-        },
-        "howCreated": "User"
-      }
-    ]
   }
 }

@@ -1,4 +1,4 @@
-expression p_月报起始日期 = #date(2025, 1, 1) meta [IsParameterQuery = true, IsParameterQueryRequired = true, Type = type date]
+expression p_月报起始日期 = #date(2026, 1, 1) meta [IsParameterQuery = true, IsParameterQueryRequired = true, Type = type date]
 	lineageTag: d37f2340-7e85-4790-a15d-b76741818d33
 	queryGroup: 参数
 
@@ -6,7 +6,7 @@ expression p_月报起始日期 = #date(2025, 1, 1) meta [IsParameterQuery = tru
 
 	annotation PBI_ResultType = Date
 
-expression p_日报起始日期 = #date(2026, 1, 1) meta [IsParameterQuery = true, IsParameterQueryRequired = true, Type = type date]
+expression p_月报终止日期 = #date(2026, 3, 31) meta [IsParameterQuery = true, IsParameterQueryRequired = true, Type = type date]
 	lineageTag: 11d89abb-ed2d-42a8-bf70-517ae5c3a03e
 	queryGroup: 参数
 
@@ -84,6 +84,19 @@ expression L2-03-02结构排序 =
 		in
 		  结构排序
 	lineageTag: 075aaf9e-2292-4f6e-a600-55c8c9f7ee5a
+	queryGroup: 辅助
+
+	annotation PBI_ResultType = Table
+
+expression L2-01-02结构排序 =
+		let
+		  // 从 SharePoint 站点定位「指标映射」工作簿，读取「结构排序」Sheet（首行提升为标题）
+		  源 = SharePoint.Files(财经SharePoint站点, [ApiVersion = 15]),
+		  指标映射文件 = Table.SelectRows(源, each Text.Contains([Name], "L2-01-02 集团合并利润汇总表指标映射") and [Extension] = ".xlsx"){0}[Content],
+		  结构排序 = Excel.Workbook(指标映射文件, true){[Item = "结构排序", Kind = "Sheet"]}[Data]
+		in
+		  结构排序
+	lineageTag: 76352e00-0758-4590-b9f9-b215b0186309
 	queryGroup: 辅助
 
 	annotation PBI_ResultType = Table
