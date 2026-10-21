@@ -95,6 +95,15 @@ svg text{font-family:var(--sans)}
 <script>
 const DATA = [
   {
+    "short": "fe4235b",
+    "date": "2026-10-21 18:50",
+    "msg": "新增 L2-04-01 库存汇总表",
+    "files": 7,
+    "add": 284,
+    "del": 83,
+    "ms": false
+  },
+  {
     "short": "1858d67",
     "date": "2026-10-21 17:13",
     "msg": "新增指标格式动态配置系统与销售费用排序列",
@@ -215,6 +224,12 @@ const DATA = [
 
 // 完整提交备注（由 update-version-html.py 维护，去 Co-Authored-By）
 const NOTES = {
+  "fe4235b": [
+    "- 新增「L2-04-01库存汇总表」：金额(人民币)、量(吨)、分类、结构、矿体、加载年月，按月循环取数",
+    "- model.tmdl 注册新表",
+    "- 集团利润表「零替换为空值」调整为保留 0",
+    "- 报告视觉与模型布局更新"
+  ],
   "1858d67": [
     "- 新增「指标格式配置」表：从 SharePoint 配置表读取指标名称/类型/小数位数/千分位/负数样式等",
     "- 新增 DynamicFormat 动态格式函数：按指标名称查配置表动态返回格式（尚未切换度量值使用）",
@@ -353,7 +368,7 @@ const NOTES = {
 const totalAdd = DATA.reduce((s,d)=>s+d.add,0);
 const totalDel = DATA.reduce((s,d)=>s+d.del,0);
 const totalFiles = DATA.reduce((s,d)=>s+d.files,0);
-const days = "1.0";
+const days = "1.1";
 
 document.getElementById('kpis').innerHTML = `
   <div class="kpi"><div class="n">${DATA.length}</div><div class="l">提交数（main）</div></div>
