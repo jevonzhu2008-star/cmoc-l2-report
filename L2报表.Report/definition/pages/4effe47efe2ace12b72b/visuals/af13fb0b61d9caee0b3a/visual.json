@@ -4,10 +4,10 @@
   "position": {
     "x": 23.213972899170486,
     "y": 23.213972899170486,
-    "z": 1,
+    "z": 1000,
     "height": 94.193326345759729,
     "width": 301.80310686294445,
-    "tabOrder": 1
+    "tabOrder": 1000
   },
   "visual": {
     "visualType": "slicer",
@@ -32,6 +32,23 @@
             }
           ]
         }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "L2-03-02 财务费用汇总表"
+                  }
+                },
+                "Property": "加载年月"
+              }
+            },
+            "direction": "Descending"
+          }
+        ]
       }
     },
     "objects": {

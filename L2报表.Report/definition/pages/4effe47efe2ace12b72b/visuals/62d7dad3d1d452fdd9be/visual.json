@@ -55,22 +55,17 @@
           "projections": [
             {
               "field": {
-                "Aggregation": {
+                "Measure": {
                   "Expression": {
-                    "Column": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "L2-03-02 财务费用汇总表"
-                        }
-                      },
-                      "Property": "指标值"
+                    "SourceRef": {
+                      "Entity": "度量值"
                     }
                   },
-                  "Function": 0
+                  "Property": "指标值"
                 }
               },
-              "queryRef": "Sum(L2-03-02 财务费用汇总表.指标值)",
-              "nativeQueryRef": "指标值 的总和"
+              "queryRef": "度量值.指标值",
+              "nativeQueryRef": "指标值"
             }
           ]
         }
@@ -373,6 +368,83 @@
                 }
               }
             }
+          }
+        },
+        {
+          "properties": {
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Conditional": {
+                      "Cases": [
+                        {
+                          "Condition": {
+                            "And": {
+                              "Left": {
+                                "Comparison": {
+                                  "ComparisonKind": 2,
+                                  "Left": {
+                                    "Measure": {
+                                      "Expression": {
+                                        "SourceRef": {
+                                          "Entity": "度量值"
+                                        }
+                                      },
+                                      "Property": "指标值"
+                                    }
+                                  },
+                                  "Right": {
+                                    "Literal": {
+                                      "Value": "-999999999999D"
+                                    }
+                                  }
+                                }
+                              },
+                              "Right": {
+                                "Comparison": {
+                                  "ComparisonKind": 3,
+                                  "Left": {
+                                    "Measure": {
+                                      "Expression": {
+                                        "SourceRef": {
+                                          "Entity": "度量值"
+                                        }
+                                      },
+                                      "Property": "指标值"
+                                    }
+                                  },
+                                  "Right": {
+                                    "Literal": {
+                                      "Value": "0D"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "Value": {
+                            "Literal": {
+                              "Value": "'#B91C1C'"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "dataViewWildcard": {
+                  "matchingOption": 1
+                }
+              }
+            ],
+            "metadata": "度量值.指标值"
           }
         }
       ],
@@ -964,39 +1036,6 @@
         },
         "type": "Categorical",
         "howCreated": "User"
-      },
-      {
-        "name": "423b763c23152ff04718",
-        "field": {
-          "Aggregation": {
-            "Expression": {
-              "Column": {
-                "Expression": {
-                  "SourceRef": {
-                    "Entity": "L2-03-02 财务费用汇总表"
-                  }
-                },
-                "Property": "指标值"
-              }
-            },
-            "Function": 0
-          }
-        },
-        "type": "Advanced"
-      },
-      {
-        "name": "b9b98a8723ab3afb6944",
-        "field": {
-          "Column": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "L2-03-02 财务费用汇总表"
-              }
-            },
-            "Property": "指标名称"
-          }
-        },
-        "type": "Categorical"
       }
     ],
     "filterSortOrder": "Custom"

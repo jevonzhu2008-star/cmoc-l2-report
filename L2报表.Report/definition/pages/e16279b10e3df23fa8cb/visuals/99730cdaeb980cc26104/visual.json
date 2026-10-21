@@ -23,6 +23,21 @@
                       "Entity": "L2-03-01 销售管理费用预算执行汇总表"
                     }
                   },
+                  "Property": "公司代码"
+                }
+              },
+              "queryRef": "L2-03-01 销售管理费用预算执行汇总表.公司代码",
+              "nativeQueryRef": "公司代码",
+              "active": true
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "L2-03-01 销售管理费用预算执行汇总表"
+                    }
+                  },
                   "Property": "管理口径利润中心"
                 }
               },
@@ -55,60 +70,45 @@
           "projections": [
             {
               "field": {
-                "Aggregation": {
+                "Measure": {
                   "Expression": {
-                    "Column": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "L2-03-01 销售管理费用预算执行汇总表"
-                        }
-                      },
-                      "Property": "累计实际"
+                    "SourceRef": {
+                      "Entity": "度量值"
                     }
                   },
-                  "Function": 0
+                  "Property": "累计实际"
                 }
               },
-              "queryRef": "Sum(L2-03-01 销售管理费用预算执行汇总表.累计实际)",
-              "nativeQueryRef": "累计实际 的总和"
+              "queryRef": "度量值.累计实际",
+              "nativeQueryRef": "累计实际"
             },
             {
               "field": {
-                "Aggregation": {
+                "Measure": {
                   "Expression": {
-                    "Column": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "L2-03-01 销售管理费用预算执行汇总表"
-                        }
-                      },
-                      "Property": "累计预算"
+                    "SourceRef": {
+                      "Entity": "度量值"
                     }
                   },
-                  "Function": 0
+                  "Property": "累计预算"
                 }
               },
-              "queryRef": "Sum(L2-03-01 销售管理费用预算执行汇总表.累计预算)",
-              "nativeQueryRef": "累计预算 的总和"
+              "queryRef": "度量值.累计预算",
+              "nativeQueryRef": "累计预算"
             },
             {
               "field": {
-                "Aggregation": {
+                "Measure": {
                   "Expression": {
-                    "Column": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "L2-03-01 销售管理费用预算执行汇总表"
-                        }
-                      },
-                      "Property": "累计执行%"
+                    "SourceRef": {
+                      "Entity": "度量值"
                     }
                   },
-                  "Function": 0
+                  "Property": "累计执行%"
                 }
               },
-              "queryRef": "Sum(L2-03-01 销售管理费用预算执行汇总表.累计执行%)",
-              "nativeQueryRef": "累计执行% 的总和"
+              "queryRef": "度量值.累计执行%",
+              "nativeQueryRef": "累计执行%"
             }
           ]
         }
