@@ -196,7 +196,36 @@ table 'L2-01-03 快报-金融投资业务专属'
 				    数据源 = SapBusinessWarehouse.Cubes(QAS服务器, 系统编号, 客户端ID, [Implementation="2.0", LanguageCode="ZH", EnableStructures=true]),
 				    立方体 = 数据源{[Name="ZRFI_CP012"]}[Data],
 				    基础查询 = 立方体{[Id="ZRFI_CP012/ZRFI_CP012_Q0001"]}[Data],
-				    BW查询转换 = Cube.Transform(基础查询, {{Cube.ApplyParameter, "[ZMSDQNY]", {"202601"}}, {Cube.AddMeasureColumn, "年净值-成本", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2R9KUV]"}, {Cube.AddMeasureColumn, "年净值-公允价值变动", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2R9R6F]"}, {Cube.AddMeasureColumn, "年净值-合计", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2R9XHZ]"}, {Cube.AddMeasureColumn, "本年-新增投资", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2RA3TJ]"}, {Cube.AddMeasureColumn, "本年利润-累计公允价值变动", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2RAA53]"}, {Cube.AddMeasureColumn, "本年利润-累计投资收益", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2RAGGN]"}, {Cube.AddMeasureColumn, "本年利润-累计所得税费用影响", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2RAMS7]"}, {Cube.AddMeasureColumn, "本年利润-退出成本", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2RAT3R]"}, {Cube.AddMeasureColumn, "本年利润-退出持有收益", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2RAZFB]"}, {Cube.AddMeasureColumn, "本年利润-累计公允价值变动(上月累计)", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2RB5QV]"}, {Cube.AddMeasureColumn, "本年利润-累计投资收益(上月累计)", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2RBC2F]"}, {Cube.AddMeasureColumn, "本年利润-累计所得税费用影响(上月累计)", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2RBIDZ]"}, {Cube.AddMeasureColumn, "本年利润-当月数", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2RBOPJ]"}, {Cube.AddMeasureColumn, "期末净值-成本", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2RBV13]"}, {Cube.AddMeasureColumn, "期末净值-公允价值变动", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2RC1CN]"}, {Cube.AddMeasureColumn, "期末净值-合计", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2RC7O7]"}, {Cube.AddMeasureColumn, "当月汇率变动影响-币种（CNY)", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2RCDZR]"}, {Cube.AddAndExpandDimensionColumn, "[ZBUKRS]", {"[ZBUKRS].[LEVEL01]"}, {"公司代码 级别 01"}}})
+				    BW查询转换 = Cube.Transform(基础查询, {
+				        // 设置BW查询年月参数 ZMSDQNY（当前硬编码为 202601，待确认业务口径后改为动态年月）
+				        {Cube.ApplyParameter, "[ZMSDQNY]", {"202601"}},
+				        // ========== 年净值指标 ==========
+				        {Cube.AddMeasureColumn, "年净值-成本", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2R9KUV]"},
+				        {Cube.AddMeasureColumn, "年净值-公允价值变动", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2R9R6F]"},
+				        {Cube.AddMeasureColumn, "年净值-合计", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2R9XHZ]"},
+				        // ========== 本年新增投资 ==========
+				        {Cube.AddMeasureColumn, "本年-新增投资", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2RA3TJ]"},
+				        // ========== 本年利润：当月累计 ==========
+				        {Cube.AddMeasureColumn, "本年利润-累计公允价值变动", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2RAA53]"},
+				        {Cube.AddMeasureColumn, "本年利润-累计投资收益", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2RAGGN]"},
+				        {Cube.AddMeasureColumn, "本年利润-累计所得税费用影响", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2RAMS7]"},
+				        {Cube.AddMeasureColumn, "本年利润-退出成本", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2RAT3R]"},
+				        {Cube.AddMeasureColumn, "本年利润-退出持有收益", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2RAZFB]"},
+				        // ========== 本年利润：上月累计 ==========
+				        {Cube.AddMeasureColumn, "本年利润-累计公允价值变动(上月累计)", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2RB5QV]"},
+				        {Cube.AddMeasureColumn, "本年利润-累计投资收益(上月累计)", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2RBC2F]"},
+				        {Cube.AddMeasureColumn, "本年利润-累计所得税费用影响(上月累计)", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2RBIDZ]"},
+				        // ========== 本年利润：当月数 ==========
+				        {Cube.AddMeasureColumn, "本年利润-当月数", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2RBOPJ]"},
+				        // ========== 期末净值指标 ==========
+				        {Cube.AddMeasureColumn, "期末净值-成本", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2RBV13]"},
+				        {Cube.AddMeasureColumn, "期末净值-公允价值变动", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2RC1CN]"},
+				        {Cube.AddMeasureColumn, "期末净值-合计", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2RC7O7]"},
+				        // ========== 当月汇率变动影响 ==========
+				        {Cube.AddMeasureColumn, "当月汇率变动影响-币种（CNY)", "[4VGQHR12MHZ3FUPQLKJ2R7TNB].[4VGQHR12MHZ3FUPQLKJ2RCDZR]"},
+				        // ========== 维度字段展开 ==========
+				        {Cube.AddAndExpandDimensionColumn, "[ZBUKRS]", {"[ZBUKRS].[LEVEL01]"}, {"公司代码 级别 01"}}
+				    })
 				in
 				    BW查询转换
 

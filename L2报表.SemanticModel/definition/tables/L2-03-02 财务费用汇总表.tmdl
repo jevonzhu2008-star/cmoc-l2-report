@@ -80,12 +80,12 @@ table 'L2-03-02 财务费用汇总表'
 				        2、BW参数[ZMSDQNY]：YYYYMM格式年月，BW根据该参数自动返回截止该月的YTD财务费用数据
 				        3、EnableStructures=true 必须开启，否则内置Structure行项目无法正常解析读取
 				        4、宽表模式，一次性返回全部财务费用分项指标，不做逐月循环合并（同ZRFI_CP011模式）
-				        5、动态年月：获取UTC时间转为东八区，自动取【上一个自然月】，生成YYYYMM文本传入BW，自动处理跨年
+				        5、年月参数：当前硬编码为 202603（固定月份）；如需动态取上月，改回 Text.From(Date.Year(上月日期)*100 + Date.Month(上月日期))
 				        6、新增【加载年月】字段，标记本次BW查询的期间，用于PowerBI建模关联筛选
 				        7、新增逆透视（行列转换）：指标列转为【指标名称】、【指标值】长表格式
 				        8、新增：关联SharePoint Excel的【指标排序】【结构排序】，增加指标排序、结构排序字段
 				        9、在数据取出后使用Cube.AttributeMemberProperty 读取维度成员唯一标识 MEMBER_UNIQUE_NAME
-				        10、修改：维度列名称由【结构.结构】统一改为【结构】
+				        10、维度列名称为【结构】（原为【结构.结构】，已统一改名）
 				    */
 				    // ========= 内嵌读取SharePoint：指标排序表 =========
 				    指标排序源 = SharePoint.Files(财经SharePoint站点, [ApiVersion = 15]),
@@ -101,11 +101,11 @@ table 'L2-03-02 财务费用汇总表'
 				    // 2、定位Cube与目标BW查询
 				    立方体 = 数据源{[Name="ZRFI_CP010"]}[Data],
 				    基础查询 = 立方体{[Id="ZRFI_CP010/ZRFI_CP010_Q0001"]}[Data],
-				    // 动态年月文本：UTC转东八区，取上月日期（自动处理跨年，1月自动变成上一年12月）
+				    // 年月参数：当前硬编码为 202603（固定月份）；动态取上月写法（待启用）：
 				    当前东八时间 = DateTimeZone.SwitchZone(DateTimeZone.UtcNow(),8),
 				    上月日期 = Date.AddMonths(Date.From(当前东八时间), 动态年月偏移),
-				    动态年月文本 = // Text.From(Date.Year(上月日期)*100 + Date.Month(上月日期))
-				"202603",
+				    //   动态年月文本 = Text.From(Date.Year(上月日期)*100 + Date.Month(上月日期))
+				    动态年月文本 = "202603",
 				    // 3、BW查询转换：传入动态期间参数，批量拉取财务费用分项度量值
 				    BW查询转换 = Cube.Transform(基础查询,
 				        {
