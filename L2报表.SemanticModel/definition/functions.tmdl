@@ -9,3 +9,39 @@ function FormatAmount = ```
 function FormatRatio = () =>"+0.00%;-0.00%;0.00%"
 	lineageTag: 218991ec-c130-43e5-a106-45cd669d18b4
 
+function DynamicFormat = ```
+		() => 
+		VAR CurrentMeasureName = SELECTEDMEASURENAME()
+		VAR ValType = LOOKUPVALUE('指标格式配置'[指标类型], '指标格式配置'[指标名称], CurrentMeasureName)
+		VAR Decimals = LOOKUPVALUE('指标格式配置'[小数位数], '指标格式配置'[指标名称], CurrentMeasureName)
+		VAR UseThousandSep = LOOKUPVALUE('指标格式配置'[千分位], '指标格式配置'[指标名称], CurrentMeasureName)
+		VAR NegStyle = LOOKUPVALUE('指标格式配置'[负数样式], '指标格式配置'[指标名称], CurrentMeasureName)
+		RETURN
+		SWITCH(
+		    TRUE(),
+		    // 查不到配置时，默认0位小数
+		    ISBLANK(ValType), "#,0",
+		    // 百分比格式
+		    ValType = "百分比",
+		        IF(NegStyle = "负号",
+		            "0." & REPT("0", Decimals) & "%;-" & "0." & REPT("0", Decimals) & "%",
+		            "0." & REPT("0", Decimals) & "%;(" & "0." & REPT("0", Decimals) & "%)"
+		        ),
+		    // 金额/数量/单价格式
+		    ValType IN {"金额", "数量", "单价"},
+		        IF(UseThousandSep,
+		            IF(NegStyle = "括号",
+		                "#,0." & REPT("0", Decimals) & ";(#,0." & REPT("0", Decimals) & ");0",
+		                "#,0." & REPT("0", Decimals) & ";-#,0." & REPT("0", Decimals) & ";0"
+		            ),
+		            IF(NegStyle = "括号",
+		                "0." & REPT("0", Decimals) & ";(0." & REPT("0", Decimals) & ");0",
+		                "0." & REPT("0", Decimals) & ";-0." & REPT("0", Decimals) & ";0"
+		            )
+		        ),
+		    // 兜底
+		    "#,0.00"
+		)
+		```
+	lineageTag: 328df944-10fb-4c70-8f93-75217debd3b9
+

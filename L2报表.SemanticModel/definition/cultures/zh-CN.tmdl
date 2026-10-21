@@ -20,22 +20,6 @@ cultureInfo zh-CN
 			        }
 			      ]
 			    },
-			    "度量值.v_": {
-			      "Definition": {
-			        "Binding": {
-			          "ConceptualEntity": "度量值",
-			          "ConceptualProperty": "."
-			        }
-			      },
-			      "State": "Generated",
-			      "Terms": [
-			        {
-			          ".": {
-			            "State": "Generated"
-			          }
-			        }
-			      ]
-			    },
 			    "度量值.entity__月计划_FormatString": {
 			      "Definition": {
 			        "Binding": {

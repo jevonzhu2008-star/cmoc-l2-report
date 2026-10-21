@@ -1,0 +1,122 @@
+table 指标格式配置
+	lineageTag: 4f001184-d5a0-4190-9673-2384177194df
+
+	column 指标名称
+		dataType: string
+		lineageTag: 348aa56a-2742-4782-a143-55af0cee6057
+		summarizeBy: none
+		sourceColumn: 指标名称
+
+		annotation SummarizationSetBy = Automatic
+
+	column 所属报表
+		dataType: string
+		lineageTag: 4b4d1426-7335-4bf3-ad35-06c0a72a4b26
+		summarizeBy: none
+		sourceColumn: 所属报表
+
+		annotation SummarizationSetBy = Automatic
+
+	column 指标类型
+		dataType: string
+		lineageTag: ae6d464f-522d-45c5-8f4b-7f955091a17f
+		summarizeBy: none
+		sourceColumn: 指标类型
+
+		annotation SummarizationSetBy = Automatic
+
+	column 单位
+		dataType: string
+		lineageTag: db24c29d-d5cd-49ec-b155-ebfc7af5bc86
+		summarizeBy: none
+		sourceColumn: 单位
+
+		annotation SummarizationSetBy = Automatic
+
+	column 小数位数
+		dataType: int64
+		formatString: 0
+		lineageTag: dbc7949e-bc5d-409d-ab18-8a10d826d63e
+		summarizeBy: sum
+		sourceColumn: 小数位数
+
+		annotation SummarizationSetBy = Automatic
+
+	column 正数颜色
+		dataType: string
+		lineageTag: dd99dd92-598c-476d-8053-1083ccc45d9a
+		summarizeBy: none
+		sourceColumn: 正数颜色
+
+		annotation SummarizationSetBy = Automatic
+
+	column 负数颜色
+		dataType: string
+		lineageTag: 7b9de4c1-d508-418e-9fb1-84556883a5a2
+		summarizeBy: none
+		sourceColumn: 负数颜色
+
+		annotation SummarizationSetBy = Automatic
+
+	column 负数样式
+		dataType: string
+		lineageTag: d0a43868-cb2e-4231-845c-39431332a37f
+		summarizeBy: none
+		sourceColumn: 负数样式
+
+		annotation SummarizationSetBy = Automatic
+
+	column 千分位
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 60107164-1959-4073-831e-575cb17ab03c
+		summarizeBy: none
+		sourceColumn: 千分位
+
+		annotation SummarizationSetBy = Automatic
+
+	column 指标排序
+		dataType: int64
+		formatString: 0
+		lineageTag: 835fb1ff-313b-45e1-80fb-029ee6d0520a
+		summarizeBy: sum
+		sourceColumn: 指标排序
+
+		annotation SummarizationSetBy = Automatic
+
+	column 备注
+		dataType: string
+		lineageTag: 8e002335-a32e-44d2-9183-b57917187179
+		summarizeBy: none
+		sourceColumn: 备注
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 指标格式配置 = m
+		mode: import
+		queryGroup: 辅助
+		source =
+				let
+				        // ========== 读取SharePoint上的指标格式配置表 ==========
+				        源 = SharePoint.Files(财经SharePoint站点, [ApiVersion = 15]),
+				        配置文件 = Table.SelectRows(源, each Text.Contains([Name], "L2报表指标格式配置表") and [Extension] = ".xlsx"){0}[Content],
+				        // 读取「指标格式配置」Sheet
+				        指标格式配置表 = Excel.Workbook(配置文件, true){[Item = "指标格式配置", Kind = "Sheet"]}[Data],
+				        设置类型 = Table.TransformColumnTypes(指标格式配置表, {
+				            {"指标名称", type text},
+				            {"所属报表", type text},
+				            {"指标类型", type text},
+				            {"单位", type text},
+				            {"小数位数", Int64.Type},
+				            {"正数颜色", type text},
+				            {"负数颜色", type text},
+				            {"负数样式", type text},
+				            {"千分位", Logical.Type},
+				            {"指标排序", Int64.Type},
+				            {"备注", type text}
+				        })
+				    in
+				        设置类型
+
+	annotation PBI_ResultType = Table
+

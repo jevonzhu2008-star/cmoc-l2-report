@@ -1,16 +1,6 @@
 table 度量值
 	lineageTag: 3155867a-412f-4412-aba1-d930d6fe7b51
 
-	/// . —— 布局占位度量值：返回空格，用于表格/矩阵制造间隔列
-	measure '.' =
-			// ------------------------------------------------------------
-			// "." —— 布局占位度量值
-			// 说明：仅返回一个空格，用于表格/矩阵中制造间隔列，无业务含义
-			// ------------------------------------------------------------
-			" "
-		displayFolder: 00辅助
-		lineageTag: e7a3b12a-83a8-4420-b280-443476456db1
-
 	/// 当月YTD：实际归母净利 YTD 累计（平均值）
 	measure 当月YTD = AVERAGE('L2-01-02 集团合并利润汇总表'[当月YTD])
 		displayFolder: L2-01-02 集团合并利润汇总表
@@ -230,31 +220,27 @@ table 度量值
 
 	/// 硫磺-采购价(单价)：硫磺采购单价（单价，取单值）
 	measure 硫磺-采购价(单价) = MAX('L2-05-01 硫磺及硫酸价格分析月报'[硫磺-采购价(单价)])
+		formatString: #,0.00
 		displayFolder: L2-05-01 硫磺及硫酸价格分析月报
 		lineageTag: 321442b2-0168-4633-bce9-36ae2effbab6
 
-		formatString: #,0.00
-
 	/// 硫磺-陆运费(单价)：硫磺陆路运费单价（单价，取单值）
 	measure 硫磺-陆运费(单价) = MAX('L2-05-01 硫磺及硫酸价格分析月报'[硫磺-陆运费(单价)])
+		formatString: #,0.00
 		displayFolder: L2-05-01 硫磺及硫酸价格分析月报
 		lineageTag: cf4a6880-db72-4248-92ef-6b0ce91b680e
 
-		formatString: #,0.00
-
 	/// 硫磺-清关税费(单价)：硫磺清关税费单价（单价，取单值）
 	measure 硫磺-清关税费(单价) = MAX('L2-05-01 硫磺及硫酸价格分析月报'[硫磺-清关税费(单价)])
+		formatString: #,0.00
 		displayFolder: L2-05-01 硫磺及硫酸价格分析月报
 		lineageTag: 2f3ec81f-f88b-48ff-ad59-7d37df0bc553
 
-		formatString: #,0.00
-
 	/// 硫磺-DDP(单价)：硫磺 DDP 全成本单价（单价，取单值）
 	measure 硫磺-DDP(单价) = MAX('L2-05-01 硫磺及硫酸价格分析月报'[硫磺-DDP(单价)])
+		formatString: #,0.00
 		displayFolder: L2-05-01 硫磺及硫酸价格分析月报
 		lineageTag: a2003ce3-fd32-4e95-9977-2142f7a49b75
-
-		formatString: #,0.00
 
 	/// 硫磺-采购量：硫磺采购数量（求和）
 	measure 硫磺-采购量 = SUM('L2-05-01 硫磺及硫酸价格分析月报'[硫磺-采购量])
@@ -265,10 +251,9 @@ table 度量值
 
 	/// 硫酸-DDP(单价)：硫酸 DDP 全成本单价（单价，取单值）
 	measure 硫酸-DDP(单价) = MAX('L2-05-01 硫磺及硫酸价格分析月报'[硫酸-DDP(单价)])
+		formatString: #,0.00
 		displayFolder: L2-05-01 硫磺及硫酸价格分析月报
 		lineageTag: 4c3947d2-3924-4007-81e4-3f2752d2831f
-
-		formatString: #,0.00
 
 	/// 硫酸-采购量：硫酸采购数量（求和）
 	measure 硫酸-采购量 = SUM('L2-05-01 硫磺及硫酸价格分析月报'[硫酸-采购量])
@@ -276,6 +261,44 @@ table 度量值
 		lineageTag: f6fbc4fd-92b9-4407-90bf-3f246dfd8e60
 
 		formatStringDefinition = FormatAmount()
+
+	measure 动态格式字符串 = ```
+			
+			VAR CurrentMeasureName = SELECTEDMEASURENAME()
+			VAR ValType = LOOKUPVALUE('指标格式配置'[指标类型], '指标格式配置'[指标名称], CurrentMeasureName)
+			VAR Decimals = LOOKUPVALUE('指标格式配置'[小数位数], '指标格式配置'[指标名称], CurrentMeasureName)
+			VAR UseThousandSep = LOOKUPVALUE('指标格式配置'[千分位], '指标格式配置'[指标名称], CurrentMeasureName)
+			VAR NegStyle = LOOKUPVALUE('指标格式配置'[负数样式], '指标格式配置'[指标名称], CurrentMeasureName)
+			RETURN
+			SWITCH(
+			    TRUE(),
+			    // 查不到配置时，默认0位小数
+			    ISBLANK(ValType), "#,0",
+			    // 百分比格式
+			    ValType = "百分比",
+			        IF(NegStyle = "负号",
+			            "0." & REPT("0", Decimals) & "%;-" & "0." & REPT("0", Decimals) & "%",
+			            "0." & REPT("0", Decimals) & "%;(" & "0." & REPT("0", Decimals) & "%)"
+			        ),
+			    // 金额/数量/单价格式
+			    ValType IN {"金额", "数量", "单价"},
+			        IF(UseThousandSep,
+			            IF(NegStyle = "括号",
+			                "#,0." & REPT("0", Decimals) & ";(#,0." & REPT("0", Decimals) & ");0",
+			                "#,0." & REPT("0", Decimals) & ";-#,0." & REPT("0", Decimals) & ";0"
+			            ),
+			            IF(NegStyle = "括号",
+			                "0." & REPT("0", Decimals) & ";(0." & REPT("0", Decimals) & ");0",
+			                "0." & REPT("0", Decimals) & ";-0." & REPT("0", Decimals) & ";0"
+			            )
+			        ),
+			    // 兜底
+			    "#,0.00"
+			)
+			
+			```
+		displayFolder: 00辅助
+		lineageTag: 4ca870d5-fdc8-436c-b059-27db949c87f6
 
 	partition 度量值 = m
 		mode: import

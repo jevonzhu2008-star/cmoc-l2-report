@@ -54,6 +54,9 @@ table 'L2-03-01 销售管理费用预算执行汇总表'
 		lineageTag: 62ddfd7b-224d-4781-9b49-a4487d62fd30
 		summarizeBy: none
 		sourceColumn: 销管费分类
+		sortByColumn: 销管费分类代码
+
+		changedProperty = SortByColumn
 
 		annotation SummarizationSetBy = Automatic
 
@@ -70,6 +73,33 @@ table 'L2-03-01 销售管理费用预算执行汇总表'
 		lineageTag: 1986833c-5b38-4394-aed1-814611a90e0e
 		summarizeBy: none
 		sourceColumn: 加载年月
+
+		annotation SummarizationSetBy = Automatic
+
+	column 公司代码代码
+		dataType: string
+		lineageTag: f72e7469-2bb4-49ac-ab70-d8a52926467b
+		summarizeBy: none
+		sourceColumn: 公司代码代码
+
+		annotation SummarizationSetBy = Automatic
+
+	column 销管费分类代码
+		dataType: int64
+		formatString: 0
+		lineageTag: 3b37c15e-8466-49a4-9ccb-5175e7f4796d
+		summarizeBy: sum
+		sourceColumn: 销管费分类代码
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+	column 利润中心代码
+		dataType: string
+		lineageTag: cbf8b153-d7b3-40a4-b2fd-78237ddb2ff7
+		summarizeBy: none
+		sourceColumn: 利润中心代码
 
 		annotation SummarizationSetBy = Automatic
 
@@ -92,47 +122,41 @@ table 'L2-03-01 销售管理费用预算执行汇总表'
 				    */
 				    // 1、连接BW QAS环境
 				    数据源 = SapBusinessWarehouse.Cubes(QAS服务器, 系统编号, 客户端ID, [LanguageCode="ZH", Implementation="2.0", BatchSize=500000000]),
-				
 				    // 2、定位Cube与目标BW查询
 				    立方体 = 数据源{[Name="ZRFI_CP005"]}[Data],
 				    基础查询 = 立方体{[Id="ZRFI_CP005/ZRFI_CP005_Q0002"]}[Data],
-				
 				    // ========== 月份循环配置 ==========
-				    // 月报起始月份，取自PowerBI参数 p_月报起始日期
 				    起始月份 = p_月报起始日期,
-				    // 结束月份：当年12月1日
 				    结束月份 = p_月报终止日期,
-				    // 生成连续月份序列
 				    月份序列 = List.Generate(() => 起始月份, each _ <= 结束月份, each Date.AddMonths(_, 1)),
-				    // 转换为BW要求的 YYYYMM 文本格式
 				    月份文本列表 = List.Transform(月份序列, each Text.From(Date.Year(_) * 100 + Date.Month(_))),
-				
-				    // 单月取数函数：输入年月文本，返回当月BW查询结果，并追加月份标记列
+				    // 单月取数函数
 				    查询单月 = (month as text) =>
 				        let
 				            Query = Cube.Transform(基础查询, {
-				                // BW期间参数，传入当前循环年月
+				                // BW期间参数
 				                {Cube.ApplyParameter, "[ZMSDQNY]", {month}},
-				
 				                // ========== 度量值：YTD累计指标 ==========
-				                {Cube.AddMeasureColumn, "累计实际", "[Measures].[4VGQHR12MHZ3FT2S9KPZM93SH]"},                // YTD累计实际金额
-				                {Cube.AddMeasureColumn, "累计实际(千人民币)", "[Measures].[4VGQHR12MHZ3FT2S9KPZM9A41]"},    // YTD累计实际(千元)
-				                {Cube.AddMeasureColumn, "累计预算", "[Measures].[4VGQHR12MHZ3FT2S9KPZM9GFL]"},              // YTD累计预算金额
-				                {Cube.AddMeasureColumn, "累计执行%", "[Measures].[4VGQHR12MHZ3FT2S9KPZM9MR5]"},            // YTD预算执行率
-				
+				                {Cube.AddMeasureColumn, "累计实际", "[Measures].[4VGQHR12MHZ3FT2S9KPZM93SH]"},
+				                {Cube.AddMeasureColumn, "累计实际(千人民币)", "[Measures].[4VGQHR12MHZ3FT2S9KPZM9A41]"},
+				                {Cube.AddMeasureColumn, "累计预算", "[Measures].[4VGQHR12MHZ3FT2S9KPZM9GFL]"},
+				                {Cube.AddMeasureColumn, "累计执行%", "[Measures].[4VGQHR12MHZ3FT2S9KPZM9MR5]"},
 				                // ========== 维度字段展开 ==========
 				                {Cube.AddAndExpandDimensionColumn, "[ZBUKRS]", {"[ZBUKRS].[LEVEL01]"}, {"公司代码"}},
 				                {Cube.AddAndExpandDimensionColumn, "[ZXGFFL]", {"[ZXGFFL].[LEVEL01]"}, {"销管费分类"}},
 				                {Cube.AddAndExpandDimensionColumn, "[ZPRCTR_GL]", {"[ZPRCTR_GL].[LEVEL01]"}, {"管理口径利润中心"}}
 				            }),
-				            // 增加月份文本列（YYYYMM），标记本条数据对应的查询期间
-				            附加月份 = Table.AddColumn(Query, "加载年月", each month)
+				            // ========== 读取维度成员代码（AttributeMemberProperty） ==========
+				            添加公司代码 = Table.AddColumn(Query, "公司代码代码", each Cube.AttributeMemberProperty([公司代码], "[2ZBUKRS]")),
+				            添加销管费分类代码 = Table.AddColumn(添加公司代码, "销管费分类代码", each Cube.AttributeMemberProperty([销管费分类], "[2ZXGFFL]")),
+				            添加利润中心代码 = Table.AddColumn(添加销管费分类代码, "利润中心代码", each Cube.AttributeMemberProperty([管理口径利润中心], "[2ZPRCTR_GL]")),
+				            // 增加加载年月列
+				            附加月份 = Table.AddColumn(添加利润中心代码, "加载年月", each month)
 				        in
 				            附加月份,
-				
-				    // 遍历月份列表，逐个执行单月查询
+				    // 遍历月份，逐个查询
 				    各月结果 = List.Transform(月份文本列表, 查询单月),
-				    // 将所有月份结果合并为一张长表
+				    // 合并所有月份结果
 				    合并结果 = Table.Combine(各月结果)
 				in
 				    合并结果
