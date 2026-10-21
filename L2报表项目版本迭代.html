@@ -95,6 +95,15 @@ svg text{font-family:var(--sans)}
 <script>
 const DATA = [
   {
+    "short": "2826161",
+    "date": "2026-10-21 15:11",
+    "msg": "优化语义模型度量值与格式，重构财务费用/快报取数",
+    "files": 24,
+    "add": 2329,
+    "del": 585,
+    "ms": true
+  },
+  {
     "short": "e436483",
     "date": "2026-10-21 11:21",
     "msg": "优化 M 查询语句与注释：L2-01-03 分行、L2-03-02 注释修正",
@@ -197,6 +206,22 @@ const DATA = [
 
 // 完整提交备注（由 update-version-html.py 维护，去 Co-Authored-By）
 const NOTES = {
+  "2826161": [
+    "度量值：",
+    "- 修正 8 个度量值注释与聚合一致（AVERAGE 标注为平均值）",
+    "- 金额/百分比格式统一（金额 FormatAmount、百分比 FormatRatio），单价改为 #,0.00 保留小数",
+    "- 统一度量值名全角/半角括号",
+    "清理：",
+    "- 删除 3 个孤儿辅助表达式（结构排序/指标排序，已被表内嵌 SharePoint 读取取代）",
+    "- functions.tmdl：FormatAmount/FormatRatio 简化为固定格式，移除失效的 SameMonthPriorYear",
+    "财务费用表（L2-03-02）：",
+    "- 由单月硬编码改为按月循环取数（与集团利润表一致）",
+    "- 简化 SharePoint 读取为单次连接",
+    "快报表（L2-01-03）：",
+    "- 列名「公司代码 级别 01」简化为「公司代码」，queryGroup 调整为财经\\单月，补充注释",
+    "报告：",
+    "- 新增「L2-01-03 快报-金融投资业务专属」页面"
+  ],
   "e436483": [
     "- L2-01-03 快报-金融投资业务专属：超长 Cube.Transform 单行拆分为逐指标分行，按业务分组加注释",
     "- L2-03-02 财务费用汇总表：修正「动态年月」注释与硬编码 202603 的矛盾，整理动态年月文本写法；维度列改名说明改为准确表述",
@@ -312,7 +337,7 @@ const NOTES = {
 const totalAdd = DATA.reduce((s,d)=>s+d.add,0);
 const totalDel = DATA.reduce((s,d)=>s+d.del,0);
 const totalFiles = DATA.reduce((s,d)=>s+d.files,0);
-const days = "0.7";
+const days = "0.9";
 
 document.getElementById('kpis').innerHTML = `
   <div class="kpi"><div class="n">${DATA.length}</div><div class="l">提交数（main）</div></div>
