@@ -95,6 +95,15 @@ svg text{font-family:var(--sans)}
 <script>
 const DATA = [
   {
+    "short": "1858d67",
+    "date": "2026-10-21 17:13",
+    "msg": "新增指标格式动态配置系统与销售费用排序列",
+    "files": 14,
+    "add": 287,
+    "del": 113,
+    "ms": false
+  },
+  {
     "short": "2826161",
     "date": "2026-10-21 15:11",
     "msg": "优化语义模型度量值与格式，重构财务费用/快报取数",
@@ -206,6 +215,13 @@ const DATA = [
 
 // 完整提交备注（由 update-version-html.py 维护，去 Co-Authored-By）
 const NOTES = {
+  "1858d67": [
+    "- 新增「指标格式配置」表：从 SharePoint 配置表读取指标名称/类型/小数位数/千分位/负数样式等",
+    "- 新增 DynamicFormat 动态格式函数：按指标名称查配置表动态返回格式（尚未切换度量值使用）",
+    "- 销售管理费用表：新增公司代码代码、销管费分类代码、利润中心代码排序列，销管费分类按代码排序",
+    "- 删除布局占位度量值 '.'",
+    "- 报告视觉与模型布局更新"
+  ],
   "2826161": [
     "度量值：",
     "- 修正 8 个度量值注释与聚合一致（AVERAGE 标注为平均值）",
@@ -337,7 +353,7 @@ const NOTES = {
 const totalAdd = DATA.reduce((s,d)=>s+d.add,0);
 const totalDel = DATA.reduce((s,d)=>s+d.del,0);
 const totalFiles = DATA.reduce((s,d)=>s+d.files,0);
-const days = "0.9";
+const days = "1.0";
 
 document.getElementById('kpis').innerHTML = `
   <div class="kpi"><div class="n">${DATA.length}</div><div class="l">提交数（main）</div></div>
