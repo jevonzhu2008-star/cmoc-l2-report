@@ -13,6 +13,25 @@
     "visualType": "pivotTable",
     "query": {
       "queryState": {
+        "Columns": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "L2-01-03 快报-金融投资业务专属"
+                    }
+                  },
+                  "Property": "指标名称"
+                }
+              },
+              "queryRef": "L2-01-03 快报-金融投资业务专属.指标名称",
+              "nativeQueryRef": "指标名称",
+              "active": true
+            }
+          ]
+        },
         "Rows": {
           "projections": [
             {
@@ -29,6 +48,21 @@
               "queryRef": "L2-01-03 快报-金融投资业务专属.公司代码",
               "nativeQueryRef": "公司代码",
               "active": true
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "L2-01-03 快报-金融投资业务专属"
+                    }
+                  },
+                  "Property": "金融投资产品"
+                }
+              },
+              "queryRef": "L2-01-03 快报-金融投资业务专属.金融投资产品",
+              "nativeQueryRef": "金融投资产品",
+              "active": true
             }
           ]
         },
@@ -36,115 +70,22 @@
           "projections": [
             {
               "field": {
-                "Measure": {
+                "Aggregation": {
                   "Expression": {
-                    "SourceRef": {
-                      "Entity": "度量值"
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "L2-01-03 快报-金融投资业务专属"
+                        }
+                      },
+                      "Property": "指标值"
                     }
                   },
-                  "Property": "年净值-成本"
+                  "Function": 0
                 }
               },
-              "queryRef": "度量值.年净值-成本",
-              "nativeQueryRef": "年净值-成本"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "度量值"
-                    }
-                  },
-                  "Property": "年净值-公允价值变动"
-                }
-              },
-              "queryRef": "度量值.年净值-公允价值变动",
-              "nativeQueryRef": "年净值-公允价值变动"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "度量值"
-                    }
-                  },
-                  "Property": "年净值-合计"
-                }
-              },
-              "queryRef": "度量值.年净值-合计",
-              "nativeQueryRef": "年净值-合计"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "度量值"
-                    }
-                  },
-                  "Property": "本年-新增投资"
-                }
-              },
-              "queryRef": "度量值.本年-新增投资",
-              "nativeQueryRef": "本年-新增投资"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "度量值"
-                    }
-                  },
-                  "Property": "本年利润-当月数"
-                }
-              },
-              "queryRef": "度量值.本年利润-当月数",
-              "nativeQueryRef": "本年利润-当月数"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "度量值"
-                    }
-                  },
-                  "Property": "期末净值-成本"
-                }
-              },
-              "queryRef": "度量值.期末净值-成本",
-              "nativeQueryRef": "期末净值-成本"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "度量值"
-                    }
-                  },
-                  "Property": "期末净值-公允价值变动"
-                }
-              },
-              "queryRef": "度量值.期末净值-公允价值变动",
-              "nativeQueryRef": "期末净值-公允价值变动"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "度量值"
-                    }
-                  },
-                  "Property": "期末净值-合计"
-                }
-              },
-              "queryRef": "度量值.期末净值-合计",
-              "nativeQueryRef": "期末净值-合计"
+              "queryRef": "Sum(L2-01-03 快报-金融投资业务专属.指标值)",
+              "nativeQueryRef": "指标值 的总和"
             }
           ]
         }

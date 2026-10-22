@@ -72,94 +72,102 @@ table 'L2-03-02 财务费用汇总表'
 	partition 'L2-03-02 财务费用汇总表' = m
 		mode: import
 		queryGroup: 财经\多月
-		source =
+		source = ```
 				let
 				    /*
 				    【查询名称】ZRFI_CP010 财务费用BW取数
-				    【对应报表】L2财务费用月报
+				    【对应报表】L2-03-02 财务费用汇总表
 				    【BW对象】Cube:ZRFI_CP010   Query:ZRFI_CP010_Q0001
-				    【说明】
-				        1、循环取数：从参数 p_月报起始日期 开始，一直取到当年12月，逐月查询BW后合并成长表
-				        2、BW参数[ZMSDQNY]：YYYYMM格式年月，BW根据该参数自动返回截止该月的YTD财务费用数据
-				        3、维度：财务费用项目（Structure内置）
-				        4、指标：YTD累计类财务费用分项指标
-				        5、连接参数统一：QAS服务器、系统编号、客户端ID，和项目其他BW查询保持一套参数规范
-				        6、EnableStructures=true 必须开启，否则内置Structure行维度无法解析
-				        7、末尾逆透视指标列，统一长表结构，方便矩阵报表排序展示
-				        8、新增：读取SharePoint指标映射表，左连接【结构唯一ID】，带出【指标排序】、【结构排序】
 				    */
+				    
 				    // ========== 读取SharePoint上的指标&结构排序映射表 ==========
 				    源 = SharePoint.Files(财经SharePoint站点, [ApiVersion = 15]),
 				    指标映射文件 = Table.SelectRows(源, each Text.Contains([Name], "L2-03-02 财务费用汇总表指标映射") and [Extension] = ".xlsx"){0}[Content],
 				    指标排序表 = Excel.Workbook(指标映射文件, true){[Item = "指标排序", Kind = "Sheet"]}[Data],
 				    结构排序表 = Excel.Workbook(指标映射文件, true){[Item = "结构排序", Kind = "Sheet"]}[Data],
-				    // 1、连接BW QAS环境
+				    
+				    // ========== 连接BW QAS环境 ==========
 				    数据源 = SapBusinessWarehouse.Cubes(QAS服务器, 系统编号, 客户端ID, [Implementation="2.0", LanguageCode="ZH", EnableStructures=true, BatchSize=500000000]),
-				    // 2、定位Cube与目标BW查询
 				    立方体 = 数据源{[Name="ZRFI_CP010"]}[Data],
 				    基础查询 = 立方体{[Id="ZRFI_CP010/ZRFI_CP010_Q0001"]}[Data],
+				    
 				    // ========== 月份循环配置 ==========
-				    // 月报起始月份，取自PowerBI参数 p_月报起始日期
 				    起始月份 = p_月报起始日期,
-				    // 结束月份：p_月报终止日期
 				    结束月份 = p_月报终止日期,
-				    // 生成连续月份序列
 				    月份序列 = List.Generate(() => 起始月份, each _ <= 结束月份, each Date.AddMonths(_, 1)),
-				    // 转换为BW要求的 YYYYMM 文本格式
 				    月份文本列表 = List.Transform(月份序列, each Text.From(Date.Year(_) * 100 + Date.Month(_))),
-				    // 单月取数函数：输入年月文本，返回当月BW查询结果，并追加加载年月标记列
+				    
+				    // ========== Measure公共前缀（提取出来，避免重复写） ==========
+				    MeasureCube = "[4VGQHR12MHZ1PJONR9LZX5FVY].[4VGQHR12MHZ1PJONR9LZX",
+				    
+				    // ========== 单月取数函数（只做BW查询，不做逆透视） ==========
 				    查询单月 = (month as text) =>
 				        let
 				            Query = Cube.Transform(基础查询, {
-				                // BW期间参数，传入当前循环年月
+				                // BW期间参数
 				                {Cube.ApplyParameter, "[ZMSDQNY]", {month}},
-				                // ========== 展开内置结构维度 财务费用项目，输出列名：结构 ==========
+				                
+				                // 展开内置结构维度（财务费用项目）
 				                {Cube.AddAndExpandDimensionColumn, "[4VGQHR12MHZ1PJONR9LZX6HTA]", {"[4VGQHR12MHZ1PJONR9LZX6HTA]"}, {"结构"}},
-				                // ========== 财务费用分项度量值 ==========
-				                {Cube.AddMeasureColumn, "财务费用", "[4VGQHR12MHZ1PJONR9LZX5FVY].[4VGQHR12MHZ1PJONR9LZX9AY6]"},
-				                {Cube.AddMeasureColumn, "筹资费用", "[4VGQHR12MHZ1PJONR9LZX5FVY].[4VGQHR12MHZ1PJONR9LZXBL4E]"},
-				                {Cube.AddMeasureColumn, "汇兑损益", "[4VGQHR12MHZ1PJONR9LZX5FVY].[4VGQHR12MHZ1PJONR9LZXBRFY]"},
-				                {Cube.AddMeasureColumn, "集团内部资金占用费收入", "[4VGQHR12MHZ1PJONR9LZX5FVY].[4VGQHR12MHZ1PJONR9LZXB25Q]"},
-				                {Cube.AddMeasureColumn, "集团内部资金占用费支出", "[4VGQHR12MHZ1PJONR9LZX5FVY].[4VGQHR12MHZ1PJONR9LZXA6JY]"},
-				                {Cube.AddMeasureColumn, "金属流、邦普借款及其他利息支出", "[4VGQHR12MHZ1PJONR9LZX5FVY].[4VGQHR12MHZ1PJONR9LZXACVI]"},
-				                {Cube.AddMeasureColumn, "净利息支出(利息支出+利息资本化)", "[4VGQHR12MHZ1PJONR9LZX5FVY].[4VGQHR12MHZ1PJONR9LZX9H9Q]"},
-				                {Cube.AddMeasureColumn, "利息收入", "[4VGQHR12MHZ1PJONR9LZX5FVY].[4VGQHR12MHZ1PJONR9LZXAVU6]"},
-				                {Cube.AddMeasureColumn, "利息收入-小计", "[4VGQHR12MHZ1PJONR9LZX5FVY].[4VGQHR12MHZ1PJONR9LZXAPIM]"},
-				                {Cube.AddMeasureColumn, "利息支出", "[4VGQHR12MHZ1PJONR9LZX5FVY].[4VGQHR12MHZ1PJONR9LZX9NLA]"},
-				                {Cube.AddMeasureColumn, "利息支出资本化", "[4VGQHR12MHZ1PJONR9LZX5FVY].[4VGQHR12MHZ1PJONR9LZXAJ72]"},
-				                {Cube.AddMeasureColumn, "其他利息收入", "[4VGQHR12MHZ1PJONR9LZX5FVY].[4VGQHR12MHZ1PJONR9LZXB8HA]"},
-				                {Cube.AddMeasureColumn, "手续费", "[4VGQHR12MHZ1PJONR9LZX5FVY].[4VGQHR12MHZ1PJONR9LZXBESU]"},
-				                {Cube.AddMeasureColumn, "外汇套保损益", "[4VGQHR12MHZ1PJONR9LZX5FVY].[4VGQHR12MHZ1PJONR9LZXCAEM]"},
-				                {Cube.AddMeasureColumn, "银行借款利息支出", "[4VGQHR12MHZ1PJONR9LZX5FVY].[4VGQHR12MHZ1PJONR9LZXA08E]"},
-				                {Cube.AddMeasureColumn, "银行理财收益及票据贴现利息", "[4VGQHR12MHZ1PJONR9LZX5FVY].[4VGQHR12MHZ1PJONR9LZXC432]"},
-				                {Cube.AddMeasureColumn, "债券利息支出", "[4VGQHR12MHZ1PJONR9LZX5FVY].[4VGQHR12MHZ1PJONR9LZX9TWU]"},
-				                {Cube.AddMeasureColumn, "折现费用", "[4VGQHR12MHZ1PJONR9LZX5FVY].[4VGQHR12MHZ1PJONR9LZXBXRI]"}
+				                
+				                // 财务费用分项度量值
+				                {Cube.AddMeasureColumn, "财务费用", MeasureCube & "9AY6]"},
+				                {Cube.AddMeasureColumn, "筹资费用", MeasureCube & "BL4E]"},
+				                {Cube.AddMeasureColumn, "汇兑损益", MeasureCube & "BRFY]"},
+				                {Cube.AddMeasureColumn, "集团内部资金占用费收入", MeasureCube & "B25Q]"},
+				                {Cube.AddMeasureColumn, "集团内部资金占用费支出", MeasureCube & "A6JY]"},
+				                {Cube.AddMeasureColumn, "金属流、邦普借款及其他利息支出", MeasureCube & "ACVI]"},
+				                {Cube.AddMeasureColumn, "净利息支出(利息支出+利息资本化)", MeasureCube & "9H9Q]"},
+				                {Cube.AddMeasureColumn, "利息收入", MeasureCube & "AVU6]"},
+				                {Cube.AddMeasureColumn, "利息收入-小计", MeasureCube & "APIM]"},
+				                {Cube.AddMeasureColumn, "利息支出", MeasureCube & "9NLA]"},
+				                {Cube.AddMeasureColumn, "利息支出资本化", MeasureCube & "AJ72]"},
+				                {Cube.AddMeasureColumn, "其他利息收入", MeasureCube & "B8HA]"},
+				                {Cube.AddMeasureColumn, "手续费", MeasureCube & "BESU]"},
+				                {Cube.AddMeasureColumn, "外汇套保损益", MeasureCube & "CAEM]"},
+				                {Cube.AddMeasureColumn, "银行借款利息支出", MeasureCube & "A08E]"},
+				                {Cube.AddMeasureColumn, "银行理财收益及票据贴现利息", MeasureCube & "C432]"},
+				                {Cube.AddMeasureColumn, "债券利息支出", MeasureCube & "9TWU]"},
+				                {Cube.AddMeasureColumn, "折现费用", MeasureCube & "BXRI]"}
 				            }),
-				            // 获取维度成员唯一ID MEMBER_UNIQUE_NAME
+				            
+				            // 获取结构唯一ID
 				            添加结构唯一ID = Table.AddColumn(Query, "结构唯一ID", each Cube.AttributeMemberProperty([结构], "[MEMBER_UNIQUE_NAME]")),
-				            // 增加加载年月字段（YYYYMM），标记本条数据对应的查询期间
-				            附加月份 = Table.AddColumn(添加结构唯一ID, "加载年月", each month),
-				            // 空值替换为0
-				            空值替换为0 = Table.ReplaceValue(附加月份, null, 0, Replacer.ReplaceValue, {"结构","结构唯一ID","财务费用", "筹资费用", "汇兑损益", "集团内部资金占用费收入", "集团内部资金占用费支出", "金属流、邦普借款及其他利息支出", "净利息支出(利息支出+利息资本化)", "利息收入", "利息收入-小计", "利息支出", "利息支出资本化", "其他利息收入", "手续费", "外汇套保损益", "银行借款利息支出", "银行理财收益及票据贴现利息", "债券利息支出", "折现费用", "加载年月"}),
-				            // 逆透视：指标列转为【指标名称】、【指标值】长表格式
-				            保留字段 = {"结构", "结构唯一ID", "加载年月"},
-				            逆透视指标列 = Table.UnpivotOtherColumns(空值替换为0, 保留字段, "指标名称", "指标值"),
-				            // 把0还原为空，避免报表展示0干扰
-				            零替换为空值 = Table.ReplaceValue(逆透视指标列, 0, null, Replacer.ReplaceValue, {"指标值"})
+				            // 附加加载年月
+				            附加加载年月 = Table.AddColumn(添加结构唯一ID, "加载年月", each month, type text)
 				        in
-				            零替换为空值,
-				    // 遍历月份列表，逐个执行单月查询
+				            附加加载年月,
+				    
+				    // ========== 循环遍历月份，逐个取数 ==========
 				    各月结果 = List.Transform(月份文本列表, 查询单月),
-				    // 将所有月份结果合并为一张长表
-				    合并结果 = Table.Combine(各月结果),
+				    
+				    // ========== 先合并所有月份的宽表（只合并一次） ==========
+				    合并宽表 = Table.Combine(各月结果),
+				    
+				    // ========== 再逆透视（只做一次，不是每个月做一次） ==========
+				    // 保留的列：结构、结构唯一ID、加载年月
+				    // 被逆透视的列：所有18个Measure列
+				    逆透视长表 = Table.UnpivotOtherColumns(
+				        合并宽表, 
+				        {"结构", "结构唯一ID", "加载年月"}, 
+				        "指标名称", 
+				        "指标值"
+				    ),
+				    
+				    // ========== 统一处理空值（最后做一次，不是每个月做一次） ==========
+				    // 把null和0都换成null，避免报表展示0干扰
+				    清洗空值 = Table.ReplaceValue(逆透视长表, 0, null, Replacer.ReplaceValue, {"指标值"}),
+				    
 				    // ========== 左连接映射表，带出【指标排序】 ==========
-				    左连接指标排序 = Table.NestedJoin(合并结果, {"指标名称"}, 指标排序表, {"指标名称"}, "指标映射临时", JoinKind.LeftOuter),
+				    左连接指标排序 = Table.NestedJoin(清洗空值, {"指标名称"}, 指标排序表, {"指标名称"}, "指标映射临时", JoinKind.LeftOuter),
 				    展开指标排序 = Table.ExpandTableColumn(左连接指标排序, "指标映射临时", {"指标排序"}, {"指标排序"}),
+				    
 				    // ========== 左连接映射表，带出【结构排序】 ==========
 				    左连接结构排序 = Table.NestedJoin(展开指标排序, {"结构唯一ID"}, 结构排序表, {"结构UniqueName"}, "结构映射临时", JoinKind.LeftOuter),
 				    展开结构排序 = Table.ExpandTableColumn(左连接结构排序, "结构映射临时", {"结构排序"}, {"结构排序"})
 				in
 				    展开结构排序
+				```
 
 	annotation PBI_ResultType = Table
 

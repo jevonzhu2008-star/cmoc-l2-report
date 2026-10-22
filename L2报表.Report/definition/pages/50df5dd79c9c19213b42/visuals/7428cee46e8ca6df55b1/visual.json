@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "7428cee46e8ca6df55b1",
   "position": {
-    "x": 320,
+    "x": 184.58541693938997,
     "y": 0,
     "z": 2001,
-    "height": 576,
-    "width": 1584,
+    "height": 539.27896321508047,
+    "width": 1719.1779028668675,
     "tabOrder": 2001
   },
   "visual": {
@@ -23,11 +23,11 @@
                       "Entity": "度量值"
                     }
                   },
-                  "Property": "利润汇总表"
+                  "Property": "HTML利润汇总表"
                 }
               },
               "queryRef": "度量值.利润汇总表",
-              "nativeQueryRef": "利润汇总表"
+              "nativeQueryRef": "HTML利润汇总表"
             }
           ]
         }

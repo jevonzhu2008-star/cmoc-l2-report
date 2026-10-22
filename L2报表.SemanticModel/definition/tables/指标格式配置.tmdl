@@ -37,7 +37,7 @@ table 指标格式配置
 		dataType: int64
 		formatString: 0
 		lineageTag: dbc7949e-bc5d-409d-ab18-8a10d826d63e
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: 小数位数
 
 		annotation SummarizationSetBy = Automatic
@@ -79,7 +79,7 @@ table 指标格式配置
 		dataType: int64
 		formatString: 0
 		lineageTag: 835fb1ff-313b-45e1-80fb-029ee6d0520a
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: 指标排序
 
 		annotation SummarizationSetBy = Automatic

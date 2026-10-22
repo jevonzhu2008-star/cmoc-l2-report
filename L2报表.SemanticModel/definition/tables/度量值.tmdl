@@ -44,21 +44,21 @@ table 度量值
 		formatStringDefinition = FormatAmount()
 
 	/// 同比YTD：YTD 同比变化（百分比，平均值）
-	measure 同比YTD = AVERAGE('L2-01-02 集团合并利润汇总表'[同比YTD])
+	measure 同比YTD = AVERAGE('L2-01-02 集团合并利润汇总表'[同比YTD])/100
 		displayFolder: L2-01-02 集团合并利润汇总表
 		lineageTag: e3c8e2a2-af68-4765-8762-68f989a8358e
 
 		formatStringDefinition = FormatRatio()
 
 	/// 预算达成率：YTD 预算达成率（百分比，平均值）
-	measure 预算达成率 = AVERAGE('L2-01-02 集团合并利润汇总表'[预算达成率])
+	measure 预算达成率 = AVERAGE('L2-01-02 集团合并利润汇总表'[预算达成率])/100
 		displayFolder: L2-01-02 集团合并利润汇总表
 		lineageTag: 26ab2870-27e9-402e-b6db-2e3872777872
 
 		formatStringDefinition = FormatRatio()
 
 	/// 环比MTD：当月 MTD 环比上月 MTD（百分比，平均值）
-	measure 环比MTD = AVERAGE('L2-01-02 集团合并利润汇总表'[环比MTD])
+	measure 环比MTD = AVERAGE('L2-01-02 集团合并利润汇总表'[环比MTD])/100
 		displayFolder: L2-01-02 集团合并利润汇总表
 		lineageTag: 477af208-18aa-46b7-829c-7c26486843a6
 
@@ -301,8 +301,11 @@ table 度量值
 		lineageTag: 4ca870d5-fdc8-436c-b059-27db949c87f6
 
 	/// 利润汇总表：L2-01-02 集团合并利润汇总表 HTML 表格（季度一级表头，无数据月份隐藏，负数红色，环比MTD 末列，分月 0 不显示）
-	measure 利润汇总表 = ```
+	measure HTML利润汇总表 = ```
 			
+			// ============================================================
+			// 第一段：计算1~12月每个月的实际值（用于判断哪些月有数据）
+			// ============================================================
 			VAR _m1 = CALCULATE(SUM('L2-01-02 集团合并利润汇总表'[实际值]), 'L2-01-02 集团合并利润汇总表'[月份] = "1月")
 			VAR _m2 = CALCULATE(SUM('L2-01-02 集团合并利润汇总表'[实际值]), 'L2-01-02 集团合并利润汇总表'[月份] = "2月")
 			VAR _m3 = CALCULATE(SUM('L2-01-02 集团合并利润汇总表'[实际值]), 'L2-01-02 集团合并利润汇总表'[月份] = "3月")
@@ -315,6 +318,11 @@ table 度量值
 			VAR _m10 = CALCULATE(SUM('L2-01-02 集团合并利润汇总表'[实际值]), 'L2-01-02 集团合并利润汇总表'[月份] = "10月")
 			VAR _m11 = CALCULATE(SUM('L2-01-02 集团合并利润汇总表'[实际值]), 'L2-01-02 集团合并利润汇总表'[月份] = "11月")
 			VAR _m12 = CALCULATE(SUM('L2-01-02 集团合并利润汇总表'[实际值]), 'L2-01-02 集团合并利润汇总表'[月份] = "12月")
+			
+			// ============================================================
+			// 第二段：判断每个月是否有数据（非空且非0）
+			// 有数据的月份才显示列，没数据的月份自动隐藏
+			// ============================================================
 			VAR _hasM1 = NOT ISBLANK(_m1) && _m1 <> 0
 			VAR _hasM2 = NOT ISBLANK(_m2) && _m2 <> 0
 			VAR _hasM3 = NOT ISBLANK(_m3) && _m3 <> 0
@@ -327,21 +335,35 @@ table 度量值
 			VAR _hasM10 = NOT ISBLANK(_m10) && _m10 <> 0
 			VAR _hasM11 = NOT ISBLANK(_m11) && _m11 <> 0
 			VAR _hasM12 = NOT ISBLANK(_m12) && _m12 <> 0
-			VAR _cQ1 = IF(_hasM1,1,0) + IF(_hasM2,1,0) + IF(_hasM3,1,0)
-			VAR _cQ2 = IF(_hasM4,1,0) + IF(_hasM5,1,0) + IF(_hasM6,1,0)
-			VAR _cQ3 = IF(_hasM7,1,0) + IF(_hasM8,1,0) + IF(_hasM9,1,0)
-			VAR _cQ4 = IF(_hasM10,1,0) + IF(_hasM11,1,0) + IF(_hasM12,1,0)
+			
+			// ============================================================
+			// 第三段：计算每个季度有几个月有数据
+			// 用于表头的colspan合并：Q1合并2列就写colspan="2"
+			// ============================================================
+			VAR _cQ1 = IF(_hasM1,1,0) + IF(_hasM2,1,0) + IF(_hasM3,1,0)  // Q1有数据的月数
+			VAR _cQ2 = IF(_hasM4,1,0) + IF(_hasM5,1,0) + IF(_hasM6,1,0)  // Q2有数据的月数
+			VAR _cQ3 = IF(_hasM7,1,0) + IF(_hasM8,1,0) + IF(_hasM9,1,0)  // Q3有数据的月数
+			VAR _cQ4 = IF(_hasM10,1,0) + IF(_hasM11,1,0) + IF(_hasM12,1,0)  // Q4有数据的月数
+			
+			// ============================================================
+			// 第四段：构建虚拟表
+			// 按「结构」分组，每行是一个利润项目
+			// 给每行加上各个指标的值（YTD、同比、预算、分月实际值）
+			// ============================================================
 			VAR _tbl =
 			    ADDCOLUMNS(
+			        // 按结构分组，取出所有利润项目
 			        SUMMARIZE(
 			            'L2-01-02 集团合并利润汇总表',
 			            'L2-01-02 集团合并利润汇总表'[结构],
 			            'L2-01-02 集团合并利润汇总表'[结构排序]
 			        ),
+			        // YTD类指标
 			        "@当月YTD", [当月YTD],
 			        "@同比YTD", [同比YTD],
 			        "@预算YTD", [预算YTD],
 			        "@预算达成率", [预算达成率],
+			        // 1~12月分月实际值
 			        "@M1", CALCULATE([实际值], 'L2-01-02 集团合并利润汇总表'[月份] = "1月"),
 			        "@M2", CALCULATE([实际值], 'L2-01-02 集团合并利润汇总表'[月份] = "2月"),
 			        "@M3", CALCULATE([实际值], 'L2-01-02 集团合并利润汇总表'[月份] = "3月"),
@@ -354,25 +376,46 @@ table 度量值
 			        "@M10", CALCULATE([实际值], 'L2-01-02 集团合并利润汇总表'[月份] = "10月"),
 			        "@M11", CALCULATE([实际值], 'L2-01-02 集团合并利润汇总表'[月份] = "11月"),
 			        "@M12", CALCULATE([实际值], 'L2-01-02 集团合并利润汇总表'[月份] = "12月"),
+			        // 环比指标
 			        "@环比MTD", [环比MTD]
 			    )
+			
+			// ============================================================
+			// 第五段：把虚拟表转成HTML表格行
+			// CONCATENATEX：遍历_tbl的每一行，把表达式拼成一个字符串
+			// ============================================================
 			VAR _rows =
 			    CONCATENATEX(
 			        _tbl,
 			        "<tr>"
+			            // 第1列：项目名称（左对齐）
 			            & "<td class='c'>" & [结构] & "</td>"
-			            & IF([@当月YTD] < 0, "<td class='n' style='color:#DC3545;'>", "<td class='n'>") & FORMAT([@当月YTD], "#,0;(#,0);0") & "</td>"
+			            
+			            // 第2列：当月YTD（金额类，负数红色带括号）
+			            & IF([@当月YTD] < 0, "<td class='n' style='color:#DC3545;'>", "<td class='n'>") 
+			            & FORMAT([@当月YTD], "#,0;(#,0);0") 
+			            & "</td>"
+			            
+			            // 第3列：同比YTD（百分比类，正数绿色带+号，负数红色）
 			            & SWITCH(TRUE(),
 			                [@同比YTD] < 0, "<td class='n' style='color:#DC3545;'>-" & FORMAT(ABS([@同比YTD]) * 100, "0.00") & "%</td>",
 			                [@同比YTD] = 0, "<td class='n' style='color:#28A745;'>" & FORMAT([@同比YTD] * 100, "0.00") & "%</td>",
 			                "<td class='n' style='color:#28A745;'>+" & FORMAT([@同比YTD] * 100, "0.00") & "%</td>"
 			            )
-			            & IF([@预算YTD] < 0, "<td class='n' style='color:#DC3545;'>", "<td class='n'>") & FORMAT([@预算YTD], "#,0;(#,0);0") & "</td>"
+			            
+			            // 第4列：预算YTD（金额类，负数红色带括号）
+			            & IF([@预算YTD] < 0, "<td class='n' style='color:#DC3545;'>", "<td class='n'>") 
+			            & FORMAT([@预算YTD], "#,0;(#,0);0") 
+			            & "</td>"
+			            
+			            // 第5列：预算达成率（百分比类）
 			            & SWITCH(TRUE(),
 			                [@预算达成率] < 0, "<td class='n' style='color:#DC3545;'>-" & FORMAT(ABS([@预算达成率]) * 100, "0.00") & "%</td>",
 			                [@预算达成率] = 0, "<td class='n' style='color:#28A745;'>" & FORMAT([@预算达成率] * 100, "0.00") & "%</td>",
 			                "<td class='n' style='color:#28A745;'>+" & FORMAT([@预算达成率] * 100, "0.00") & "%</td>"
 			            )
+			            
+			            // 第6~17列：1月~12月分月实际值（动态列，有数据才显示，0值显示为空）
 			            & IF(_hasM1, IF([@M1] < 0, "<td class='n' style='color:#DC3545;'>", "<td class='n'>") & IF([@M1] = 0, "", FORMAT([@M1], "#,0;(#,0);0")) & "</td>", "")
 			            & IF(_hasM2, IF([@M2] < 0, "<td class='n' style='color:#DC3545;'>", "<td class='n'>") & IF([@M2] = 0, "", FORMAT([@M2], "#,0;(#,0);0")) & "</td>", "")
 			            & IF(_hasM3, IF([@M3] < 0, "<td class='n' style='color:#DC3545;'>", "<td class='n'>") & IF([@M3] = 0, "", FORMAT([@M3], "#,0;(#,0);0")) & "</td>", "")
@@ -385,13 +428,23 @@ table 度量值
 			            & IF(_hasM10, IF([@M10] < 0, "<td class='n' style='color:#DC3545;'>", "<td class='n'>") & IF([@M10] = 0, "", FORMAT([@M10], "#,0;(#,0);0")) & "</td>", "")
 			            & IF(_hasM11, IF([@M11] < 0, "<td class='n' style='color:#DC3545;'>", "<td class='n'>") & IF([@M11] = 0, "", FORMAT([@M11], "#,0;(#,0);0")) & "</td>", "")
 			            & IF(_hasM12, IF([@M12] < 0, "<td class='n' style='color:#DC3545;'>", "<td class='n'>") & IF([@M12] = 0, "", FORMAT([@M12], "#,0;(#,0);0")) & "</td>", "")
+			            
+			            // 最后一列：环比MTD（百分比类）
 			            & SWITCH(TRUE(),
 			                [@环比MTD] < 0, "<td class='n' style='color:#DC3545;'>-" & FORMAT(ABS([@环比MTD]) * 100, "0.00") & "%</td>",
 			                [@环比MTD] = 0, "<td class='n' style='color:#28A745;'>" & FORMAT([@环比MTD] * 100, "0.00") & "%</td>",
 			                "<td class='n' style='color:#28A745;'>+" & FORMAT([@环比MTD] * 100, "0.00") & "%</td>"
-			            )
+			            ),
+			        "",          // 行之间不需要分隔符（已经是<tr>标签）
+			        [结构排序],   // 按结构排序列排序
+			        ASC          // 升序排列
 			    )
+			
+			// ============================================================
+			// 第六段：拼接完整HTML
+			// ============================================================
 			RETURN
+			    // CSS样式
 			    "<style>"
 			    & ".tb{border-collapse:collapse;font-family:'Segoe UI','Microsoft YaHei',sans-serif;font-size:16px;width:100%;}"
 			    & ".tb th{background:#1A2538;color:#fff;padding:6px 6px;border:1px solid #111A29;text-align:center;font-weight:normal;white-space:nowrap;}"
@@ -400,35 +453,42 @@ table 度量值
 			    & ".tb .n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;}"
 			    & ".tb .neg{color:#DC3545;}"
 			    & ".tb .pos{color:#28A745;}"
-			    & ".tb tbody tr:nth-child(even){background:#f5f8fc;}"
+			    & ".tb tbody tr:nth-child(even){background:#f5f8fc;}"  // 斑马纹
 			    & "</style>"
+			    // 表格开始
 			    & "<table class='tb'>"
+			    // 表头
 			    & "<thead>"
+			    // 第一层表头：项目、YTD类指标跨2行，季度合并
 			    & "<tr>"
 			    & "<th rowspan='2'>项目</th>"
 			    & "<th rowspan='2'>当月YTD</th><th rowspan='2'>同比YTD</th><th rowspan='2'>预算YTD</th><th rowspan='2'>预算达成率</th>"
-			        & IF(_cQ1 > 0, "<th colspan='" & _cQ1 & "'>Q1</th>", "")
-			        & IF(_cQ2 > 0, "<th colspan='" & _cQ2 & "'>Q2</th>", "")
-			        & IF(_cQ3 > 0, "<th colspan='" & _cQ3 & "'>Q3</th>", "")
-			        & IF(_cQ4 > 0, "<th colspan='" & _cQ4 & "'>Q4</th>", "")
+			    // 季度表头：有数据的季度才显示，colspan是该季度有几个月
+			    & IF(_cQ1 > 0, "<th colspan='" & _cQ1 & "'>Q1</th>", "")
+			    & IF(_cQ2 > 0, "<th colspan='" & _cQ2 & "'>Q2</th>", "")
+			    & IF(_cQ3 > 0, "<th colspan='" & _cQ3 & "'>Q3</th>", "")
+			    & IF(_cQ4 > 0, "<th colspan='" & _cQ4 & "'>Q4</th>", "")
 			    & "<th rowspan='2'>环比MTD</th>"
 			    & "</tr>"
+			    // 第二层表头：月份明细（有数据的月份才显示）
 			    & "<tr>"
-			        & IF(_hasM1, "<th>1月</th>", "")
-			        & IF(_hasM2, "<th>2月</th>", "")
-			        & IF(_hasM3, "<th>3月</th>", "")
-			        & IF(_hasM4, "<th>4月</th>", "")
-			        & IF(_hasM5, "<th>5月</th>", "")
-			        & IF(_hasM6, "<th>6月</th>", "")
-			        & IF(_hasM7, "<th>7月</th>", "")
-			        & IF(_hasM8, "<th>8月</th>", "")
-			        & IF(_hasM9, "<th>9月</th>", "")
-			        & IF(_hasM10, "<th>10月</th>", "")
-			        & IF(_hasM11, "<th>11月</th>", "")
-			        & IF(_hasM12, "<th>12月</th>", "")
+			    & IF(_hasM1, "<th>1月</th>", "")
+			    & IF(_hasM2, "<th>2月</th>", "")
+			    & IF(_hasM3, "<th>3月</th>", "")
+			    & IF(_hasM4, "<th>4月</th>", "")
+			    & IF(_hasM5, "<th>5月</th>", "")
+			    & IF(_hasM6, "<th>6月</th>", "")
+			    & IF(_hasM7, "<th>7月</th>", "")
+			    & IF(_hasM8, "<th>8月</th>", "")
+			    & IF(_hasM9, "<th>9月</th>", "")
+			    & IF(_hasM10, "<th>10月</th>", "")
+			    & IF(_hasM11, "<th>11月</th>", "")
+			    & IF(_hasM12, "<th>12月</th>", "")
 			    & "</tr>"
 			    & "</thead>"
-			    & "<tbody>" & _rows & "</tbody></table>"
+			    // 表体
+			    & "<tbody>" & _rows & "</tbody>"
+			    & "</table>"
 			
 			```
 		displayFolder: L2-01-02 集团合并利润汇总表
