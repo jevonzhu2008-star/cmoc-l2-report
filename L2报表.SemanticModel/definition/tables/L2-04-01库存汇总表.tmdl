@@ -26,6 +26,9 @@ table L2-04-01库存汇总表
 		lineageTag: 085ec1ab-8624-4d3c-b500-45446ee1c4a3
 		summarizeBy: none
 		sourceColumn: 分类
+		sortByColumn: 分类排序
+
+		changedProperty = SortByColumn
 
 		annotation SummarizationSetBy = Automatic
 
@@ -34,6 +37,9 @@ table L2-04-01库存汇总表
 		lineageTag: 0cbbd182-68b1-445e-acb8-8de584c38b22
 		summarizeBy: none
 		sourceColumn: 结构
+		sortByColumn: 结构排序
+
+		changedProperty = SortByColumn
 
 		annotation SummarizationSetBy = Automatic
 
@@ -42,6 +48,9 @@ table L2-04-01库存汇总表
 		lineageTag: 7d926462-de41-4be2-8fd5-7fe01e4dd316
 		summarizeBy: none
 		sourceColumn: 矿体
+		sortByColumn: 矿体排序
+
+		changedProperty = SortByColumn
 
 		annotation SummarizationSetBy = Automatic
 
@@ -53,56 +62,108 @@ table L2-04-01库存汇总表
 
 		annotation SummarizationSetBy = Automatic
 
+	column 分类排序
+		dataType: double
+		lineageTag: 307f151f-2448-47e2-bd49-e41c51a4324f
+		summarizeBy: sum
+		sourceColumn: 分类排序
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 结构排序
+		dataType: double
+		lineageTag: addc1b53-b7e1-469f-a087-a19aade4ae77
+		summarizeBy: sum
+		sourceColumn: 结构排序
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 矿体排序
+		dataType: double
+		lineageTag: cf9c6100-d8a2-4098-b49b-595f0b25de41
+		summarizeBy: sum
+		sourceColumn: 矿体排序
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
 	partition L2-04-01库存汇总表 = m
 		mode: import
 		queryGroup: 财经\多月
-		source =
+		source = ```
 				let
 				    /*
 				    【查询名称】ZRMM_CP002 矿石成本分析BW取数
 				    【对应报表】L2-02-04 矿石成本分析
 				    【BW对象】Cube:ZRMM_CP002   Query:ZRMM_CP002_Q0001
-				    【说明】
-				        1、循环取数：从参数 p_月报起始日期 开始，取到 p_月报终止日期，逐月查询BW后合并成长表
-				        2、BW参数[ZMSDQNY]：YYYYMM格式年月，返回截止当月YTD数据
-				        3、维度：分类、结构、矿体
-				        4、指标：金额(人民币)、量(吨)
-				        5、连接参数统一：QAS服务器、系统编号、客户端ID
 				    */
-				    // 1、连接BW QAS环境
+				    
+				    // ========== 读取SharePoint上的排序映射表 ==========
+				    源 = SharePoint.Files(财经SharePoint站点, [ApiVersion = 15]),
+				    指标映射文件 = Table.SelectRows(源, each Text.Contains([Name], "L2-04-01库存汇总表指标映射") and [Extension] = ".xlsx"){0}[Content],
+				    分类排序表 = Excel.Workbook(指标映射文件, true){[Item = "分类排序", Kind = "Sheet"]}[Data],
+				    结构排序表 = Excel.Workbook(指标映射文件, true){[Item = "结构排序", Kind = "Sheet"]}[Data],
+				    矿体排序表 = Excel.Workbook(指标映射文件, true){[Item = "矿体排序", Kind = "Sheet"]}[Data],
+				    
+				    // ========== 连接BW QAS环境 ==========
 				    数据源 = SapBusinessWarehouse.Cubes(QAS服务器, 系统编号, 客户端ID, [LanguageCode="ZH", Implementation="2.0", EnableStructures=true, BatchSize=500000000]),
-				    // 2、定位Cube与目标BW查询
 				    立方体 = 数据源{[Name="ZRMM_CP002"]}[Data],
 				    基础查询 = 立方体{[Id="ZRMM_CP002/ZRMM_CP002_Q0001"]}[Data],
+				    
 				    // ========== 月份循环配置 ==========
 				    起始月份 = p_月报起始日期,
 				    结束月份 = p_月报终止日期,
 				    月份序列 = List.Generate(() => 起始月份, each _ <= 结束月份, each Date.AddMonths(_, 1)),
 				    月份文本列表 = List.Transform(月份序列, each Text.From(Date.Year(_) * 100 + Date.Month(_))),
-				    // 单月取数函数
+				    
+				    // ========== 单月取数函数 ==========
 				    查询单月 = (month as text) =>
 				        let
 				            Query = Cube.Transform(基础查询, {
 				                // BW期间参数
 				                {Cube.ApplyParameter, "[ZMSDQNY]", {month}},
-				                // ========== 维度字段展开 ==========
+				                
+				                // 维度字段展开
 				                {Cube.AddAndExpandDimensionColumn, "[4ZRMM_CP002-ZKL]", {"[4ZRMM_CP002-ZKL].[LEVEL01]"}, {"分类"}},
 				                {Cube.AddAndExpandDimensionColumn, "[4VGQHR12MHZ3FVOJ91YJ55O51]", {"[4VGQHR12MHZ3FVOJ91YJ55O51]"}, {"结构"}},
 				                {Cube.AddAndExpandDimensionColumn, "[ZKT]", {"[ZKT].[LEVEL01]"}, {"矿体"}},
-				                // ========== 度量值 ==========
+				                
+				                // 度量值
 				                {Cube.AddMeasureColumn, "金额(人民币)", "[4VGQHR12MHZ3FVOJ91YJ55HTH].[4VGQHR12MHZ1PLAV995LXI93I]"},
 				                {Cube.AddMeasureColumn, "量(吨)", "[4VGQHR12MHZ3FVOJ91YJ55HTH].[4VGQHR12MHZ1PLAV995LXI2RY]"}
 				            }),
+				            
+				            // ✅ 新增：对结构列做前后截断（去掉空格）
+				            截断结构列 = Table.TransformColumns(Query, {{"结构", Text.Trim, type text}}),
+				            
 				            // 增加加载年月列
-				            附加月份 = Table.AddColumn(Query, "加载年月", each month)
+				            附加月份 = Table.AddColumn(截断结构列, "加载年月", each month, type text)
 				        in
 				            附加月份,
+				    
 				    // 遍历月份，逐个查询
 				    各月结果 = List.Transform(月份文本列表, 查询单月),
+				    
 				    // 合并所有月份结果
-				    合并结果 = Table.Combine(各月结果)
+				    合并结果 = Table.Combine(各月结果),
+				    
+				    // ========== 左连接映射表，带出三个排序 ==========
+				    左连接分类排序 = Table.NestedJoin(合并结果, {"分类"}, 分类排序表, {"分类"}, "分类映射临时", JoinKind.LeftOuter),
+				    展开分类排序 = Table.ExpandTableColumn(左连接分类排序, "分类映射临时", {"分类排序"}, {"分类排序"}),
+				    
+				    左连接结构排序 = Table.NestedJoin(展开分类排序, {"结构"}, 结构排序表, {"结构"}, "结构映射临时", JoinKind.LeftOuter),
+				    展开结构排序 = Table.ExpandTableColumn(左连接结构排序, "结构映射临时", {"结构排序"}, {"结构排序"}),
+				    
+				    左连接矿体排序 = Table.NestedJoin(展开结构排序, {"矿体"}, 矿体排序表, {"矿体"}, "矿体映射临时", JoinKind.LeftOuter),
+				    展开矿体排序 = Table.ExpandTableColumn(左连接矿体排序, "矿体映射临时", {"矿体排序"}, {"矿体排序"})
 				in
-				    合并结果
+				    展开矿体排序
+				```
 
 	annotation PBI_ResultType = Table
 

@@ -61,7 +61,7 @@
                       "Entity": "度量值"
                     }
                   },
-                  "Property": "指标值"
+                  "Property": "L2-03-02指标值"
                 }
               },
               "queryRef": "度量值.指标值",
@@ -391,7 +391,7 @@
                                           "Entity": "度量值"
                                         }
                                       },
-                                      "Property": "指标值"
+                                      "Property": "L2-03-02指标值"
                                     }
                                   },
                                   "Right": {
@@ -411,7 +411,7 @@
                                           "Entity": "度量值"
                                         }
                                       },
-                                      "Property": "指标值"
+                                      "Property": "L2-03-02指标值"
                                     }
                                   },
                                   "Right": {

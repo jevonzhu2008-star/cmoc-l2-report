@@ -64,125 +64,6 @@ table 度量值
 
 		formatStringDefinition = FormatRatio()
 
-	/// 年净值-成本（求和）
-	measure 年净值-成本 = CALCULATE(SUM('L2-01-03 快报-金融投资业务专属'[指标值]), 'L2-01-03 快报-金融投资业务专属'[指标名称] = "年净值-成本")
-		displayFolder: L2-01-03 快报-金融投资业务专属
-		lineageTag: bdbf7cce-277a-4bb3-942d-9078ebe86db1
-
-		formatStringDefinition = FormatAmount()
-
-	/// 年净值-公允价值变动（求和）
-	measure 年净值-公允价值变动 = CALCULATE(SUM('L2-01-03 快报-金融投资业务专属'[指标值]), 'L2-01-03 快报-金融投资业务专属'[指标名称] = "年净值-公允价值变动")
-		displayFolder: L2-01-03 快报-金融投资业务专属
-		lineageTag: f9a16848-e965-4b4d-bc20-80965d8965bc
-
-		formatStringDefinition = FormatAmount()
-
-	/// 年净值-合计（求和）
-	measure 年净值-合计 = CALCULATE(SUM('L2-01-03 快报-金融投资业务专属'[指标值]), 'L2-01-03 快报-金融投资业务专属'[指标名称] = "年净值-合计")
-		displayFolder: L2-01-03 快报-金融投资业务专属
-		lineageTag: 86b47614-5e37-42e8-b728-6862b0bc7204
-
-		formatStringDefinition = FormatAmount()
-
-	/// 本年-新增投资（求和）
-	measure 本年-新增投资 = CALCULATE(SUM('L2-01-03 快报-金融投资业务专属'[指标值]), 'L2-01-03 快报-金融投资业务专属'[指标名称] = "本年-新增投资")
-		displayFolder: L2-01-03 快报-金融投资业务专属
-		lineageTag: ac2b77aa-a25f-4df9-abf1-efa08ddb003c
-
-		formatStringDefinition = FormatAmount()
-
-	/// 本年利润-累计公允价值变动（求和）
-	measure 本年利润-累计公允价值变动 = CALCULATE(SUM('L2-01-03 快报-金融投资业务专属'[指标值]), 'L2-01-03 快报-金融投资业务专属'[指标名称] = "本年利润-累计公允价值变动")
-		displayFolder: L2-01-03 快报-金融投资业务专属
-		lineageTag: af671ee9-dca8-4b81-82f8-0f565dc05f88
-
-		formatStringDefinition = FormatAmount()
-
-	/// 本年利润-累计投资收益（求和）
-	measure 本年利润-累计投资收益 = CALCULATE(SUM('L2-01-03 快报-金融投资业务专属'[指标值]), 'L2-01-03 快报-金融投资业务专属'[指标名称] = "本年利润-累计投资收益")
-		displayFolder: L2-01-03 快报-金融投资业务专属
-		lineageTag: c5434ddc-608d-4a6e-bf8a-94c0f11eb010
-
-		formatStringDefinition = FormatAmount()
-
-	/// 本年利润-累计所得税费用影响（求和）
-	measure 本年利润-累计所得税费用影响 = CALCULATE(SUM('L2-01-03 快报-金融投资业务专属'[指标值]), 'L2-01-03 快报-金融投资业务专属'[指标名称] = "本年利润-累计所得税费用影响")
-		displayFolder: L2-01-03 快报-金融投资业务专属
-		lineageTag: 69e2d58c-9031-4e23-bd79-7806416b4530
-
-		formatStringDefinition = FormatAmount()
-
-	/// 本年利润-退出成本（求和）
-	measure 本年利润-退出成本 = CALCULATE(SUM('L2-01-03 快报-金融投资业务专属'[指标值]), 'L2-01-03 快报-金融投资业务专属'[指标名称] = "本年利润-退出成本")
-		displayFolder: L2-01-03 快报-金融投资业务专属
-		lineageTag: 5e555ef0-db98-45b8-a4f6-3e7a15786ab1
-
-		formatStringDefinition = FormatAmount()
-
-	/// 本年利润-退出持有收益（求和）
-	measure 本年利润-退出持有收益 = CALCULATE(SUM('L2-01-03 快报-金融投资业务专属'[指标值]), 'L2-01-03 快报-金融投资业务专属'[指标名称] = "本年利润-退出持有收益")
-		displayFolder: L2-01-03 快报-金融投资业务专属
-		lineageTag: 6859cd61-77ed-4871-b6fa-32362bd98a34
-
-		formatStringDefinition = FormatAmount()
-
-	/// 本年利润-累计公允价值变动(上月累计)（求和）
-	measure 本年利润-累计公允价值变动(上月累计) = CALCULATE(SUM('L2-01-03 快报-金融投资业务专属'[指标值]), 'L2-01-03 快报-金融投资业务专属'[指标名称] = "本年利润-累计公允价值变动(上月累计)")
-		displayFolder: L2-01-03 快报-金融投资业务专属
-		lineageTag: 5ce90b64-143b-4631-bab8-8cf1c17601a2
-
-		formatStringDefinition = FormatAmount()
-
-	/// 本年利润-累计投资收益(上月累计)（求和）
-	measure 本年利润-累计投资收益(上月累计) = CALCULATE(SUM('L2-01-03 快报-金融投资业务专属'[指标值]), 'L2-01-03 快报-金融投资业务专属'[指标名称] = "本年利润-累计投资收益(上月累计)")
-		displayFolder: L2-01-03 快报-金融投资业务专属
-		lineageTag: c834efee-c905-4127-a630-0320d0a1fa82
-
-		formatStringDefinition = FormatAmount()
-
-	/// 本年利润-累计所得税费用影响(上月累计)（求和）
-	measure 本年利润-累计所得税费用影响(上月累计) = CALCULATE(SUM('L2-01-03 快报-金融投资业务专属'[指标值]), 'L2-01-03 快报-金融投资业务专属'[指标名称] = "本年利润-累计所得税费用影响(上月累计)")
-		displayFolder: L2-01-03 快报-金融投资业务专属
-		lineageTag: e588ed20-8128-4135-91f0-eea1f307d9a1
-
-		formatStringDefinition = FormatAmount()
-
-	/// 本年利润-当月数（求和）
-	measure 本年利润-当月数 = CALCULATE(SUM('L2-01-03 快报-金融投资业务专属'[指标值]), 'L2-01-03 快报-金融投资业务专属'[指标名称] = "本年利润-当月数")
-		displayFolder: L2-01-03 快报-金融投资业务专属
-		lineageTag: 2572e682-94a1-47d7-8473-3b9abab8e863
-
-		formatStringDefinition = FormatAmount()
-
-	/// 期末净值-成本（求和）
-	measure 期末净值-成本 = CALCULATE(SUM('L2-01-03 快报-金融投资业务专属'[指标值]), 'L2-01-03 快报-金融投资业务专属'[指标名称] = "期末净值-成本")
-		displayFolder: L2-01-03 快报-金融投资业务专属
-		lineageTag: 7487e26f-64f7-41ba-bf2f-54dc5c77fa73
-
-		formatStringDefinition = FormatAmount()
-
-	/// 期末净值-公允价值变动（求和）
-	measure 期末净值-公允价值变动 = CALCULATE(SUM('L2-01-03 快报-金融投资业务专属'[指标值]), 'L2-01-03 快报-金融投资业务专属'[指标名称] = "期末净值-公允价值变动")
-		displayFolder: L2-01-03 快报-金融投资业务专属
-		lineageTag: 71281729-894e-4762-84c8-ed62ef8f1b8a
-
-		formatStringDefinition = FormatAmount()
-
-	/// 期末净值-合计（求和）
-	measure 期末净值-合计 = CALCULATE(SUM('L2-01-03 快报-金融投资业务专属'[指标值]), 'L2-01-03 快报-金融投资业务专属'[指标名称] = "期末净值-合计")
-		displayFolder: L2-01-03 快报-金融投资业务专属
-		lineageTag: d72c5d7c-04b0-4852-a019-897e9c5d3142
-
-		formatStringDefinition = FormatAmount()
-
-	/// 当月汇率变动影响-币种(CNY)（求和）
-	measure 当月汇率变动影响-币种(CNY) = CALCULATE(SUM('L2-01-03 快报-金融投资业务专属'[指标值]), 'L2-01-03 快报-金融投资业务专属'[指标名称] = "当月汇率变动影响-币种（CNY)")
-		displayFolder: L2-01-03 快报-金融投资业务专属
-		lineageTag: 8462465d-2672-45ca-8765-2bfeb5a6998e
-
-		formatStringDefinition = FormatAmount()
-
 	/// 累计实际：YTD 累计实际金额（求和）
 	measure 累计实际 = SUM('L2-03-01 销售管理费用预算执行汇总表'[累计实际])
 		displayFolder: L2-03-01 销售管理费用预算执行汇总表
@@ -212,53 +93,9 @@ table 度量值
 		formatStringDefinition = FormatRatio()
 
 	/// 指标值：财务费用分项金额（求和）
-	measure 指标值 = SUM('L2-03-02 财务费用汇总表'[指标值])
+	measure L2-03-02指标值 = SUM('L2-03-02 财务费用汇总表'[指标值])
 		displayFolder: L2-03-02 财务费用汇总表
 		lineageTag: fb0f769c-a919-47cc-a43e-bb2e3aa98866
-
-		formatStringDefinition = FormatAmount()
-
-	/// 硫磺-采购价(单价)：硫磺采购单价（单价，取单值）
-	measure 硫磺-采购价(单价) = MAX('L2-05-01 硫磺及硫酸价格分析月报'[硫磺-采购价(单价)])
-		formatString: #,0.00
-		displayFolder: L2-05-01 硫磺及硫酸价格分析月报
-		lineageTag: 321442b2-0168-4633-bce9-36ae2effbab6
-
-	/// 硫磺-陆运费(单价)：硫磺陆路运费单价（单价，取单值）
-	measure 硫磺-陆运费(单价) = MAX('L2-05-01 硫磺及硫酸价格分析月报'[硫磺-陆运费(单价)])
-		formatString: #,0.00
-		displayFolder: L2-05-01 硫磺及硫酸价格分析月报
-		lineageTag: cf4a6880-db72-4248-92ef-6b0ce91b680e
-
-	/// 硫磺-清关税费(单价)：硫磺清关税费单价（单价，取单值）
-	measure 硫磺-清关税费(单价) = MAX('L2-05-01 硫磺及硫酸价格分析月报'[硫磺-清关税费(单价)])
-		formatString: #,0.00
-		displayFolder: L2-05-01 硫磺及硫酸价格分析月报
-		lineageTag: 2f3ec81f-f88b-48ff-ad59-7d37df0bc553
-
-	/// 硫磺-DDP(单价)：硫磺 DDP 全成本单价（单价，取单值）
-	measure 硫磺-DDP(单价) = MAX('L2-05-01 硫磺及硫酸价格分析月报'[硫磺-DDP(单价)])
-		formatString: #,0.00
-		displayFolder: L2-05-01 硫磺及硫酸价格分析月报
-		lineageTag: a2003ce3-fd32-4e95-9977-2142f7a49b75
-
-	/// 硫磺-采购量：硫磺采购数量（求和）
-	measure 硫磺-采购量 = SUM('L2-05-01 硫磺及硫酸价格分析月报'[硫磺-采购量])
-		displayFolder: L2-05-01 硫磺及硫酸价格分析月报
-		lineageTag: 70e4952a-e4f3-4414-bb80-03a3f0ce7c15
-
-		formatStringDefinition = FormatAmount()
-
-	/// 硫酸-DDP(单价)：硫酸 DDP 全成本单价（单价，取单值）
-	measure 硫酸-DDP(单价) = MAX('L2-05-01 硫磺及硫酸价格分析月报'[硫酸-DDP(单价)])
-		formatString: #,0.00
-		displayFolder: L2-05-01 硫磺及硫酸价格分析月报
-		lineageTag: 4c3947d2-3924-4007-81e4-3f2752d2831f
-
-	/// 硫酸-采购量：硫酸采购数量（求和）
-	measure 硫酸-采购量 = SUM('L2-05-01 硫磺及硫酸价格分析月报'[硫酸-采购量])
-		displayFolder: L2-05-01 硫磺及硫酸价格分析月报
-		lineageTag: f6fbc4fd-92b9-4407-90bf-3f246dfd8e60
 
 		formatStringDefinition = FormatAmount()
 
@@ -493,6 +330,32 @@ table 度量值
 			```
 		displayFolder: L2-01-02 集团合并利润汇总表
 		lineageTag: b16ade29-53f0-48f5-b8a3-3844ead880f8
+
+	measure L2-01-03指标值 = ```
+			SUM('L2-01-03 快报-金融投资业务专属'[指标值]) 
+			```
+		displayFolder: L2-01-03 快报-金融投资业务专属
+		lineageTag: e0315754-a628-482f-abb8-94fd9476e555
+
+		formatStringDefinition = FormatAmount()
+
+	measure 金额(人民币) = SUM('L2-04-01库存汇总表'[金额(人民币)])
+		displayFolder: L2-04-01库存汇总表
+		lineageTag: db3d5d29-b50b-4a23-857b-20503c3ec9d8
+
+		formatStringDefinition = FormatAmount()
+
+	measure 量(吨) = SUM('L2-04-01库存汇总表'[量(吨)])
+		displayFolder: L2-04-01库存汇总表
+		lineageTag: d0d7509a-718e-4f98-ad1f-15492ec8c281
+
+		formatStringDefinition = FormatAmount()
+
+	measure L2-05-01指标值 = SUM('L2-05-01 硫磺及硫酸价格分析月报'[指标值])
+		displayFolder: L2-05-01 硫磺及硫酸价格分析月报
+		lineageTag: 1b84b574-ee08-4c40-9052-d6c81de6ab8e
+
+		formatStringDefinition = FormatAmount()
 
 	partition 度量值 = m
 		mode: import

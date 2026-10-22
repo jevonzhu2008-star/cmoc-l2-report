@@ -1,76 +1,6 @@
 table 'L2-05-01 硫磺及硫酸价格分析月报'
 	lineageTag: d3dfe0d7-08fb-48ce-be44-6e9270507f18
 
-	column 硫磺-采购价(单价)
-		dataType: double
-		lineageTag: b8749074-119b-4a5e-96fe-71357c03f2ad
-		summarizeBy: sum
-		sourceColumn: 硫磺-采购价(单价)
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	column 硫磺-陆运费(单价)
-		dataType: double
-		lineageTag: 28a2e241-3467-437e-b9f6-9e2dd10593c9
-		summarizeBy: sum
-		sourceColumn: 硫磺-陆运费(单价)
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	column 硫磺-清关税费(单价)
-		dataType: double
-		lineageTag: d0007328-2125-435c-af19-023708f6f7e1
-		summarizeBy: sum
-		sourceColumn: 硫磺-清关税费(单价)
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	column 硫磺-DDP(单价)
-		dataType: double
-		lineageTag: 7645490b-1f10-4bda-9748-41b9081c08f3
-		summarizeBy: sum
-		sourceColumn: 硫磺-DDP(单价)
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	column 硫磺-采购量
-		dataType: double
-		lineageTag: dc9e5931-3e61-464a-aea7-3eb3e2a427bc
-		summarizeBy: sum
-		sourceColumn: 硫磺-采购量
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	column 硫酸-DDP(单价)
-		dataType: double
-		lineageTag: 813ee224-fa20-4ad5-b1fb-38569911633b
-		summarizeBy: sum
-		sourceColumn: 硫酸-DDP(单价)
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	column 硫酸-采购量
-		dataType: double
-		lineageTag: 36c98121-09f1-4991-9b51-b54a46e70315
-		summarizeBy: sum
-		sourceColumn: 硫酸-采购量
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
 	column 加载年月
 		dataType: string
 		lineageTag: 60b489c7-c3ae-4948-b113-b743eba22f2a
@@ -134,6 +64,37 @@ table 'L2-05-01 硫磺及硫酸价格分析月报'
 
 		annotation SummarizationSetBy = Automatic
 
+	column 指标名称
+		dataType: string
+		lineageTag: 1cb06f0c-0281-4c11-99bd-e79e9aa42b56
+		summarizeBy: none
+		sourceColumn: 指标名称
+		sortByColumn: 指标排序
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column 指标值
+		dataType: double
+		lineageTag: 51b9d7bb-bf64-421a-abc5-e13ae0443c40
+		summarizeBy: sum
+		sourceColumn: 指标值
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 指标排序
+		dataType: double
+		lineageTag: 7df05834-bab6-4be6-aa27-b377dc706159
+		summarizeBy: sum
+		sourceColumn: 指标排序
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
 	partition 'L2-05-01 硫磺及硫酸价格分析月报' = m
 		mode: import
 		queryGroup: 财经\多月
@@ -153,6 +114,11 @@ table 'L2-05-01 硫磺及硫酸价格分析月报'
 				        7、新增【期间名称】字段：ACT=年-月；BGT=年预算
 				        8、新增【期间排序】数值列：ACT用年月数字排序，BGT统一放同一年末尾，用于报表可视化排序
 				    */
+				    // ========== 读取SharePoint上的指标排序映射表 ==========
+				    源 = SharePoint.Files(财经SharePoint站点, [ApiVersion = 15]),
+				    指标映射文件 = Table.SelectRows(源, each Text.Contains([Name], "L2-05-01 硫磺及硫酸价格分析月报指标映射") and [Extension] = ".xlsx"){0}[Content],
+				    指标排序表 = Excel.Workbook(指标映射文件, true){[Item = "指标排序", Kind = "Sheet"]}[Data],
+				
 				    // 1、连接BW QAS环境
 				    数据源 = SapBusinessWarehouse.Cubes(QAS服务器, 系统编号, 客户端ID, [LanguageCode="ZH", Implementation="2.0", BatchSize=500000000]),
 				    // 2、定位Cube与目标BW查询
@@ -212,9 +178,14 @@ table 'L2-05-01 硫磺及硫酸价格分析月报'
 				    // 将所有月份结果合并为一张长表
 				    合并结果 = Table.Combine(各月结果),
 				    // 使用【期间排序】字段排序，直接满足：月度ACT按日期从小到大，BGT预算在同一年最后
-				    排序后表 = Table.Sort(合并结果,{{"期间排序", Order.Ascending}})
+				    排序后表 = Table.Sort(合并结果,{{"期间排序", Order.Ascending}}),
+				    已逆透视其他列 = Table.UnpivotOtherColumns(排序后表, {"数据类别", "年月", "年", "月", "加载年月", "期间名称", "期间排序"}, "指标名称", "指标值"),
+				
+				    // ========== 左连接指标排序表（按指标名称） ==========
+				    左连接指标排序 = Table.NestedJoin(已逆透视其他列, {"指标名称"}, 指标排序表, {"指标名称"}, "指标映射临时", JoinKind.LeftOuter),
+				    展开指标排序 = Table.ExpandTableColumn(左连接指标排序, "指标映射临时", {"指标排序"}, {"指标排序"})
 				in
-				    排序后表
+				    展开指标排序
 
 	annotation PBI_ResultType = Table
 

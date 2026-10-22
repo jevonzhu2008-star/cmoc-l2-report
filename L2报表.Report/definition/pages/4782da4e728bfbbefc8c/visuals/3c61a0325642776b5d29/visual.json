@@ -13,6 +13,25 @@
     "visualType": "pivotTable",
     "query": {
       "queryState": {
+        "Columns": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "L2-05-01 硫磺及硫酸价格分析月报"
+                    }
+                  },
+                  "Property": "指标名称"
+                }
+              },
+              "queryRef": "L2-05-01 硫磺及硫酸价格分析月报.指标名称",
+              "nativeQueryRef": "指标名称",
+              "active": true
+            }
+          ]
+        },
         "Rows": {
           "projections": [
             {
@@ -42,95 +61,11 @@
                       "Entity": "度量值"
                     }
                   },
-                  "Property": "硫磺-采购价(单价)"
+                  "Property": "L2-05-01指标值"
                 }
               },
-              "queryRef": "度量值.硫磺-采购价(单价)",
-              "nativeQueryRef": "硫磺-采购价(单价)"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "度量值"
-                    }
-                  },
-                  "Property": "硫磺-陆运费(单价)"
-                }
-              },
-              "queryRef": "度量值.硫磺-陆运费(单价)",
-              "nativeQueryRef": "硫磺-陆运费(单价)"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "度量值"
-                    }
-                  },
-                  "Property": "硫磺-清关税费(单价)"
-                }
-              },
-              "queryRef": "度量值.硫磺-清关税费(单价)",
-              "nativeQueryRef": "硫磺-清关税费(单价)"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "度量值"
-                    }
-                  },
-                  "Property": "硫磺-DDP(单价)"
-                }
-              },
-              "queryRef": "度量值.硫磺-DDP(单价)",
-              "nativeQueryRef": "硫磺-DDP(单价)"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "度量值"
-                    }
-                  },
-                  "Property": "硫磺-采购量"
-                }
-              },
-              "queryRef": "度量值.硫磺-采购量",
-              "nativeQueryRef": "硫磺-采购量"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "度量值"
-                    }
-                  },
-                  "Property": "硫酸-DDP(单价)"
-                }
-              },
-              "queryRef": "度量值.硫酸-DDP(单价)",
-              "nativeQueryRef": "硫酸-DDP(单价)"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "度量值"
-                    }
-                  },
-                  "Property": "硫酸-采购量"
-                }
-              },
-              "queryRef": "度量值.硫酸-采购量",
-              "nativeQueryRef": "硫酸-采购量"
+              "queryRef": "度量值.L2-05-01指标值",
+              "nativeQueryRef": "L2-05-01指标值"
             }
           ]
         }

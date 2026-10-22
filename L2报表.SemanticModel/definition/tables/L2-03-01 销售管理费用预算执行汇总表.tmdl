@@ -46,6 +46,9 @@ table 'L2-03-01 销售管理费用预算执行汇总表'
 		lineageTag: 46a20433-22b1-4d1b-8df5-13749ee7e568
 		summarizeBy: none
 		sourceColumn: 公司代码
+		sortByColumn: 公司代码排序
+
+		changedProperty = SortByColumn
 
 		annotation SummarizationSetBy = Automatic
 
@@ -54,7 +57,7 @@ table 'L2-03-01 销售管理费用预算执行汇总表'
 		lineageTag: 62ddfd7b-224d-4781-9b49-a4487d62fd30
 		summarizeBy: none
 		sourceColumn: 销管费分类
-		sortByColumn: 销管费分类代码
+		sortByColumn: 销管费分类排序
 
 		changedProperty = SortByColumn
 
@@ -65,6 +68,9 @@ table 'L2-03-01 销售管理费用预算执行汇总表'
 		lineageTag: 4dd302d5-d15a-4775-b73f-5acf206e9b68
 		summarizeBy: none
 		sourceColumn: 管理口径利润中心
+		sortByColumn: 管理口径利润中心排序
+
+		changedProperty = SortByColumn
 
 		annotation SummarizationSetBy = Automatic
 
@@ -103,6 +109,36 @@ table 'L2-03-01 销售管理费用预算执行汇总表'
 
 		annotation SummarizationSetBy = Automatic
 
+	column 公司代码排序
+		dataType: double
+		lineageTag: 92d6a9ff-b277-4302-b55a-3e3e499d9975
+		summarizeBy: sum
+		sourceColumn: 公司代码排序
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 销管费分类排序
+		dataType: double
+		lineageTag: 1cacb813-def8-4601-95cb-7f072228578c
+		summarizeBy: sum
+		sourceColumn: 销管费分类排序
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 管理口径利润中心排序
+		dataType: double
+		lineageTag: ddb1dcc8-df01-481f-8001-1624621828be
+		summarizeBy: sum
+		sourceColumn: 管理口径利润中心排序
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
 	partition 'L2-03-01 销售管理费用预算执行汇总表' = m
 		mode: import
 		queryGroup: 财经\多月
@@ -120,6 +156,13 @@ table 'L2-03-01 销售管理费用预算执行汇总表'
 				        5、连接参数统一：QAS服务器、系统编号、客户端ID，和项目其他BW查询保持一套参数规范
 				        6、BatchSize调大，用于提升大批量BW数据拉取性能
 				    */
+				    // ========== 读取SharePoint上的排序映射表 ==========
+				    源 = SharePoint.Files(财经SharePoint站点, [ApiVersion = 15]),
+				    指标映射文件 = Table.SelectRows(源, each Text.Contains([Name], "L2-03-01 销售管理费用预算执行汇总表指标映射") and [Extension] = ".xlsx"){0}[Content],
+				    公司代码排序表 = Excel.Workbook(指标映射文件, true){[Item = "公司代码排序", Kind = "Sheet"]}[Data],
+				    销管费分类排序表 = Excel.Workbook(指标映射文件, true){[Item = "销管费分类排序", Kind = "Sheet"]}[Data],
+				    管理口径利润中心排序表 = Excel.Workbook(指标映射文件, true){[Item = "管理口径利润中心排序", Kind = "Sheet"]}[Data],
+				
 				    // 1、连接BW QAS环境
 				    数据源 = SapBusinessWarehouse.Cubes(QAS服务器, 系统编号, 客户端ID, [LanguageCode="ZH", Implementation="2.0", BatchSize=500000000]),
 				    // 2、定位Cube与目标BW查询
@@ -157,9 +200,20 @@ table 'L2-03-01 销售管理费用预算执行汇总表'
 				    // 遍历月份，逐个查询
 				    各月结果 = List.Transform(月份文本列表, 查询单月),
 				    // 合并所有月份结果
-				    合并结果 = Table.Combine(各月结果)
+				    合并结果 = Table.Combine(各月结果),
+				
+				    // ========== 左连接映射表，带出三个排序 ==========
+				    // 左连接公司代码排序表（按公司代码代码）
+				    左连接公司排序 = Table.NestedJoin(合并结果, {"公司代码"}, 公司代码排序表, {"公司代码"}, "公司映射临时", JoinKind.LeftOuter),
+				    展开公司排序 = Table.ExpandTableColumn(左连接公司排序, "公司映射临时", {"公司代码排序"}, {"公司代码排序"}),
+				    // 左连接销管费分类排序表（按销管费分类代码）
+				    左连接分类排序 = Table.NestedJoin(展开公司排序, {"销管费分类"}, 销管费分类排序表, {"销管费分类"}, "分类映射临时", JoinKind.LeftOuter),
+				    展开分类排序 = Table.ExpandTableColumn(左连接分类排序, "分类映射临时", {"销管费分类排序"}, {"销管费分类排序"}),
+				    // 左连接管理口径利润中心排序表（按利润中心代码）
+				    左连接利润中心排序 = Table.NestedJoin(展开分类排序, {"管理口径利润中心"}, 管理口径利润中心排序表, {"管理口径利润中心"}, "利润中心映射临时", JoinKind.LeftOuter),
+				    展开利润中心排序 = Table.ExpandTableColumn(左连接利润中心排序, "利润中心映射临时", {"管理口径利润中心排序"}, {"管理口径利润中心排序"})
 				in
-				    合并结果
+				    展开利润中心排序
 
 	annotation PBI_ResultType = Table
 

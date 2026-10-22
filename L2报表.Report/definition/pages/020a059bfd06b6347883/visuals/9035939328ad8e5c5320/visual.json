@@ -85,22 +85,17 @@
           "projections": [
             {
               "field": {
-                "Aggregation": {
+                "Measure": {
                   "Expression": {
-                    "Column": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "L2-01-03 快报-金融投资业务专属"
-                        }
-                      },
-                      "Property": "指标值"
+                    "SourceRef": {
+                      "Entity": "度量值"
                     }
                   },
-                  "Function": 0
+                  "Property": "L2-01-03指标值"
                 }
               },
-              "queryRef": "Sum(L2-01-03 快报-金融投资业务专属.指标值)",
-              "nativeQueryRef": "指标值 的总和"
+              "queryRef": "度量值.L2-01-03指标值",
+              "nativeQueryRef": "L2-01-03指标值"
             }
           ]
         }
@@ -420,6 +415,83 @@
                 }
               }
             }
+          }
+        },
+        {
+          "properties": {
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Conditional": {
+                      "Cases": [
+                        {
+                          "Condition": {
+                            "And": {
+                              "Left": {
+                                "Comparison": {
+                                  "ComparisonKind": 2,
+                                  "Left": {
+                                    "Measure": {
+                                      "Expression": {
+                                        "SourceRef": {
+                                          "Entity": "度量值"
+                                        }
+                                      },
+                                      "Property": "L2-01-03指标值"
+                                    }
+                                  },
+                                  "Right": {
+                                    "Literal": {
+                                      "Value": "-999999999999D"
+                                    }
+                                  }
+                                }
+                              },
+                              "Right": {
+                                "Comparison": {
+                                  "ComparisonKind": 3,
+                                  "Left": {
+                                    "Measure": {
+                                      "Expression": {
+                                        "SourceRef": {
+                                          "Entity": "度量值"
+                                        }
+                                      },
+                                      "Property": "L2-01-03指标值"
+                                    }
+                                  },
+                                  "Right": {
+                                    "Literal": {
+                                      "Value": "0D"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "Value": {
+                            "Literal": {
+                              "Value": "'#B91C1C'"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "dataViewWildcard": {
+                  "matchingOption": 1
+                }
+              }
+            ],
+            "metadata": "度量值.L2-01-03指标值"
           }
         }
       ],
@@ -995,6 +1067,62 @@
         },
         "type": "Categorical",
         "howCreated": "User"
+      },
+      {
+        "name": "463a1303d74b1b17040a",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "L2-01-03 快报-金融投资业务专属"
+              }
+            },
+            "Property": "指标名称"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "563212b84f68f361c027",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "L2-01-03 快报-金融投资业务专属"
+              }
+            },
+            "Property": "公司代码"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "097ae48c69c6dd3e73ac",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "L2-01-03 快报-金融投资业务专属"
+              }
+            },
+            "Property": "金融投资产品"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "cbac7cd210955dd7fbdd",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "L2-01-03 快报-金融投资业务专属"
+              }
+            },
+            "Property": "公司代码货币"
+          }
+        },
+        "type": "Categorical"
       }
     ],
     "filterSortOrder": "Custom"

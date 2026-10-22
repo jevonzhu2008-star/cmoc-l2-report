@@ -70,41 +70,31 @@
           "projections": [
             {
               "field": {
-                "Aggregation": {
+                "Measure": {
                   "Expression": {
-                    "Column": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "L2-04-01库存汇总表"
-                        }
-                      },
-                      "Property": "金额(人民币)"
+                    "SourceRef": {
+                      "Entity": "度量值"
                     }
                   },
-                  "Function": 0
+                  "Property": "金额(人民币)"
                 }
               },
-              "queryRef": "Sum(L2-04-01库存汇总表.金额(人民币))",
-              "nativeQueryRef": "金额(人民币) 的总和"
+              "queryRef": "度量值.金额(人民币)",
+              "nativeQueryRef": "金额(人民币)"
             },
             {
               "field": {
-                "Aggregation": {
+                "Measure": {
                   "Expression": {
-                    "Column": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "L2-04-01库存汇总表"
-                        }
-                      },
-                      "Property": "量(吨)"
+                    "SourceRef": {
+                      "Entity": "度量值"
                     }
                   },
-                  "Function": 0
+                  "Property": "量(吨)"
                 }
               },
-              "queryRef": "Sum(L2-04-01库存汇总表.量(吨))",
-              "nativeQueryRef": "量(吨) 的总和"
+              "queryRef": "度量值.量(吨)",
+              "nativeQueryRef": "量(吨)"
             }
           ]
         }
