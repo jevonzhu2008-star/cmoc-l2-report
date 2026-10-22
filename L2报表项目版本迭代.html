@@ -95,6 +95,15 @@ svg text{font-family:var(--sans)}
 <script>
 const DATA = [
   {
+    "short": "f72cecf",
+    "date": "2026-10-22 16:03",
+    "msg": "全面补充与修正 M 和 DAX 注释",
+    "files": 7,
+    "add": 30,
+    "del": 2,
+    "ms": false
+  },
+  {
     "short": "bd9bda6",
     "date": "2026-10-22 15:53",
     "msg": "三张表添加 SharePoint 排序映射",
@@ -260,6 +269,13 @@ const DATA = [
 
 // 完整提交备注（由 update-version-html.py 维护，去 Co-Authored-By）
 const NOTES = {
+  "f72cecf": [
+    "- functions.tmdl：FormatRatio、DynamicFormat 补注释",
+    "- expressions.tmdl：7 个参数补注释",
+    "- 度量值.tmdl：5 个度量值补注释",
+    "- L2-03-02、L2-04-01 表头补【说明】",
+    "- 修正 L2-01-02、L2-05-01 结束月份注释（当年12月 → p_月报终止日期）"
+  ],
   "bd9bda6": [
     "- L2-03-01 销售管理费用：公司代码排序、销管费分类排序、管理口径利润中心排序",
     "- L2-04-01 库存汇总：分类排序、结构排序、矿体排序",
