@@ -99,6 +99,7 @@ table 度量值
 
 		formatStringDefinition = FormatAmount()
 
+	/// 动态格式字符串：按当前度量值名（SELECTEDMEASURENAME）从「指标格式配置」表查配置，返回动态格式字符串（类型/小数位数/千分位/负数样式），供度量值 formatStringDefinition 引用
 	measure 动态格式字符串 = ```
 			
 			VAR CurrentMeasureName = SELECTEDMEASURENAME()
@@ -331,6 +332,7 @@ table 度量值
 		displayFolder: L2-01-02 集团合并利润汇总表
 		lineageTag: b16ade29-53f0-48f5-b8a3-3844ead880f8
 
+	/// L2-01-03指标值：快报-金融投资业务专属长表（指标名称+指标值）的指标值求和，报表中配合「指标名称」筛选展示各指标
 	measure L2-01-03指标值 = ```
 			SUM('L2-01-03 快报-金融投资业务专属'[指标值]) 
 			```
@@ -339,18 +341,21 @@ table 度量值
 
 		formatStringDefinition = FormatAmount()
 
+	/// 金额(人民币)：库存汇总表金额求和（单位：人民币）
 	measure 金额(人民币) = SUM('L2-04-01库存汇总表'[金额(人民币)])
 		displayFolder: L2-04-01库存汇总表
 		lineageTag: db3d5d29-b50b-4a23-857b-20503c3ec9d8
 
 		formatStringDefinition = FormatAmount()
 
+	/// 量(吨)：库存汇总表数量求和（单位：吨）
 	measure 量(吨) = SUM('L2-04-01库存汇总表'[量(吨)])
 		displayFolder: L2-04-01库存汇总表
 		lineageTag: d0d7509a-718e-4f98-ad1f-15492ec8c281
 
 		formatStringDefinition = FormatAmount()
 
+	/// L2-05-01指标值：硫磺及硫酸价格分析月报长表（指标名称+指标值）的指标值求和，报表中配合「指标名称」筛选展示各指标
 	measure L2-05-01指标值 = SUM('L2-05-01 硫磺及硫酸价格分析月报'[指标值])
 		displayFolder: L2-05-01 硫磺及硫酸价格分析月报
 		lineageTag: 1b84b574-ee08-4c40-9052-d6c81de6ab8e

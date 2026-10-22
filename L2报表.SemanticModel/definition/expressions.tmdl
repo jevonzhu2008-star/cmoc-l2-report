@@ -1,3 +1,4 @@
+/// p_月报起始日期：月报循环取数的起始月份（参数，各 BW 查询循环取数用）
 expression p_月报起始日期 = #date(2026, 1, 1) meta [IsParameterQuery = true, IsParameterQueryRequired = true, Type = type date]
 	lineageTag: d37f2340-7e85-4790-a15d-b76741818d33
 	queryGroup: 参数
@@ -6,24 +7,28 @@ expression p_月报起始日期 = #date(2026, 1, 1) meta [IsParameterQuery = tru
 
 	annotation PBI_ResultType = Date
 
+/// p_月报终止日期：月报循环取数的终止月份（参数，各 BW 查询循环取数用）
 expression p_月报终止日期 = #date(2026, 4, 1) meta [IsParameterQuery = true, IsParameterQueryRequired = true, Type = type date]
 	lineageTag: 11d89abb-ed2d-42a8-bf70-517ae5c3a03e
 	queryGroup: 参数
 
 	annotation PBI_ResultType = Date
 
+/// 系统编号：SAP BW 系统编号（参数，连接 BW 用）
 expression 系统编号 = "00" meta [IsParameterQuery = true, IsParameterQueryRequired = false, Type = type text]
 	lineageTag: ccc630c4-3332-4432-9740-ec4ea8a87f4e
 	queryGroup: 参数
 
 	annotation PBI_ResultType = Text
 
+/// 客户端ID：SAP BW 客户端 ID（参数，连接 BW 用）
 expression 客户端ID = "100" meta [IsParameterQuery = true, IsParameterQueryRequired = false, Type = type text]
 	lineageTag: 7c1720ff-1ca5-4ea0-bc78-056db0769523
 	queryGroup: 参数
 
 	annotation PBI_ResultType = Text
 
+/// QAS服务器：SAP BW QAS 环境服务器地址（参数，连接 BW 用）
 expression QAS服务器 =
 		let
 		    源 = "10.43.15.32" meta [IsParameterQuery = true, IsParameterQueryRequired = false, Type = type text]
@@ -34,12 +39,14 @@ expression QAS服务器 =
 
 	annotation PBI_ResultType = Text
 
+/// 动态年月偏移：动态年月偏移月数（参数，-1 表示取上一个月，用于单月取数的表）
 expression 动态年月偏移 = -1 meta [IsParameterQuery = true, IsParameterQueryRequired = false, Type = type number]
 	lineageTag: 1dd751e2-7755-4003-bcba-ad29b64d226a
 	queryGroup: 参数
 
 	annotation PBI_ResultType = Number
 
+/// 财经SharePoint站点：财经报表 SharePoint 站点地址（参数，读取指标映射等 Excel 文件用）
 expression 财经SharePoint站点 = "https://xsyzz.sharepoint.com/sites/CMOCGroup/" meta [IsParameterQuery = true, IsParameterQueryRequired = false, Type = type text]
 	lineageTag: 9e6b9c11-4f6a-4b51-8c63-0b5f673c9c38
 	queryGroup: 参数

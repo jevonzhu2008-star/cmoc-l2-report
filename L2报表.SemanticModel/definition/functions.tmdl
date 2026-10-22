@@ -6,9 +6,11 @@ function FormatAmount = ```
 		```
 	lineageTag: 15da78dd-fbd0-4602-96c6-32c1edbef155
 
+/// 返回百分比格式字符串（带正负号，2 位小数），供度量值 formatStringDefinition 引用
 function FormatRatio = () =>"+0.00%;-0.00%;0.00%"
 	lineageTag: 218991ec-c130-43e5-a106-45cd669d18b4
 
+/// 动态格式函数：按当前度量值名（SELECTEDMEASURENAME）从「指标格式配置」表查配置，动态返回格式字符串（类型/小数位数/千分位/负数样式），供度量值 formatStringDefinition 引用
 function DynamicFormat = ```
 		() => 
 		VAR CurrentMeasureName = SELECTEDMEASURENAME()
