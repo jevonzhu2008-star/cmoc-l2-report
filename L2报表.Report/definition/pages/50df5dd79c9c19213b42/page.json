@@ -4,5 +4,17 @@
   "displayName": "L2-01-02 集团合并利润汇总表",
   "displayOption": "FitToPage",
   "height": 1080,
-  "width": 1920
+  "width": 1920,
+  "visualInteractions": [
+    {
+      "source": "44bc85994c68c0c714f8",
+      "target": "00ce9c9b414e391d9599",
+      "type": "NoFilter"
+    },
+    {
+      "source": "00ce9c9b414e391d9599",
+      "target": "44bc85994c68c0c714f8",
+      "type": "NoFilter"
+    }
+  ]
 }

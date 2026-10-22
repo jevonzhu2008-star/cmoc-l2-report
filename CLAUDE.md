@@ -73,6 +73,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `.gitignore` 已排除 `**/.pbi/localSettings.json`（本地连接凭据）与 `**/.pbi/cache.abf`（数据缓存）。
 - 已知坑：Windows 上 `core.autocrlf=true` 会让 `.tmdl` 文件出现仅行尾差异的「假修改」（`git diff` 为空）。遇到时 `git add -A` 会将其规范化掉，或加 `.gitattributes` 固定 `*.tmdl text eol=lf`。
 
+## HTML 度量值规范
+
+报表里用「HTML 内容」视觉渲染的度量值（生成 HTML 表格，如「利润汇总表」），其**配色、数值格式、颜色判断、表格结构**必须遵循 `L2报表HTML格式规范.md`（项目根目录）。要点：金额 `#,0;(#,0);0` 正黑负红、百分比 2 位小数带 `+`/`-` 号正绿负红、颜色用内联 `style` 属性（不依赖 `<style>` 的 class）、分月值 0 不显示、无数据月份整列隐藏、环比MTD 末列。
+
 ## 可用工具
 
 - 语义模型操作可用 **powerbi-modeling MCP**（连接本地 TMDL/PBIP、DAX 查询、增删改表/度量值/列/关系等）。
