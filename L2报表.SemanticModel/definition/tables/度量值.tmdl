@@ -65,119 +65,119 @@ table 度量值
 		formatStringDefinition = FormatRatio()
 
 	/// 年净值-成本（求和）
-	measure 年净值-成本 = SUM('L2-01-03 快报-金融投资业务专属'[年净值-成本])
+	measure 年净值-成本 = CALCULATE(SUM('L2-01-03 快报-金融投资业务专属'[指标值]), 'L2-01-03 快报-金融投资业务专属'[指标名称] = "年净值-成本")
 		displayFolder: L2-01-03 快报-金融投资业务专属
 		lineageTag: bdbf7cce-277a-4bb3-942d-9078ebe86db1
 
 		formatStringDefinition = FormatAmount()
 
 	/// 年净值-公允价值变动（求和）
-	measure 年净值-公允价值变动 = SUM('L2-01-03 快报-金融投资业务专属'[年净值-公允价值变动])
+	measure 年净值-公允价值变动 = CALCULATE(SUM('L2-01-03 快报-金融投资业务专属'[指标值]), 'L2-01-03 快报-金融投资业务专属'[指标名称] = "年净值-公允价值变动")
 		displayFolder: L2-01-03 快报-金融投资业务专属
 		lineageTag: f9a16848-e965-4b4d-bc20-80965d8965bc
 
 		formatStringDefinition = FormatAmount()
 
 	/// 年净值-合计（求和）
-	measure 年净值-合计 = SUM('L2-01-03 快报-金融投资业务专属'[年净值-合计])
+	measure 年净值-合计 = CALCULATE(SUM('L2-01-03 快报-金融投资业务专属'[指标值]), 'L2-01-03 快报-金融投资业务专属'[指标名称] = "年净值-合计")
 		displayFolder: L2-01-03 快报-金融投资业务专属
 		lineageTag: 86b47614-5e37-42e8-b728-6862b0bc7204
 
 		formatStringDefinition = FormatAmount()
 
 	/// 本年-新增投资（求和）
-	measure 本年-新增投资 = SUM('L2-01-03 快报-金融投资业务专属'[本年-新增投资])
+	measure 本年-新增投资 = CALCULATE(SUM('L2-01-03 快报-金融投资业务专属'[指标值]), 'L2-01-03 快报-金融投资业务专属'[指标名称] = "本年-新增投资")
 		displayFolder: L2-01-03 快报-金融投资业务专属
 		lineageTag: ac2b77aa-a25f-4df9-abf1-efa08ddb003c
 
 		formatStringDefinition = FormatAmount()
 
 	/// 本年利润-累计公允价值变动（求和）
-	measure 本年利润-累计公允价值变动 = SUM('L2-01-03 快报-金融投资业务专属'[本年利润-累计公允价值变动])
+	measure 本年利润-累计公允价值变动 = CALCULATE(SUM('L2-01-03 快报-金融投资业务专属'[指标值]), 'L2-01-03 快报-金融投资业务专属'[指标名称] = "本年利润-累计公允价值变动")
 		displayFolder: L2-01-03 快报-金融投资业务专属
 		lineageTag: af671ee9-dca8-4b81-82f8-0f565dc05f88
 
 		formatStringDefinition = FormatAmount()
 
 	/// 本年利润-累计投资收益（求和）
-	measure 本年利润-累计投资收益 = SUM('L2-01-03 快报-金融投资业务专属'[本年利润-累计投资收益])
+	measure 本年利润-累计投资收益 = CALCULATE(SUM('L2-01-03 快报-金融投资业务专属'[指标值]), 'L2-01-03 快报-金融投资业务专属'[指标名称] = "本年利润-累计投资收益")
 		displayFolder: L2-01-03 快报-金融投资业务专属
 		lineageTag: c5434ddc-608d-4a6e-bf8a-94c0f11eb010
 
 		formatStringDefinition = FormatAmount()
 
 	/// 本年利润-累计所得税费用影响（求和）
-	measure 本年利润-累计所得税费用影响 = SUM('L2-01-03 快报-金融投资业务专属'[本年利润-累计所得税费用影响])
+	measure 本年利润-累计所得税费用影响 = CALCULATE(SUM('L2-01-03 快报-金融投资业务专属'[指标值]), 'L2-01-03 快报-金融投资业务专属'[指标名称] = "本年利润-累计所得税费用影响")
 		displayFolder: L2-01-03 快报-金融投资业务专属
 		lineageTag: 69e2d58c-9031-4e23-bd79-7806416b4530
 
 		formatStringDefinition = FormatAmount()
 
 	/// 本年利润-退出成本（求和）
-	measure 本年利润-退出成本 = SUM('L2-01-03 快报-金融投资业务专属'[本年利润-退出成本])
+	measure 本年利润-退出成本 = CALCULATE(SUM('L2-01-03 快报-金融投资业务专属'[指标值]), 'L2-01-03 快报-金融投资业务专属'[指标名称] = "本年利润-退出成本")
 		displayFolder: L2-01-03 快报-金融投资业务专属
 		lineageTag: 5e555ef0-db98-45b8-a4f6-3e7a15786ab1
 
 		formatStringDefinition = FormatAmount()
 
 	/// 本年利润-退出持有收益（求和）
-	measure 本年利润-退出持有收益 = SUM('L2-01-03 快报-金融投资业务专属'[本年利润-退出持有收益])
+	measure 本年利润-退出持有收益 = CALCULATE(SUM('L2-01-03 快报-金融投资业务专属'[指标值]), 'L2-01-03 快报-金融投资业务专属'[指标名称] = "本年利润-退出持有收益")
 		displayFolder: L2-01-03 快报-金融投资业务专属
 		lineageTag: 6859cd61-77ed-4871-b6fa-32362bd98a34
 
 		formatStringDefinition = FormatAmount()
 
 	/// 本年利润-累计公允价值变动(上月累计)（求和）
-	measure 本年利润-累计公允价值变动(上月累计) = SUM('L2-01-03 快报-金融投资业务专属'[本年利润-累计公允价值变动(上月累计)])
+	measure 本年利润-累计公允价值变动(上月累计) = CALCULATE(SUM('L2-01-03 快报-金融投资业务专属'[指标值]), 'L2-01-03 快报-金融投资业务专属'[指标名称] = "本年利润-累计公允价值变动(上月累计)")
 		displayFolder: L2-01-03 快报-金融投资业务专属
 		lineageTag: 5ce90b64-143b-4631-bab8-8cf1c17601a2
 
 		formatStringDefinition = FormatAmount()
 
 	/// 本年利润-累计投资收益(上月累计)（求和）
-	measure 本年利润-累计投资收益(上月累计) = SUM('L2-01-03 快报-金融投资业务专属'[本年利润-累计投资收益(上月累计)])
+	measure 本年利润-累计投资收益(上月累计) = CALCULATE(SUM('L2-01-03 快报-金融投资业务专属'[指标值]), 'L2-01-03 快报-金融投资业务专属'[指标名称] = "本年利润-累计投资收益(上月累计)")
 		displayFolder: L2-01-03 快报-金融投资业务专属
 		lineageTag: c834efee-c905-4127-a630-0320d0a1fa82
 
 		formatStringDefinition = FormatAmount()
 
 	/// 本年利润-累计所得税费用影响(上月累计)（求和）
-	measure 本年利润-累计所得税费用影响(上月累计) = SUM('L2-01-03 快报-金融投资业务专属'[本年利润-累计所得税费用影响(上月累计)])
+	measure 本年利润-累计所得税费用影响(上月累计) = CALCULATE(SUM('L2-01-03 快报-金融投资业务专属'[指标值]), 'L2-01-03 快报-金融投资业务专属'[指标名称] = "本年利润-累计所得税费用影响(上月累计)")
 		displayFolder: L2-01-03 快报-金融投资业务专属
 		lineageTag: e588ed20-8128-4135-91f0-eea1f307d9a1
 
 		formatStringDefinition = FormatAmount()
 
 	/// 本年利润-当月数（求和）
-	measure 本年利润-当月数 = SUM('L2-01-03 快报-金融投资业务专属'[本年利润-当月数])
+	measure 本年利润-当月数 = CALCULATE(SUM('L2-01-03 快报-金融投资业务专属'[指标值]), 'L2-01-03 快报-金融投资业务专属'[指标名称] = "本年利润-当月数")
 		displayFolder: L2-01-03 快报-金融投资业务专属
 		lineageTag: 2572e682-94a1-47d7-8473-3b9abab8e863
 
 		formatStringDefinition = FormatAmount()
 
 	/// 期末净值-成本（求和）
-	measure 期末净值-成本 = SUM('L2-01-03 快报-金融投资业务专属'[期末净值-成本])
+	measure 期末净值-成本 = CALCULATE(SUM('L2-01-03 快报-金融投资业务专属'[指标值]), 'L2-01-03 快报-金融投资业务专属'[指标名称] = "期末净值-成本")
 		displayFolder: L2-01-03 快报-金融投资业务专属
 		lineageTag: 7487e26f-64f7-41ba-bf2f-54dc5c77fa73
 
 		formatStringDefinition = FormatAmount()
 
 	/// 期末净值-公允价值变动（求和）
-	measure 期末净值-公允价值变动 = SUM('L2-01-03 快报-金融投资业务专属'[期末净值-公允价值变动])
+	measure 期末净值-公允价值变动 = CALCULATE(SUM('L2-01-03 快报-金融投资业务专属'[指标值]), 'L2-01-03 快报-金融投资业务专属'[指标名称] = "期末净值-公允价值变动")
 		displayFolder: L2-01-03 快报-金融投资业务专属
 		lineageTag: 71281729-894e-4762-84c8-ed62ef8f1b8a
 
 		formatStringDefinition = FormatAmount()
 
 	/// 期末净值-合计（求和）
-	measure 期末净值-合计 = SUM('L2-01-03 快报-金融投资业务专属'[期末净值-合计])
+	measure 期末净值-合计 = CALCULATE(SUM('L2-01-03 快报-金融投资业务专属'[指标值]), 'L2-01-03 快报-金融投资业务专属'[指标名称] = "期末净值-合计")
 		displayFolder: L2-01-03 快报-金融投资业务专属
 		lineageTag: d72c5d7c-04b0-4852-a019-897e9c5d3142
 
 		formatStringDefinition = FormatAmount()
 
 	/// 当月汇率变动影响-币种(CNY)（求和）
-	measure 当月汇率变动影响-币种(CNY) = SUM('L2-01-03 快报-金融投资业务专属'[当月汇率变动影响-币种（CNY)])
+	measure 当月汇率变动影响-币种(CNY) = CALCULATE(SUM('L2-01-03 快报-金融投资业务专属'[指标值]), 'L2-01-03 快报-金融投资业务专属'[指标名称] = "当月汇率变动影响-币种（CNY)")
 		displayFolder: L2-01-03 快报-金融投资业务专属
 		lineageTag: 8462465d-2672-45ca-8765-2bfeb5a6998e
 

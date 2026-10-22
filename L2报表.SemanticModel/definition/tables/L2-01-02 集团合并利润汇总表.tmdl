@@ -263,7 +263,7 @@ table 'L2-01-02 集团合并利润汇总表'
 				                    else if mSort <= 9 then "Q3"
 				                    else if mSort <= 12 then "Q4"
 				                    else null
-				            , type text),
+				            , type text)
 				        in
 				        添加季度,
 				    // 遍历月份列表，逐个执行单月查询

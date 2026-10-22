@@ -63,6 +63,21 @@
               "queryRef": "L2-01-03 快报-金融投资业务专属.金融投资产品",
               "nativeQueryRef": "金融投资产品",
               "active": true
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "L2-01-03 快报-金融投资业务专属"
+                    }
+                  },
+                  "Property": "公司代码货币"
+                }
+              },
+              "queryRef": "L2-01-03 快报-金融投资业务专属.公司代码货币",
+              "nativeQueryRef": "公司代码货币",
+              "active": true
             }
           ]
         },
@@ -89,6 +104,23 @@
             }
           ]
         }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "L2-01-03 快报-金融投资业务专属"
+                  }
+                },
+                "Property": "金融投资产品"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ]
       }
     },
     "objects": {

@@ -6,6 +6,9 @@ table 'L2-01-03 快报-金融投资业务专属'
 		lineageTag: aa6a8c1d-f5c7-442f-a5b8-c5a61e0d6a26
 		summarizeBy: none
 		sourceColumn: 公司代码
+		sortByColumn: 公司代码排序
+
+		changedProperty = SortByColumn
 
 		annotation SummarizationSetBy = Automatic
 
@@ -22,6 +25,9 @@ table 'L2-01-03 快报-金融投资业务专属'
 		lineageTag: c161ac73-f1e8-49bd-b6f6-1414631711a9
 		summarizeBy: none
 		sourceColumn: 金融投资产品
+		sortByColumn: 金融投资产品排序
+
+		changedProperty = SortByColumn
 
 		annotation SummarizationSetBy = Automatic
 
@@ -38,6 +44,9 @@ table 'L2-01-03 快报-金融投资业务专属'
 		lineageTag: 78041398-bfa1-4405-a065-5d40f85fbafc
 		summarizeBy: none
 		sourceColumn: 指标名称
+		sortByColumn: 指标排序
+
+		changedProperty = SortByColumn
 
 		annotation SummarizationSetBy = Automatic
 
@@ -46,6 +55,36 @@ table 'L2-01-03 快报-金融投资业务专属'
 		lineageTag: 96dc77ea-ca8c-4f0d-b952-7c4b7cf45396
 		summarizeBy: sum
 		sourceColumn: 指标值
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 指标排序
+		dataType: double
+		lineageTag: 2d5ed53d-7c40-495f-a02f-d7292c9ffcf2
+		summarizeBy: sum
+		sourceColumn: 指标排序
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 金融投资产品排序
+		dataType: double
+		lineageTag: 85172362-a02f-4bbc-9660-d37ac203bf36
+		summarizeBy: sum
+		sourceColumn: 金融投资产品排序
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 公司代码排序
+		dataType: double
+		lineageTag: 49db9968-3f6f-47c3-9f82-3dd31f34c72b
+		summarizeBy: sum
+		sourceColumn: 公司代码排序
 
 		annotation SummarizationSetBy = Automatic
 
@@ -67,6 +106,13 @@ table 'L2-01-03 快报-金融投资业务专属'
 				        4、指标：年净值、投资变动、本年利润累计、上月累计、当月数、期末净值、汇率变动共17个Measure
 				        5、末尾逆透视：把17个指标列转成「指标名称+指标值」的长表结构，方便报表按指标筛选展示
 				    */
+				    
+				    // ========== 读取SharePoint上的排序映射表 ==========
+				    源 = SharePoint.Files(财经SharePoint站点, [ApiVersion = 15]),
+				    指标映射文件 = Table.SelectRows(源, each Text.Contains([Name], "L2-01-03 快报-金融投资业务专属指标映射") and [Extension] = ".xlsx"){0}[Content],
+				    指标排序表 = Excel.Workbook(指标映射文件, true){[Item = "指标排序", Kind = "Sheet"]}[Data],
+				    金融投资产品排序表 = Excel.Workbook(指标映射文件, true){[Item = "金融投资产品排序", Kind = "Sheet"]}[Data],
+				    公司代码排序表 = Excel.Workbook(指标映射文件, true){[Item = "公司代码排序", Kind = "Sheet"]}[Data],
 				    
 				    // ========== 第一步：连接BW QAS环境 ==========
 				    数据源 = SapBusinessWarehouse.Cubes(QAS服务器, 系统编号, 客户端ID, [Implementation="2.0"]),
@@ -156,9 +202,20 @@ table 'L2-01-03 快报-金融投资业务专属'
 				        {"公司代码", "公司代码货币", "金融投资产品", "加载年月"},  // 保留的列
 				        "指标名称",   // 新列名：存指标名称（如"年净值-成本"）
 				        "指标值"      // 新列名：存指标数值
-				    )
+				    ),
+				    
+				    // ========== 第八步：左连接映射表，带出三个排序 ==========
+				    // 左连接指标排序表（按指标名称）
+				    左连接指标排序 = Table.NestedJoin(已逆透视其他列, {"指标名称"}, 指标排序表, {"指标名称"}, "指标映射临时", JoinKind.LeftOuter),
+				    展开指标排序 = Table.ExpandTableColumn(左连接指标排序, "指标映射临时", {"指标排序"}, {"指标排序"}),
+				    // 左连接金融投资产品排序表（按金融投资产品）
+				    左连接产品排序 = Table.NestedJoin(展开指标排序, {"金融投资产品"}, 金融投资产品排序表, {"金融投资产品"}, "产品映射临时", JoinKind.LeftOuter),
+				    展开产品排序 = Table.ExpandTableColumn(左连接产品排序, "产品映射临时", {"金融投资产品排序"}, {"金融投资产品排序"}),
+				    // 左连接公司代码排序表（按公司代码）
+				    左连接公司排序 = Table.NestedJoin(展开产品排序, {"公司代码"}, 公司代码排序表, {"公司代码"}, "公司映射临时", JoinKind.LeftOuter),
+				    展开公司排序 = Table.ExpandTableColumn(左连接公司排序, "公司映射临时", {"公司代码排序"}, {"公司代码排序"})
 				in
-				    已逆透视其他列
+				    展开公司排序
 				```
 
 	annotation PBI_ResultType = Table
