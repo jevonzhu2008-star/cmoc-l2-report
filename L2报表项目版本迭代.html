@@ -95,6 +95,15 @@ svg text{font-family:var(--sans)}
 <script>
 const DATA = [
   {
+    "short": "12857fc",
+    "date": "2026-10-22 14:04",
+    "msg": "修复快报度量值与 M 语句，快报表添加排序映射",
+    "files": 8,
+    "add": 116,
+    "del": 42,
+    "ms": false
+  },
+  {
     "short": "6ad72cb",
     "date": "2026-10-22 13:09",
     "msg": "优化 M 语句与注释，新增模型关系",
@@ -242,6 +251,15 @@ const DATA = [
 
 // 完整提交备注（由 update-version-html.py 维护，去 Co-Authored-By）
 const NOTES = {
+  "12857fc": [
+    "L2-01-02：",
+    "- 修复删除 no-op 步骤后遗留的「逗号在 in 之前」语法错误",
+    "L2-01-03 快报-金融投资业务专属：",
+    "- 度量值改为长表结构：CALCULATE(SUM(指标值), 指标名称=指标名)",
+    "- 添加 SharePoint 排序映射：指标排序、金融投资产品排序、公司代码排序（三个 Sheet + 左连接 + 列定义）",
+    "报告与模型：",
+    "- 报告视觉调整，删除模型关系"
+  ],
   "6ad72cb": [
     "M 语句优化：",
     "- 4 张表注释对齐 p_月报终止日期（原写「取到当年12月」）",
@@ -408,7 +426,7 @@ const NOTES = {
 const totalAdd = DATA.reduce((s,d)=>s+d.add,0);
 const totalDel = DATA.reduce((s,d)=>s+d.del,0);
 const totalFiles = DATA.reduce((s,d)=>s+d.files,0);
-const days = "1.8";
+const days = "1.9";
 
 document.getElementById('kpis').innerHTML = `
   <div class="kpi"><div class="n">${DATA.length}</div><div class="l">提交数（main）</div></div>
