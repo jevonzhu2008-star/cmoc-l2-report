@@ -95,6 +95,15 @@ svg text{font-family:var(--sans)}
 <script>
 const DATA = [
   {
+    "short": "6ad72cb",
+    "date": "2026-10-22 13:09",
+    "msg": "优化 M 语句与注释，新增模型关系",
+    "files": 18,
+    "add": 357,
+    "del": 427,
+    "ms": false
+  },
+  {
     "short": "92a4899",
     "date": "2026-10-22 08:33",
     "msg": "利润汇总表 HTML 度量值格式规范，新增 HTML 格式标准文档",
@@ -233,6 +242,17 @@ const DATA = [
 
 // 完整提交备注（由 update-version-html.py 维护，去 Co-Authored-By）
 const NOTES = {
+  "6ad72cb": [
+    "M 语句优化：",
+    "- 4 张表注释对齐 p_月报终止日期（原写「取到当年12月」）",
+    "- L2-01-02 空值替换为0 超长行分行",
+    "- L2-01-02 删除无操作步骤「零替换为空值」（0→0）",
+    "语义模型：",
+    "- 新增模型关系（relationships.tmdl）",
+    "- L2-01-03、L2-03-02 取数逻辑重构",
+    "报告：",
+    "- 度量值与多个视觉对象调整"
+  ],
   "92a4899": [
     "利润汇总表度量值：",
     "- 按指标格式配置表设置格式：金额 #,0 0位小数（千分位、负数括号），百分比 2位小数带 +/- 号",
@@ -388,7 +408,7 @@ const NOTES = {
 const totalAdd = DATA.reduce((s,d)=>s+d.add,0);
 const totalDel = DATA.reduce((s,d)=>s+d.del,0);
 const totalFiles = DATA.reduce((s,d)=>s+d.files,0);
-const days = "1.6";
+const days = "1.8";
 
 document.getElementById('kpis').innerHTML = `
   <div class="kpi"><div class="n">${DATA.length}</div><div class="l">提交数（main）</div></div>
