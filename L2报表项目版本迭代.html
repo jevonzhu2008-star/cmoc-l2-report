@@ -95,6 +95,15 @@ svg text{font-family:var(--sans)}
 <script>
 const DATA = [
   {
+    "short": "92a4899",
+    "date": "2026-10-22 08:33",
+    "msg": "利润汇总表 HTML 度量值格式规范，新增 HTML 格式标准文档",
+    "files": 15,
+    "add": 1520,
+    "del": 118,
+    "ms": true
+  },
+  {
     "short": "fe4235b",
     "date": "2026-10-21 18:50",
     "msg": "新增 L2-04-01 库存汇总表",
@@ -224,6 +233,17 @@ const DATA = [
 
 // 完整提交备注（由 update-version-html.py 维护，去 Co-Authored-By）
 const NOTES = {
+  "92a4899": [
+    "利润汇总表度量值：",
+    "- 按指标格式配置表设置格式：金额 #,0 0位小数（千分位、负数括号），百分比 2位小数带 +/- 号",
+    "- 颜色判断：金额正黑负红，百分比正绿负红（内联 style，不依赖 style 标签 class）",
+    "- 季度一级表头 Q1~Q4、无数据月份整列隐藏、环比MTD 末列、分月值 0 不显示",
+    "规范文档：",
+    "- 新增 L2报表HTML格式规范.md，统一 HTML 度量值的配色/数值格式/颜色判断/表格结构标准",
+    "- CLAUDE.md 接入该规范",
+    "其他：",
+    "- 报告页面与硫磺硫酸价格分析表调整"
+  ],
   "fe4235b": [
     "- 新增「L2-04-01库存汇总表」：金额(人民币)、量(吨)、分类、结构、矿体、加载年月，按月循环取数",
     "- model.tmdl 注册新表",
@@ -368,7 +388,7 @@ const NOTES = {
 const totalAdd = DATA.reduce((s,d)=>s+d.add,0);
 const totalDel = DATA.reduce((s,d)=>s+d.del,0);
 const totalFiles = DATA.reduce((s,d)=>s+d.files,0);
-const days = "1.1";
+const days = "1.6";
 
 document.getElementById('kpis').innerHTML = `
   <div class="kpi"><div class="n">${DATA.length}</div><div class="l">提交数（main）</div></div>
