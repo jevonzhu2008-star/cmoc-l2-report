@@ -1,29 +1,9 @@
 table L2-04-01库存汇总表
-	lineageTag: 9de3caef-4aac-42f2-914d-832803c2a857
-
-	column 金额(人民币)
-		dataType: double
-		lineageTag: 4abd419e-7702-41df-b745-8ca3a132cf92
-		summarizeBy: sum
-		sourceColumn: 金额(人民币)
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	column 量(吨)
-		dataType: double
-		lineageTag: 73b806f3-0c53-416e-b1f5-516277c1bd99
-		summarizeBy: sum
-		sourceColumn: 量(吨)
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
+	lineageTag: 9ad232da-a9e9-47b9-a472-bb7a8856a791
 
 	column 分类
 		dataType: string
-		lineageTag: 085ec1ab-8624-4d3c-b500-45446ee1c4a3
+		lineageTag: 4a59eca6-d4c3-4589-b652-6bbf59da4477
 		summarizeBy: none
 		sourceColumn: 分类
 		sortByColumn: 分类排序
@@ -34,18 +14,15 @@ table L2-04-01库存汇总表
 
 	column 结构
 		dataType: string
-		lineageTag: 0cbbd182-68b1-445e-acb8-8de584c38b22
+		lineageTag: 9462dbff-e185-4c42-954b-d29d18546a2a
 		summarizeBy: none
 		sourceColumn: 结构
-		sortByColumn: 结构排序
-
-		changedProperty = SortByColumn
 
 		annotation SummarizationSetBy = Automatic
 
 	column 矿体
 		dataType: string
-		lineageTag: 7d926462-de41-4be2-8fd5-7fe01e4dd316
+		lineageTag: e58da382-9b47-4efa-92ae-27b340578ca5
 		summarizeBy: none
 		sourceColumn: 矿体
 		sortByColumn: 矿体排序
@@ -54,9 +31,29 @@ table L2-04-01库存汇总表
 
 		annotation SummarizationSetBy = Automatic
 
+	column 金额(人民币)
+		dataType: double
+		lineageTag: d6453285-3835-4506-92ae-35903839c664
+		summarizeBy: sum
+		sourceColumn: 金额(人民币)
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 量(吨)
+		dataType: double
+		lineageTag: 2d5ec4a3-756d-4715-8a15-16c9e4eb7dec
+		summarizeBy: sum
+		sourceColumn: 量(吨)
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
 	column 加载年月
 		dataType: string
-		lineageTag: 389b0a01-6c52-4653-949e-f29f51e03a7a
+		lineageTag: 9bce5392-abbe-450c-b6cc-a7c38d11bc8d
 		summarizeBy: none
 		sourceColumn: 加载年月
 
@@ -64,7 +61,7 @@ table L2-04-01库存汇总表
 
 	column 分类排序
 		dataType: double
-		lineageTag: 307f151f-2448-47e2-bd49-e41c51a4324f
+		lineageTag: bb135ebc-1f84-4ec5-8ba0-a41301b17099
 		summarizeBy: sum
 		sourceColumn: 分类排序
 
@@ -74,7 +71,7 @@ table L2-04-01库存汇总表
 
 	column 结构排序
 		dataType: double
-		lineageTag: addc1b53-b7e1-469f-a087-a19aade4ae77
+		lineageTag: 60e7bab6-a352-4ddc-be53-f42f8af5eec6
 		summarizeBy: sum
 		sourceColumn: 结构排序
 
@@ -84,7 +81,7 @@ table L2-04-01库存汇总表
 
 	column 矿体排序
 		dataType: double
-		lineageTag: cf9c6100-d8a2-4098-b49b-595f0b25de41
+		lineageTag: cd3d4b29-08cd-4f11-a247-8a72971c595b
 		summarizeBy: sum
 		sourceColumn: 矿体排序
 
@@ -141,8 +138,8 @@ table L2-04-01库存汇总表
 				                {Cube.AddAndExpandDimensionColumn, "[ZKT]", {"[ZKT].[LEVEL01]"}, {"矿体"}},
 				                
 				                // 度量值
-				                {Cube.AddMeasureColumn, "金额(人民币)", "[4VGQHR12MHZ3FVOJ91YJ55HTH].[4VGQHR12MHZ1PLAV995LXI93I]"},
-				                {Cube.AddMeasureColumn, "量(吨)", "[4VGQHR12MHZ3FVOJ91YJ55HTH].[4VGQHR12MHZ1PLAV995LXI2RY]"}
+				                {Cube.AddMeasureColumn, "金额(人民币)", "[4VGQHR12MHZ3FVOJ91YJ55HTH].[4VGQHR12MHZ1PLG0H34K5L7V0]"},
+				                {Cube.AddMeasureColumn, "量(吨)", "[4VGQHR12MHZ3FVOJ91YJ55HTH].[4VGQHR12MHZ1PLG0H34K5L1JG]"}
 				            }),
 				            
 				            // ✅ 新增：对结构列做前后截断（去掉空格）

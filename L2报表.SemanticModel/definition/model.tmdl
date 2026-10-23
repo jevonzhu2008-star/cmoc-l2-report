@@ -40,7 +40,6 @@ ref table 'L2-03-01 销售管理费用预算执行汇总表'
 ref table 'L2-01-02 集团合并利润汇总表'
 ref table 'L2-03-02 财务费用汇总表'
 ref table 'L2-01-03 快报-金融投资业务专属'
-ref table 指标格式配置
 ref table L2-04-01库存汇总表
 
 ref cultureInfo zh-CN

@@ -42,11 +42,11 @@
                       "Entity": "L2-04-01库存汇总表"
                     }
                   },
-                  "Property": "分类"
+                  "Property": "矿体"
                 }
               },
-              "queryRef": "L2-04-01库存汇总表.分类",
-              "nativeQueryRef": "分类",
+              "queryRef": "L2-04-01库存汇总表.矿体",
+              "nativeQueryRef": "矿体",
               "active": true
             },
             {
@@ -57,11 +57,11 @@
                       "Entity": "L2-04-01库存汇总表"
                     }
                   },
-                  "Property": "矿体"
+                  "Property": "分类"
                 }
               },
-              "queryRef": "L2-04-01库存汇总表.矿体",
-              "nativeQueryRef": "矿体",
+              "queryRef": "L2-04-01库存汇总表.分类",
+              "nativeQueryRef": "分类",
               "active": true
             }
           ]
