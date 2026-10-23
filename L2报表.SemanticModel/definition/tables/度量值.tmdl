@@ -342,14 +342,14 @@ table 度量值
 		formatStringDefinition = FormatAmount()
 
 	/// 金额(人民币)：库存汇总表金额求和（单位：人民币）
-	measure 金额(人民币) = SUM('L2-04-01库存汇总表'[金额(人民币)])
+	measure 金额(人民币) = SUM('L2-04-01 库存汇总表'[金额(人民币)])
 		displayFolder: L2-04-01库存汇总表
 		lineageTag: db3d5d29-b50b-4a23-857b-20503c3ec9d8
 
 		formatStringDefinition = FormatAmount()
 
 	/// 量(吨)：库存汇总表数量求和（单位：吨）
-	measure 量(吨) = SUM('L2-04-01库存汇总表'[量(吨)])
+	measure 量(吨) = SUM('L2-04-01 库存汇总表'[量(吨)])
 		displayFolder: L2-04-01库存汇总表
 		lineageTag: d0d7509a-718e-4f98-ad1f-15492ec8c281
 
@@ -361,6 +361,18 @@ table 度量值
 		lineageTag: 1b84b574-ee08-4c40-9052-d6c81de6ab8e
 
 		formatStringDefinition = FormatAmount()
+
+	measure L2-01-04指标值 = SUM('L2-01-04 S3 C1成本变化步行图VS上月'[指标值])
+		displayFolder: L2-01-04 S3 C1成本变化步行图VS上月
+		lineageTag: 6a619460-8596-4c1a-9cbe-cf6bfde8a11b
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure L2-01-14指标值 = SUM('L2-01-14 物料单耗月表'[指标值])
+		displayFolder: L2-01-14 物料单耗月表
+		lineageTag: d2407060-2d2a-448f-957a-c69114e65d9e
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	partition 度量值 = m
 		mode: import

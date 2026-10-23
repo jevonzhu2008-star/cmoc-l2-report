@@ -1,4 +1,4 @@
-table L2-04-01库存汇总表
+table 'L2-04-01 库存汇总表'
 	lineageTag: 9ad232da-a9e9-47b9-a472-bb7a8856a791
 
 	column 分类
@@ -89,7 +89,7 @@ table L2-04-01库存汇总表
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	partition L2-04-01库存汇总表 = m
+	partition 'L2-04-01 库存汇总表' = m
 		mode: import
 		queryGroup: 财经\多月
 		source = ```
@@ -168,6 +168,8 @@ table L2-04-01库存汇总表
 				in
 				    展开矿体排序
 				```
+
+	changedProperty = Name
 
 	annotation PBI_ResultType = Table
 

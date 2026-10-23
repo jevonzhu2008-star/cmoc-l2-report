@@ -20,7 +20,7 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "L2-01-04 TFM C1成本变化步行图"
+                      "Entity": "L2-01-04 S3 C1成本变化步行图VS上月"
                     }
                   },
                   "Property": "指标名称"
@@ -39,7 +39,7 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "L2-01-04 TFM C1成本变化步行图"
+                      "Entity": "L2-01-04 S3 C1成本变化步行图VS上月"
                     }
                   },
                   "Property": "矿体"
@@ -54,7 +54,7 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "L2-01-04 TFM C1成本变化步行图"
+                      "Entity": "L2-01-04 S3 C1成本变化步行图VS上月"
                     }
                   },
                   "Property": "产品"
@@ -69,7 +69,7 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "L2-01-04 TFM C1成本变化步行图"
+                      "Entity": "L2-01-04 S3 C1成本变化步行图VS上月"
                     }
                   },
                   "Property": "单位"
@@ -90,7 +90,7 @@
                     "Column": {
                       "Expression": {
                         "SourceRef": {
-                          "Entity": "L2-01-04 TFM C1成本变化步行图"
+                          "Entity": "L2-01-04 S3 C1成本变化步行图VS上月"
                         }
                       },
                       "Property": "指标值"

@@ -1,4 +1,4 @@
-table 'L2-01-04 TFM C1成本变化步行图'
+table 'L2-01-04 S3 C1成本变化步行图VS上月'
 	lineageTag: ff1baaee-53d0-490b-95b3-6ebd301cd99a
 
 	column 产品
@@ -90,7 +90,7 @@ table 'L2-01-04 TFM C1成本变化步行图'
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	partition 'L2-01-04 TFM C1成本变化步行图' = m
+	partition 'L2-01-04 S3 C1成本变化步行图VS上月' = m
 		mode: import
 		queryGroup: 财经\多月
 		source =
@@ -109,7 +109,7 @@ table 'L2-01-04 TFM C1成本变化步行图'
 				    */
 				    // ========== 读取SharePoint上的映射表 ==========
 				    源 = SharePoint.Files(财经SharePoint站点, [ApiVersion = 15]),
-				    指标映射文件 = Table.SelectRows(源, each Text.Contains([Name], "L2-01-04 TFM C1成本变化步行图指标映射") and [Extension] = ".xlsx"){0}[Content],
+				    指标映射文件 = Table.SelectRows(源, each Text.Contains([Name], "L2-01-04 S3 C1成本变化步行图VS上月指标映射") and [Extension] = ".xlsx"){0}[Content],
 				    指标排序映射表 = Excel.Workbook(指标映射文件, true){[Item = "指标名称排序", Kind = "Sheet"]}[Data],
 				    产品排序映射表 = Excel.Workbook(指标映射文件, true){[Item = "产品排序", Kind = "Sheet"]}[Data],
 				    矿体排序映射表 = Excel.Workbook(指标映射文件, true){[Item = "矿体排序", Kind = "Sheet"]}[Data],

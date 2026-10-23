@@ -20,7 +20,7 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "L2-04-01库存汇总表"
+                      "Entity": "L2-04-01 库存汇总表"
                     }
                   },
                   "Property": "结构"
@@ -39,7 +39,7 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "L2-04-01库存汇总表"
+                      "Entity": "L2-04-01 库存汇总表"
                     }
                   },
                   "Property": "矿体"
@@ -54,7 +54,7 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "L2-04-01库存汇总表"
+                      "Entity": "L2-04-01 库存汇总表"
                     }
                   },
                   "Property": "分类"
