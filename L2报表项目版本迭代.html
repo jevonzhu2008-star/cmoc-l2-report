@@ -95,6 +95,15 @@ svg text{font-family:var(--sans)}
 <script>
 const DATA = [
   {
+    "short": "6442d1f",
+    "date": "2026-10-23 18:54",
+    "msg": "优化语义模型 M 与 DAX：修复硬编码、空值污染并清理死代码",
+    "files": 9,
+    "add": 10,
+    "del": 112,
+    "ms": false
+  },
+  {
     "short": "c24a5b6",
     "date": "2026-10-23 17:19",
     "msg": "重命名成本步行图表，新增 L2-01-14 物料单耗月表",
@@ -296,6 +305,14 @@ const DATA = [
 
 // 完整提交备注（由 update-version-html.py 维护，去 Co-Authored-By）
 const NOTES = {
+  "6442d1f": [
+    "- L2-01-04 连接参数硬编码 \"00\"/\"100\" 改为系统编号/客户端ID 参数，与其他表统一",
+    "- L2-01-02/04/14 空值替换列列表移除文本维度列，避免 null→0 污染列类型",
+    "- L2-05-01 删除逆透视前无意义的 Table.Sort 及过时注释",
+    "- 修正 L2-01-04/L2-04-01 与表名不符的过时注释",
+    "- 删除重复且未引用的 DynamicFormat 函数与「动态格式字符串」度量值",
+    "- 连带删除孤立的「指标格式配置」查询及 model.tmdl 的 PBI_QueryOrder 条目"
+  ],
   "c24a5b6": [
     "- L2-01-04「TFM C1成本变化步行图」重命名为「S3 C1成本变化步行图VS上月」",
     "- L2-04-01库存汇总表 名称统一加空格为「L2-04-01 库存汇总表」，度量值引用同步更新",
@@ -506,7 +523,7 @@ const NOTES = {
 const totalAdd = DATA.reduce((s,d)=>s+d.add,0);
 const totalDel = DATA.reduce((s,d)=>s+d.del,0);
 const totalFiles = DATA.reduce((s,d)=>s+d.files,0);
-const days = "3.0";
+const days = "3.1";
 
 document.getElementById('kpis').innerHTML = `
   <div class="kpi"><div class="n">${DATA.length}</div><div class="l">提交数（main）</div></div>
