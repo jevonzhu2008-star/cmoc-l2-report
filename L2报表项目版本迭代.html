@@ -95,6 +95,15 @@ svg text{font-family:var(--sans)}
 <script>
 const DATA = [
   {
+    "short": "c24a5b6",
+    "date": "2026-10-23 17:19",
+    "msg": "重命名成本步行图表，新增 L2-01-14 物料单耗月表",
+    "files": 14,
+    "add": 1384,
+    "del": 27,
+    "ms": false
+  },
+  {
     "short": "26aa199",
     "date": "2026-10-23 15:58",
     "msg": "新增 L2-01-04 TFM C1 成本变化步行图",
@@ -287,6 +296,13 @@ const DATA = [
 
 // 完整提交备注（由 update-version-html.py 维护，去 Co-Authored-By）
 const NOTES = {
+  "c24a5b6": [
+    "- L2-01-04「TFM C1成本变化步行图」重命名为「S3 C1成本变化步行图VS上月」",
+    "- L2-04-01库存汇总表 名称统一加空格为「L2-04-01 库存汇总表」，度量值引用同步更新",
+    "- 新增语义模型表「L2-01-14 物料单耗月表」及对应报告页面（设为活动页）",
+    "- 度量值新增 L2-01-04指标值、L2-01-14指标值",
+    "- model.tmdl 更新表引用与 PBI_QueryOrder 取数顺序"
+  ],
   "26aa199": [
     "- 新增语义模型表「L2-01-04 TFM C1成本变化步行图」，含产品/单位/排序等列",
     "- 新增对应报告页面（8df4296b5610c7c60c7a）并设为活动页",
@@ -490,7 +506,7 @@ const NOTES = {
 const totalAdd = DATA.reduce((s,d)=>s+d.add,0);
 const totalDel = DATA.reduce((s,d)=>s+d.del,0);
 const totalFiles = DATA.reduce((s,d)=>s+d.files,0);
-const days = "2.9";
+const days = "3.0";
 
 document.getElementById('kpis').innerHTML = `
   <div class="kpi"><div class="n">${DATA.length}</div><div class="l">提交数（main）</div></div>
