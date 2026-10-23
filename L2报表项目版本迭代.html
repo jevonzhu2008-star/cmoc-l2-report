@@ -95,6 +95,15 @@ svg text{font-family:var(--sans)}
 <script>
 const DATA = [
   {
+    "short": "5799d3a",
+    "date": "2026-10-23 13:42",
+    "msg": "指标格式配置表改为 SharePoint 动态读取，新增库存汇总表页面",
+    "files": 9,
+    "add": 260,
+    "del": 163,
+    "ms": false
+  },
+  {
     "short": "f72cecf",
     "date": "2026-10-22 16:03",
     "msg": "全面补充与修正 M 和 DAX 注释",
@@ -269,6 +278,14 @@ const DATA = [
 
 // 完整提交备注（由 update-version-html.py 维护，去 Co-Authored-By）
 const NOTES = {
+  "5799d3a": [
+    "- 新增「指标格式配置」Power Query 表达式，从 SharePoint 读取",
+    "L2报表指标格式配置表.xlsx（Sheet「指标格式配置」），替代原本地导入",
+    "- 删除本地 指标格式配置.tmdl 表与 L2报表指标格式配置表.xlsx",
+    "- L2-04-01 库存汇总表：更新结构/矿体/分类排序及金额、量的度量值引用",
+    "- 报告活动页切换到库存汇总表页，调换「分类/矿体」列顺序",
+    "- 新增 L2报表数据转换逻辑说明页与模拟数据生成脚本 generate_mock_data.py"
+  ],
   "f72cecf": [
     "- functions.tmdl：FormatRatio、DynamicFormat 补注释",
     "- expressions.tmdl：7 个参数补注释",
@@ -459,7 +476,7 @@ const NOTES = {
 const totalAdd = DATA.reduce((s,d)=>s+d.add,0);
 const totalDel = DATA.reduce((s,d)=>s+d.del,0);
 const totalFiles = DATA.reduce((s,d)=>s+d.files,0);
-const days = "1.9";
+const days = "2.8";
 
 document.getElementById('kpis').innerHTML = `
   <div class="kpi"><div class="n">${DATA.length}</div><div class="l">提交数（main）</div></div>
