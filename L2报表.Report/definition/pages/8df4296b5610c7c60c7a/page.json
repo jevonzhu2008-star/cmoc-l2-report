@@ -1,0 +1,8 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
+  "name": "8df4296b5610c7c60c7a",
+  "displayName": "L2-01-04 TFM C1成本变化步行图",
+  "displayOption": "FitToPage",
+  "height": 1080,
+  "width": 1920
+}
