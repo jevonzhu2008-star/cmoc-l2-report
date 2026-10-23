@@ -96,8 +96,8 @@ table 'L2-01-04 S3 C1成本变化步行图VS上月'
 		source =
 				let
 				    /*
-				    【查询名称】ZRCO_CP004 TFM C1成本变化步行图 BW取数
-				    【对应报表】L2-01-04 TFM C1成本变化步行图
+				    【查询名称】ZRCO_CP004 S3 C1成本变化步行图VS上月 BW取数
+				    【对应报表】L2-01-04 S3 C1成本变化步行图VS上月
 				    【BW对象】Cube:ZRCO_CP004  Query:ZRCO_CP004_Q0012
 				    【说明】
 				        1、循环取数：从 p_月报起始日期 到 p_月报终止日期，逐月查询BW后合并成长表
@@ -115,7 +115,7 @@ table 'L2-01-04 S3 C1成本变化步行图VS上月'
 				    矿体排序映射表 = Excel.Workbook(指标映射文件, true){[Item = "矿体排序", Kind = "Sheet"]}[Data],
 				
 				    // ========== 连接BW QAS环境 ==========
-				    数据源 = SapBusinessWarehouse.Cubes(QAS服务器, "00", "100", [Implementation="2.0", LanguageCode="ZH", EnableStructures=true, BatchSize=500000000]),
+				    数据源 = SapBusinessWarehouse.Cubes(QAS服务器, 系统编号, 客户端ID, [Implementation="2.0", LanguageCode="ZH", EnableStructures=true, BatchSize=500000000]),
 				    立方体 = 数据源{[Name="ZRCO_CP004"]}[Data],
 				    基础查询 = 立方体{[Id="ZRCO_CP004/ZRCO_CP004_Q0012"]}[Data],
 				
@@ -170,7 +170,7 @@ table 'L2-01-04 S3 C1成本变化步行图VS上月'
 				            }),
 				            附加月份 = Table.AddColumn(Query, "加载年月", each month),
 				            空值替换 = Table.ReplaceValue(附加月份, null, 0, Replacer.ReplaceValue,
-				                {"产品", "矿体", "单位", "M0", "M0_E01", "M0_E02", "M0_E03", "M0_E04", "M0_E05", "M0_E14", "M0_E15",
+				                {"M0", "M0_E01", "M0_E02", "M0_E03", "M0_E04", "M0_E05", "M0_E14", "M0_E15",
 				                 "M1", "M1_E01", "M1_E02", "M1_E03", "M1_E04", "M1_E05", "M1_E14", "M1_E15",
 				                 "Q0", "Q1", "备件", "本月C1", "产量", "递延剥离", "勾稽差",
 				                 "耗材", "能源", "其他及未归类", "人工", "上月C1", "外包", "在产品变动", "加载年月"}

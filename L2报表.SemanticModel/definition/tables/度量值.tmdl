@@ -99,44 +99,6 @@ table 度量值
 
 		formatStringDefinition = FormatAmount()
 
-	/// 动态格式字符串：按当前度量值名（SELECTEDMEASURENAME）从「指标格式配置」表查配置，返回动态格式字符串（类型/小数位数/千分位/负数样式），供度量值 formatStringDefinition 引用
-	measure 动态格式字符串 = ```
-			
-			VAR CurrentMeasureName = SELECTEDMEASURENAME()
-			VAR ValType = LOOKUPVALUE('指标格式配置'[指标类型], '指标格式配置'[指标名称], CurrentMeasureName)
-			VAR Decimals = LOOKUPVALUE('指标格式配置'[小数位数], '指标格式配置'[指标名称], CurrentMeasureName)
-			VAR UseThousandSep = LOOKUPVALUE('指标格式配置'[千分位], '指标格式配置'[指标名称], CurrentMeasureName)
-			VAR NegStyle = LOOKUPVALUE('指标格式配置'[负数样式], '指标格式配置'[指标名称], CurrentMeasureName)
-			RETURN
-			SWITCH(
-			    TRUE(),
-			    // 查不到配置时，默认0位小数
-			    ISBLANK(ValType), "#,0",
-			    // 百分比格式
-			    ValType = "百分比",
-			        IF(NegStyle = "负号",
-			            "0." & REPT("0", Decimals) & "%;-" & "0." & REPT("0", Decimals) & "%",
-			            "0." & REPT("0", Decimals) & "%;(" & "0." & REPT("0", Decimals) & "%)"
-			        ),
-			    // 金额/数量/单价格式
-			    ValType IN {"金额", "数量", "单价"},
-			        IF(UseThousandSep,
-			            IF(NegStyle = "括号",
-			                "#,0." & REPT("0", Decimals) & ";(#,0." & REPT("0", Decimals) & ");0",
-			                "#,0." & REPT("0", Decimals) & ";-#,0." & REPT("0", Decimals) & ";0"
-			            ),
-			            IF(NegStyle = "括号",
-			                "0." & REPT("0", Decimals) & ";(0." & REPT("0", Decimals) & ");0",
-			                "0." & REPT("0", Decimals) & ";-0." & REPT("0", Decimals) & ";0"
-			            )
-			        ),
-			    // 兜底
-			    "#,0.00"
-			)
-			
-			```
-		displayFolder: 00辅助
-		lineageTag: 4ca870d5-fdc8-436c-b059-27db949c87f6
 
 	/// 利润汇总表：L2-01-02 集团合并利润汇总表 HTML 表格（季度一级表头，无数据月份隐藏，负数红色，环比MTD 末列，分月 0 不显示）
 	measure HTML利润汇总表 = ```

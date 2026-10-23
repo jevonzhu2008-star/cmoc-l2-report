@@ -53,30 +53,4 @@ expression 财经SharePoint站点 = "https://xsyzz.sharepoint.com/sites/CMOCGrou
 
 	annotation PBI_ResultType = Text
 
-expression 指标格式配置 =
-		let
-		        // ========== 读取SharePoint上的指标格式配置表 ==========
-		        源 = SharePoint.Files(财经SharePoint站点, [ApiVersion = 15]),
-		        配置文件 = Table.SelectRows(源, each Text.Contains([Name], "L2报表指标格式配置表") and [Extension] = ".xlsx"){0}[Content],
-		        // 读取「指标格式配置」Sheet
-		        指标格式配置表 = Excel.Workbook(配置文件, true){[Item = "指标格式配置", Kind = "Sheet"]}[Data],
-		        设置类型 = Table.TransformColumnTypes(指标格式配置表, {
-		            {"指标名称", type text},
-		            {"所属报表", type text},
-		            {"指标类型", type text},
-		            {"单位", type text},
-		            {"小数位数", Int64.Type},
-		            {"正数颜色", type text},
-		            {"负数颜色", type text},
-		            {"负数样式", type text},
-		            {"千分位", Logical.Type},
-		            {"指标排序", Int64.Type},
-		            {"备注", type text}
-		        })
-		    in
-		        设置类型
-	lineageTag: d3781da9-e2b4-4963-916f-890b7448c53f
-	queryGroup: 辅助
-
-	annotation PBI_ResultType = Exception
 
