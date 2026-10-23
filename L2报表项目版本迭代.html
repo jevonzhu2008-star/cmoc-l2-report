@@ -95,6 +95,15 @@ svg text{font-family:var(--sans)}
 <script>
 const DATA = [
   {
+    "short": "26aa199",
+    "date": "2026-10-23 15:58",
+    "msg": "新增 L2-01-04 TFM C1 成本变化步行图",
+    "files": 6,
+    "add": 1368,
+    "del": 2,
+    "ms": false
+  },
+  {
     "short": "5799d3a",
     "date": "2026-10-23 13:42",
     "msg": "指标格式配置表改为 SharePoint 动态读取，新增库存汇总表页面",
@@ -278,6 +287,11 @@ const DATA = [
 
 // 完整提交备注（由 update-version-html.py 维护，去 Co-Authored-By）
 const NOTES = {
+  "26aa199": [
+    "- 新增语义模型表「L2-01-04 TFM C1成本变化步行图」，含产品/单位/排序等列",
+    "- 新增对应报告页面（8df4296b5610c7c60c7a）并设为活动页",
+    "- model.tmdl 补登记表引用与 PBI_QueryOrder 取数顺序"
+  ],
   "5799d3a": [
     "- 新增「指标格式配置」Power Query 表达式，从 SharePoint 读取",
     "L2报表指标格式配置表.xlsx（Sheet「指标格式配置」），替代原本地导入",
@@ -476,7 +490,7 @@ const NOTES = {
 const totalAdd = DATA.reduce((s,d)=>s+d.add,0);
 const totalDel = DATA.reduce((s,d)=>s+d.del,0);
 const totalFiles = DATA.reduce((s,d)=>s+d.files,0);
-const days = "2.8";
+const days = "2.9";
 
 document.getElementById('kpis').innerHTML = `
   <div class="kpi"><div class="n">${DATA.length}</div><div class="l">提交数（main）</div></div>
