@@ -95,6 +95,15 @@ svg text{font-family:var(--sans)}
 <script>
 const DATA = [
   {
+    "short": "3d03f79",
+    "date": "2026-10-25 08:14",
+    "msg": "报表调整：精简页面视觉、统一画布对齐，清理 TMDL 冗余",
+    "files": 24,
+    "add": 80,
+    "del": 360,
+    "ms": true
+  },
+  {
     "short": "6442d1f",
     "date": "2026-10-23 18:54",
     "msg": "优化语义模型 M 与 DAX：修复硬编码、空值污染并清理死代码",
@@ -305,6 +314,14 @@ const DATA = [
 
 // 完整提交备注（由 update-version-html.py 维护，去 Co-Authored-By）
 const NOTES = {
+  "3d03f79": [
+    "- 集团合并利润汇总表页：移除重复的 HTML 利润汇总表视觉，保留透视表与加载年月切片器",
+    "- 硫磺及硫酸价格分析月报页：移除「硫磺/硫酸 DDP 与采购价月度走势」折线图，改由透视表呈现",
+    "- 各页视觉位置与尺寸统一对齐为整数网格（L2-01-02、L2-01-03、L2-01-04、L2-01-14、L2-03-01、L2-03-02、L2-04-01、L2-05-01）",
+    "- L2-01-14 物料单耗月表矩阵固定层级展开状态：矿体、中区东区展开，单位折叠",
+    "- 报告活动页切换为 L2-05-01 硫磺及硫酸价格分析月报",
+    "- 语义模型清理 Power BI Desktop 生成的冗余行（expressions/functions/度量值尾部空行、L2-04-01 的 changedProperty = Name）"
+  ],
   "6442d1f": [
     "- L2-01-04 连接参数硬编码 \"00\"/\"100\" 改为系统编号/客户端ID 参数，与其他表统一",
     "- L2-01-02/04/14 空值替换列列表移除文本维度列，避免 null→0 污染列类型",
@@ -523,7 +540,7 @@ const NOTES = {
 const totalAdd = DATA.reduce((s,d)=>s+d.add,0);
 const totalDel = DATA.reduce((s,d)=>s+d.del,0);
 const totalFiles = DATA.reduce((s,d)=>s+d.files,0);
-const days = "3.1";
+const days = "4.6";
 
 document.getElementById('kpis').innerHTML = `
   <div class="kpi"><div class="n">${DATA.length}</div><div class="l">提交数（main）</div></div>
