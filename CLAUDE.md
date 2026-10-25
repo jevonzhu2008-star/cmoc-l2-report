@@ -48,17 +48,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 报告（PBIR）
 
-`L2报表.Report/definition/pages/` 下每个页面是一个 **UUID 命名的目录**（`page.json` + `visuals/`）。页面顺序、活动页、落地页由 `pages/pages.json` 的 `pageOrder` / `activePageName` / `landingPageName` 维护，值都是页面目录的 UUID。切换报告活动页只需改 `activePageName`。
+`L2报表.Report/definition/pages/` 下每个页面是一个 **UUID 命名的目录**（`page.json` + `visuals/`）。页面顺序与活动页由 `pages/pages.json` 的 `pageOrder` / `activePageName` 维护，值都是页面目录的 UUID。切换报告活动页只需改 `activePageName`；隐藏某一页则在该页 `page.json` 里加 `"visibility": "HiddenInViewMode"`。
 
-页面 UUID → 业务名称对照（业务名在各页 `page.json` 的 `displayName`，改动 `activePageName` / `pageOrder` 时用）：
+页面 UUID → 业务名称对照（业务名在各页 `page.json` 的 `displayName`，按 `pageOrder` 顺序排列；改动 `activePageName` / `pageOrder` 时用）：
 
-- `ad90dc3587cb9698b4f0` → 月报（落地页，隐藏）
-- `f02a10333ccb89cb058b` → 日报（隐藏）
-- `7237a172b79900aea0a2` → 月报数据导出（隐藏）
-- `50df5dd79c9c19213b42` → 集团合并利润汇总表
-- `e16279b10e3df23fa8cb` → 销售管理费用预算执行汇总表
-- `4effe47efe2ace12b72b` → 财务费用汇总表
-- `4782da4e728bfbbefc8c` → 硫磺及硫酸价格分析月报
+- `50df5dd79c9c19213b42` → L2-01-02 集团合并利润汇总表
+- `020a059bfd06b6347883` → L2-01-03 快报-金融投资业务专属
+- `8df4296b5610c7c60c7a` → L2-01-04 S3 C1成本变化步行图VS上月
+- `540ff71af184f11c2116` → L2-01-14 物料单耗月表
+- `e16279b10e3df23fa8cb` → L2-03-01 销售管理费用预算执行汇总表
+- `4effe47efe2ace12b72b` → L2-03-02 财务费用汇总表
+- `4dd8b19487bd640b4b60` → L2-04-01库存汇总表
+- `4782da4e728bfbbefc8c` → L2-05-01 硫磺及硫酸价格分析月报
+
+当前活动页以 `pages/pages.json` 的 `activePageName` 为准（Power BI Desktop 里切换页面会改写它，容易随操作变动）。当前 8 个页面画布均为 1920 × 1080，无隐藏页（早先的「月报 / 日报 / 月报数据导出」三个隐藏页已在 `023b12f` 中移除）。
 
 主题在 `definition/report.json`：基础主题 Fluent2-CY26SU09 + 自定义主题（RegisteredResources）。
 
