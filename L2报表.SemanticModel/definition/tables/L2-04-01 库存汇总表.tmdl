@@ -169,7 +169,5 @@ table 'L2-04-01 库存汇总表'
 				    展开矿体排序
 				```
 
-	changedProperty = Name
-
 	annotation PBI_ResultType = Table
 

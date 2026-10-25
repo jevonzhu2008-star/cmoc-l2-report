@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "286acd836dac792ef581",
   "position": {
-    "x": 24.005079199700457,
-    "y": 162.03428459797809,
+    "x": 16,
+    "y": 80,
     "z": 0,
-    "height": 878.496941632902,
-    "width": 1872.3326502197956,
+    "height": 960.00000000000011,
+    "width": 1888,
     "tabOrder": 0
   },
   "visual": {
@@ -106,6 +106,35 @@
         }
       }
     },
+    "expansionStates": [
+      {
+        "roles": [
+          "Rows"
+        ],
+        "levels": [
+          {
+            "queryRefs": [
+              "L2-01-14 物料单耗月表.矿体"
+            ],
+            "isPinned": true
+          },
+          {
+            "queryRefs": [
+              "L2-01-14 物料单耗月表.中区东区"
+            ],
+            "isPinned": true
+          },
+          {
+            "queryRefs": [
+              "L2-01-14 物料单耗月表.单位"
+            ],
+            "isCollapsed": true,
+            "isPinned": true
+          }
+        ],
+        "root": {}
+      }
+    ],
     "objects": {
       "columnHeaders": [
         {

@@ -10,4 +10,3 @@ function FormatAmount = ```
 function FormatRatio = () =>"+0.00%;-0.00%;0.00%"
 	lineageTag: 218991ec-c130-43e5-a106-45cd669d18b4
 
-

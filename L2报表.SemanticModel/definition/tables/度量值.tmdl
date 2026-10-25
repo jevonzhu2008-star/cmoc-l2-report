@@ -99,7 +99,6 @@ table 度量值
 
 		formatStringDefinition = FormatAmount()
 
-
 	/// 利润汇总表：L2-01-02 集团合并利润汇总表 HTML 表格（季度一级表头，无数据月份隐藏，负数红色，环比MTD 末列，分月 0 不显示）
 	measure HTML利润汇总表 = ```
 			
