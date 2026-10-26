@@ -294,9 +294,7 @@ table 度量值
 		lineageTag: b16ade29-53f0-48f5-b8a3-3844ead880f8
 
 	/// L2-01-03指标值：快报-金融投资业务专属长表（指标名称+指标值）的指标值求和，报表中配合「指标名称」筛选展示各指标
-	measure L2-01-03指标值 = ```
-			SUM('L2-01-03 快报-金融投资业务专属'[指标值]) 
-			```
+	measure L2-01-03指标值 = SUM('L2-01-03 快报-金融投资业务专属'[指标值])
 		displayFolder: L2-01-03 快报-金融投资业务专属
 		lineageTag: e0315754-a628-482f-abb8-94fd9476e555
 
@@ -323,24 +321,28 @@ table 度量值
 
 		formatStringDefinition = FormatAmount()
 
+	/// L2-01-04指标值：S3 C1成本变化步行图长表（指标名称+指标值）的指标值求和；指标值含成本金额/数量等混合类型，故用通用数字格式
 	measure L2-01-04指标值 = SUM('L2-01-04 S3 C1成本变化步行图VS上月'[指标值])
 		displayFolder: L2-01-04 S3 C1成本变化步行图VS上月
 		lineageTag: 6a619460-8596-4c1a-9cbe-cf6bfde8a11b
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// L2-01-14指标值：物料单耗月表长表（指标名称+指标值）的指标值求和；指标值含单耗比率/数量等混合类型，故用通用数字格式
 	measure L2-01-14指标值 = SUM('L2-01-14 物料单耗月表'[指标值])
 		displayFolder: L2-01-14 物料单耗月表
 		lineageTag: d2407060-2d2a-448f-957a-c69114e65d9e
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// L2-01-25指标值：工序成本完成情况长表（指标名称+指标值）的指标值求和
 	measure L2-01-25指标值 = SUM('L2-01-25 工序成本完成情况'[指标值])
 		displayFolder: L2-01-25 工序成本完成情况
 		lineageTag: c043b380-a857-4f96-bd06-709e56a0c038
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// L2-03-06指标值：矿石成本分析长表（指标名称+指标值）的指标值求和
 	measure L2-03-06指标值 = SUM('L2-03-06 矿石成本分析'[指标值])
 		displayFolder: L2-03-06 矿石成本分析
 		lineageTag: 5414a2e4-66df-4721-9803-d18cdfe0cf18

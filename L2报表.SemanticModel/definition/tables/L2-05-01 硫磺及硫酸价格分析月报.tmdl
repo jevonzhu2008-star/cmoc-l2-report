@@ -165,7 +165,7 @@ table 'L2-05-01 硫磺及硫酸价格分析月报'
 				                {Cube.AddAndExpandDimensionColumn, "[0CALYEAR]", {"[0CALYEAR].[LEVEL01]"}, {"年"}},    // 日历年
 				                {Cube.AddAndExpandDimensionColumn, "[0CALMONTH2]", {"[0CALMONTH2].[LEVEL01]"}, {"月"}}  // 月份(1~12)
 				            }),
-				            // 增加【加载日期】文本列（YYYYMM），标记本条数据对应的查询期间，用于报表筛选
+				            // 增加【加载日期】列（当月首日），标记本条数据对应的查询期间，用于报表筛选
 				            附加加载日期 = Table.AddColumn(Query, "加载日期", each #date(Number.From(Text.Start(month, 4)), Number.From(Text.End(month, 2)), 1), type date),
 				            // 新增【期间名称】：ACT -> "年-月"；BGT -> "年预算"，月份固定两位
 				            附加期间名称 = Table.AddColumn(附加加载日期, "期间名称",

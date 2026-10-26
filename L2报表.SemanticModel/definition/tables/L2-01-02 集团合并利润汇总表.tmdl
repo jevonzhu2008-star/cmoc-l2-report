@@ -264,7 +264,7 @@ table 'L2-01-02 集团合并利润汇总表'
 				            }),
 				            // 【可选】获取维度成员唯一ID MEMBER_UNIQUE_NAME
 				            添加结构唯一ID = Table.AddColumn(Query, "结构唯一ID", each Cube.AttributeMemberProperty([结构], "[MEMBER_UNIQUE_NAME]")),
-				            // 增加加载日期字段（YYYYMM），标记本条数据对应的查询期间
+				            // 增加加载日期字段（当月首日），标记本条数据对应的查询期间
 				            附加月份 = Table.AddColumn(添加结构唯一ID, "加载日期", each #date(Number.From(Text.Start(month, 4)), Number.From(Text.End(month, 2)), 1), type date),
 				            // 空值替换为0
 				            空值替换为0 = Table.ReplaceValue(
