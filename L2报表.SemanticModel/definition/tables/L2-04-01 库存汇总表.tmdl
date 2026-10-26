@@ -51,13 +51,16 @@ table 'L2-04-01 库存汇总表'
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	column 加载年月
-		dataType: string
+	column 加载日期
+		dataType: dateTime
+		formatString: yyyy-M-d
 		lineageTag: 9bce5392-abbe-450c-b6cc-a7c38d11bc8d
 		summarizeBy: none
-		sourceColumn: 加载年月
+		sourceColumn: 加载日期
 
 		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
 
 	column 分类排序
 		dataType: double
@@ -145,8 +148,8 @@ table 'L2-04-01 库存汇总表'
 				            // ✅ 新增：对结构列做前后截断（去掉空格）
 				            截断结构列 = Table.TransformColumns(Query, {{"结构", Text.Trim, type text}}),
 				            
-				            // 增加加载年月列
-				            附加月份 = Table.AddColumn(截断结构列, "加载年月", each month, type text)
+				            // 增加加载日期列
+				            附加月份 = Table.AddColumn(截断结构列, "加载日期", each #date(Number.From(Text.Start(month, 4)), Number.From(Text.End(month, 2)), 1), type date)
 				        in
 				            附加月份,
 				    

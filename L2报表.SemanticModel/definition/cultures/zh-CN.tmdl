@@ -282,17 +282,17 @@ cultureInfo zh-CN
 			        }
 			      ]
 			    },
-			    "L20501_硫磺及硫酸价格分析月报.加载年月": {
+			    "L20501_硫磺及硫酸价格分析月报.加载日期": {
 			      "Definition": {
 			        "Binding": {
 			          "ConceptualEntity": "L2-05-01 硫磺及硫酸价格分析月报",
-			          "ConceptualProperty": "加载年月"
+			          "ConceptualProperty": "加载日期"
 			        }
 			      },
 			      "State": "Generated",
 			      "Terms": [
 			        {
-			          "加载年月": {
+			          "加载日期": {
 			            "State": "Generated"
 			          }
 			        }
@@ -483,17 +483,17 @@ cultureInfo zh-CN
 			        }
 			      ]
 			    },
-			    "L20301_销售管理费用预算执行汇总表.加载年月": {
+			    "L20301_销售管理费用预算执行汇总表.加载日期": {
 			      "Definition": {
 			        "Binding": {
 			          "ConceptualEntity": "L2-03-01 销售管理费用预算执行汇总表",
-			          "ConceptualProperty": "加载年月"
+			          "ConceptualProperty": "加载日期"
 			        }
 			      },
 			      "State": "Generated",
 			      "Terms": [
 			        {
-			          "加载年月": {
+			          "加载日期": {
 			            "State": "Generated"
 			          }
 			        }
@@ -514,17 +514,17 @@ cultureInfo zh-CN
 			        }
 			      ]
 			    },
-			    "L20102_集团合并利润汇总表.加载年月": {
+			    "L20102_集团合并利润汇总表.加载日期": {
 			      "Definition": {
 			        "Binding": {
 			          "ConceptualEntity": "L2-01-02 集团合并利润汇总表",
-			          "ConceptualProperty": "加载年月"
+			          "ConceptualProperty": "加载日期"
 			        }
 			      },
 			      "State": "Generated",
 			      "Terms": [
 			        {
-			          "加载年月": {
+			          "加载日期": {
 			            "State": "Generated"
 			          }
 			        }
@@ -545,17 +545,17 @@ cultureInfo zh-CN
 			        }
 			      ]
 			    },
-			    "L20302_财务费用汇总表.加载年月": {
+			    "L20302_财务费用汇总表.加载日期": {
 			      "Definition": {
 			        "Binding": {
 			          "ConceptualEntity": "L2-03-02 财务费用汇总表",
-			          "ConceptualProperty": "加载年月"
+			          "ConceptualProperty": "加载日期"
 			        }
 			      },
 			      "State": "Generated",
 			      "Terms": [
 			        {
-			          "加载年月": {
+			          "加载日期": {
 			            "State": "Generated"
 			          }
 			        }
@@ -825,7 +825,7 @@ cultureInfo zh-CN
 			        }
 			      ]
 			    },
-			    "L20302_财务费用汇总表_has_加载年月": {
+			    "L20302_财务费用汇总表_has_加载日期": {
 			      "Binding": {
 			        "ConceptualEntity": "L2-03-02 财务费用汇总表"
 			      },
@@ -836,9 +836,9 @@ cultureInfo zh-CN
 			            "Entity": "L20302_财务费用汇总表"
 			          }
 			        },
-			        "L20302_财务费用汇总表.加载年月": {
+			        "L20302_财务费用汇总表.加载日期": {
 			          "Target": {
-			            "Entity": "L20302_财务费用汇总表.加载年月"
+			            "Entity": "L20302_财务费用汇总表.加载日期"
 			          }
 			        }
 			      },
@@ -849,12 +849,12 @@ cultureInfo zh-CN
 			              "Role": "L20302_财务费用汇总表"
 			            },
 			            "Object": {
-			              "Role": "L20302_财务费用汇总表.加载年月"
+			              "Role": "L20302_财务费用汇总表.加载日期"
 			            }
 			          },
 			          "State": "Generated",
 			          "Weight": 0.99,
-			          "ID": "L20302_财务费用汇总表_have_加载年月"
+			          "ID": "L20302_财务费用汇总表_have_加载日期"
 			        }
 			      ]
 			    },
@@ -891,7 +891,7 @@ cultureInfo zh-CN
 			        }
 			      ]
 			    },
-			    "L20102_集团合并利润汇总表_has_加载年月": {
+			    "L20102_集团合并利润汇总表_has_加载日期": {
 			      "Binding": {
 			        "ConceptualEntity": "L2-01-02 集团合并利润汇总表"
 			      },
@@ -902,9 +902,9 @@ cultureInfo zh-CN
 			            "Entity": "L20102_集团合并利润汇总表"
 			          }
 			        },
-			        "L20102_集团合并利润汇总表.加载年月": {
+			        "L20102_集团合并利润汇总表.加载日期": {
 			          "Target": {
-			            "Entity": "L20102_集团合并利润汇总表.加载年月"
+			            "Entity": "L20102_集团合并利润汇总表.加载日期"
 			          }
 			        }
 			      },
@@ -915,12 +915,12 @@ cultureInfo zh-CN
 			              "Role": "L20102_集团合并利润汇总表"
 			            },
 			            "Object": {
-			              "Role": "L20102_集团合并利润汇总表.加载年月"
+			              "Role": "L20102_集团合并利润汇总表.加载日期"
 			            }
 			          },
 			          "State": "Generated",
 			          "Weight": 0.99,
-			          "ID": "L20102_集团合并利润汇总表_have_加载年月"
+			          "ID": "L20102_集团合并利润汇总表_have_加载日期"
 			        }
 			      ]
 			    },
@@ -1188,7 +1188,7 @@ cultureInfo zh-CN
 			        }
 			      ]
 			    },
-			    "L20301_销售管理费用预算执行汇总表_has_加载年月": {
+			    "L20301_销售管理费用预算执行汇总表_has_加载日期": {
 			      "Binding": {
 			        "ConceptualEntity": "L2-03-01 销售管理费用预算执行汇总表"
 			      },
@@ -1199,9 +1199,9 @@ cultureInfo zh-CN
 			            "Entity": "L20301_销售管理费用预算执行汇总表"
 			          }
 			        },
-			        "L20301_销售管理费用预算执行汇总表.加载年月": {
+			        "L20301_销售管理费用预算执行汇总表.加载日期": {
 			          "Target": {
-			            "Entity": "L20301_销售管理费用预算执行汇总表.加载年月"
+			            "Entity": "L20301_销售管理费用预算执行汇总表.加载日期"
 			          }
 			        }
 			      },
@@ -1212,12 +1212,12 @@ cultureInfo zh-CN
 			              "Role": "L20301_销售管理费用预算执行汇总表"
 			            },
 			            "Object": {
-			              "Role": "L20301_销售管理费用预算执行汇总表.加载年月"
+			              "Role": "L20301_销售管理费用预算执行汇总表.加载日期"
 			            }
 			          },
 			          "State": "Generated",
 			          "Weight": 0.99,
-			          "ID": "L20301_销售管理费用预算执行汇总表_have_加载年月"
+			          "ID": "L20301_销售管理费用预算执行汇总表_have_加载日期"
 			        }
 			      ]
 			    },
@@ -1518,7 +1518,7 @@ cultureInfo zh-CN
 			        }
 			      ]
 			    },
-			    "L20501_硫磺及硫酸价格分析月报_has_加载年月": {
+			    "L20501_硫磺及硫酸价格分析月报_has_加载日期": {
 			      "Binding": {
 			        "ConceptualEntity": "L2-05-01 硫磺及硫酸价格分析月报"
 			      },
@@ -1529,9 +1529,9 @@ cultureInfo zh-CN
 			            "Entity": "L20501_硫磺及硫酸价格分析月报"
 			          }
 			        },
-			        "L20501_硫磺及硫酸价格分析月报.加载年月": {
+			        "L20501_硫磺及硫酸价格分析月报.加载日期": {
 			          "Target": {
-			            "Entity": "L20501_硫磺及硫酸价格分析月报.加载年月"
+			            "Entity": "L20501_硫磺及硫酸价格分析月报.加载日期"
 			          }
 			        }
 			      },
@@ -1542,12 +1542,12 @@ cultureInfo zh-CN
 			              "Role": "L20501_硫磺及硫酸价格分析月报"
 			            },
 			            "Object": {
-			              "Role": "L20501_硫磺及硫酸价格分析月报.加载年月"
+			              "Role": "L20501_硫磺及硫酸价格分析月报.加载日期"
 			            }
 			          },
 			          "State": "Generated",
 			          "Weight": 0.99,
-			          "ID": "L20501_硫磺及硫酸价格分析月报_have_加载年月"
+			          "ID": "L20501_硫磺及硫酸价格分析月报_have_加载日期"
 			        }
 			      ]
 			    },

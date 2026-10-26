@@ -74,13 +74,16 @@ table 'L2-03-01 销售管理费用预算执行汇总表'
 
 		annotation SummarizationSetBy = Automatic
 
-	column 加载年月
-		dataType: string
+	column 加载日期
+		dataType: dateTime
+		formatString: yyyy-M-d
 		lineageTag: 1986833c-5b38-4394-aed1-814611a90e0e
 		summarizeBy: none
-		sourceColumn: 加载年月
+		sourceColumn: 加载日期
 
 		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
 
 	column 公司代码代码
 		dataType: string
@@ -193,8 +196,8 @@ table 'L2-03-01 销售管理费用预算执行汇总表'
 				            添加公司代码 = Table.AddColumn(Query, "公司代码代码", each Cube.AttributeMemberProperty([公司代码], "[2ZBUKRS]")),
 				            添加销管费分类代码 = Table.AddColumn(添加公司代码, "销管费分类代码", each Cube.AttributeMemberProperty([销管费分类], "[2ZXGFFL]")),
 				            添加利润中心代码 = Table.AddColumn(添加销管费分类代码, "利润中心代码", each Cube.AttributeMemberProperty([管理口径利润中心], "[2ZPRCTR_GL]")),
-				            // 增加加载年月列
-				            附加月份 = Table.AddColumn(添加利润中心代码, "加载年月", each month)
+				            // 增加加载日期列
+				            附加月份 = Table.AddColumn(添加利润中心代码, "加载日期", each #date(Number.From(Text.Start(month, 4)), Number.From(Text.End(month, 2)), 1), type date)
 				        in
 				            附加月份,
 				    // 遍历月份，逐个查询

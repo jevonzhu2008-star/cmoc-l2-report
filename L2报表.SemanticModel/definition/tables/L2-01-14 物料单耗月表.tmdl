@@ -17,13 +17,16 @@ table 'L2-01-14 物料单耗月表'
 
 		annotation SummarizationSetBy = Automatic
 
-	column 加载年月
-		dataType: string
+	column 加载日期
+		dataType: dateTime
+		formatString: yyyy-M-d
 		lineageTag: cc9f0af8-88ef-4520-bbe4-7374cc5cda45
 		summarizeBy: none
-		sourceColumn: 加载年月
+		sourceColumn: 加载日期
 
 		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
 
 	column 指标名称
 		dataType: string
@@ -158,14 +161,14 @@ table 'L2-01-14 物料单耗月表'
 				                {Cube.AddMeasureColumn, "预算量BM", "[4VGQHR12MHZ1PH0QD0454F134].[4VGQHR12MHZ1PH0QD0454GFNK]"},
 				                {Cube.AddMeasureColumn, "预算数BM", "[4VGQHR12MHZ1PH0QD0454F134].[4VGQHR12MHZ1PH0QD0454G9C0]"}
 				            }),
-				            附加月份 = Table.AddColumn(Query, "加载年月", each month),
+				            附加月份 = Table.AddColumn(Query, "加载日期", each #date(Number.From(Text.Start(month, 4)), Number.From(Text.End(month, 2)), 1), type date),
 				            空值替换 = Table.ReplaceValue(附加月份, null, 0, Replacer.ReplaceValue,
 				                {"26年目标", "比目标±%", "当月", "当月累计", "环比", "环比±%",
 				                 "环比实际量LAM", "环比实际数LAM", "累计比目标", "年累实际量AY", "年累实际数AY",
-				                 "上月", "实际量AM", "实际数AM", "预算量BM", "预算数BM", "加载年月"}
+				                 "上月", "实际量AM", "实际数AM", "预算量BM", "预算数BM"}
 				            ),
-				            // 逆透视：保留维度+加载年月
-				            逆透视 = Table.UnpivotOtherColumns(空值替换, {"中区东区", "矿体", "单位", "加载年月"}, "指标名称", "指标值")
+				            // 逆透视：保留维度+加载日期
+				            逆透视 = Table.UnpivotOtherColumns(空值替换, {"中区东区", "矿体", "单位", "加载日期"}, "指标名称", "指标值")
 				        in
 				            逆透视,
 				

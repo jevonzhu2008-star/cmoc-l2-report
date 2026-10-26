@@ -1,13 +1,16 @@
 table 'L2-05-01 硫磺及硫酸价格分析月报'
 	lineageTag: d3dfe0d7-08fb-48ce-be44-6e9270507f18
 
-	column 加载年月
-		dataType: string
+	column 加载日期
+		dataType: dateTime
+		formatString: yyyy-M-d
 		lineageTag: 60b489c7-c3ae-4948-b113-b743eba22f2a
 		summarizeBy: none
-		sourceColumn: 加载年月
+		sourceColumn: 加载日期
 
 		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
 
 	column 期间名称
 		dataType: string
@@ -108,7 +111,7 @@ table 'L2-05-01 硫磺及硫酸价格分析月报'
 				        1、按月循环取数：从参数 p_月报起始日期 开始，取到 p_月报终止日期，逐期查询BW，最后合并为长表
 				        2、BW参数[ZMSDQNY]：YYYYMM格式年月，控制BW查询的统计期间
 				        3、指标：硫磺/硫酸采购单价、分项费用、采购量；维度包含数据类别、日历年月
-				        4、末尾增加【加载年月】字段，标记本次PQ循环查询的期间，用于PowerBI内筛选、报表切片
+				        4、末尾增加【加载日期】字段，标记本次PQ循环查询的期间，用于PowerBI内筛选、报表切片
 				        5、连接参数统一规范：QAS服务器、系统编号、客户端ID，与ZRFI_CP005保持一致
 				        6、BatchSize调大，提升大批量BW数据拉取性能
 				        7、新增【期间名称】字段：ACT=年-月；BGT=年预算
@@ -133,7 +136,7 @@ table 'L2-05-01 硫磺及硫酸价格分析月报'
 				    月份序列 = List.Generate(() => 起始月份, each _ <= 结束月份, each Date.AddMonths(_, 1)),
 				    // 转换为BW要求的 YYYYMM 文本格式
 				    月份文本列表 = List.Transform(月份序列, each Text.From(Date.Year(_) * 100 + Date.Month(_))),
-				    // 单月取数函数：输入年月文本，返回当月BW查询结果，并追加【加载年月】标记列
+				    // 单月取数函数：输入年月文本，返回当月BW查询结果，并追加【加载日期】标记列
 				    查询单月 = (month as text) =>
 				        let
 				            Query = Cube.Transform(基础查询, {
@@ -153,10 +156,10 @@ table 'L2-05-01 硫磺及硫酸价格分析月报'
 				                {Cube.AddAndExpandDimensionColumn, "[0CALYEAR]", {"[0CALYEAR].[LEVEL01]"}, {"年"}},    // 日历年
 				                {Cube.AddAndExpandDimensionColumn, "[0CALMONTH2]", {"[0CALMONTH2].[LEVEL01]"}, {"月"}}  // 月份(1~12)
 				            }),
-				            // 增加【加载年月】文本列（YYYYMM），标记本条数据对应的查询期间，用于报表筛选
-				            附加加载年月 = Table.AddColumn(Query, "加载年月", each month),
+				            // 增加【加载日期】文本列（YYYYMM），标记本条数据对应的查询期间，用于报表筛选
+				            附加加载日期 = Table.AddColumn(Query, "加载日期", each #date(Number.From(Text.Start(month, 4)), Number.From(Text.End(month, 2)), 1), type date),
 				            // 新增【期间名称】：ACT -> "年-月"；BGT -> "年预算"，月份固定两位
-				            附加期间名称 = Table.AddColumn(附加加载年月, "期间名称",
+				            附加期间名称 = Table.AddColumn(附加加载日期, "期间名称",
 				                each if [数据类别] = "ACT"
 				                      then Text.From([年]) & "-" & Text.PadStart(Text.From([月]),2,"0")
 				                      else if [数据类别] = "BGT"
@@ -177,7 +180,7 @@ table 'L2-05-01 硫磺及硫酸价格分析月报'
 				    各月结果 = List.Transform(月份文本列表, 查询单月),
 				    // 将所有月份结果合并为一张长表
 				    合并结果 = Table.Combine(各月结果),
-				    已逆透视其他列 = Table.UnpivotOtherColumns(合并结果, {"数据类别", "年月", "年", "月", "加载年月", "期间名称", "期间排序"}, "指标名称", "指标值"),
+				    已逆透视其他列 = Table.UnpivotOtherColumns(合并结果, {"数据类别", "年月", "年", "月", "加载日期", "期间名称", "期间排序"}, "指标名称", "指标值"),
 				
 				    // ========== 左连接指标排序表（按指标名称） ==========
 				    左连接指标排序 = Table.NestedJoin(已逆透视其他列, {"指标名称"}, 指标排序表, {"指标名称"}, "指标映射临时", JoinKind.LeftOuter),

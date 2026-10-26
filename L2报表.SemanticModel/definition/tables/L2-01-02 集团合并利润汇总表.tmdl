@@ -1,13 +1,16 @@
 table 'L2-01-02 集团合并利润汇总表'
 	lineageTag: 3c5faa89-4ba7-465c-b07a-3af108aba99c
 
-	column 加载年月
-		dataType: string
+	column 加载日期
+		dataType: dateTime
+		formatString: yyyy-M-d
 		lineageTag: a479603b-cf29-4603-b57b-fdec92cbeeac
 		summarizeBy: none
-		sourceColumn: 加载年月
+		sourceColumn: 加载日期
 
 		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
 
 	column 结构唯一ID
 		dataType: string
@@ -225,18 +228,18 @@ table 'L2-01-02 集团合并利润汇总表'
 				            }),
 				            // 【可选】获取维度成员唯一ID MEMBER_UNIQUE_NAME
 				            添加结构唯一ID = Table.AddColumn(Query, "结构唯一ID", each Cube.AttributeMemberProperty([结构], "[MEMBER_UNIQUE_NAME]")),
-				            // 增加加载年月字段（YYYYMM），标记本条数据对应的查询期间
-				            附加月份 = Table.AddColumn(添加结构唯一ID, "加载年月", each month),
+				            // 增加加载日期字段（YYYYMM），标记本条数据对应的查询期间
+				            附加月份 = Table.AddColumn(添加结构唯一ID, "加载日期", each #date(Number.From(Text.Start(month, 4)), Number.From(Text.End(month, 2)), 1), type date),
 				            // 空值替换为0
 				            空值替换为0 = Table.ReplaceValue(
 				            	附加月份,
 				            	null,
 				            	0,
 				            	Replacer.ReplaceValue,
-				            	{"当月YTD", "同比YTD", "去年同期YTD", "预算YTD", "预算达成率", "1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月", "环比MTD", "当月MTD", "上月MTD", "加载年月"}
+				            	{"当月YTD", "同比YTD", "去年同期YTD", "预算YTD", "预算达成率", "1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月", "环比MTD", "当月MTD", "上月MTD"}
 				            ),
 				            // 逆透视分月列，1~12月转为行
-				            逆透视分月列 = Table.UnpivotOtherColumns(空值替换为0, {"结构","结构唯一ID","环比MTD", "当月MTD", "上月MTD", "加载年月", "预算达成率", "预算YTD", "去年同期YTD", "同比YTD", "当月YTD"}, "月份", "实际值"),
+				            逆透视分月列 = Table.UnpivotOtherColumns(空值替换为0, {"结构","结构唯一ID","环比MTD", "当月MTD", "上月MTD", "加载日期", "预算达成率", "预算YTD", "去年同期YTD", "同比YTD", "当月YTD"}, "月份", "实际值"),
 				            // 月份排序
 				            添加月份排序 = Table.AddColumn(逆透视分月列, "月份排序", each
 				                if [月份] = "1月" then 1

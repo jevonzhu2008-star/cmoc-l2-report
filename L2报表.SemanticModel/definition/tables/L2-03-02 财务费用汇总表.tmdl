@@ -1,13 +1,16 @@
 table 'L2-03-02 财务费用汇总表'
 	lineageTag: 0c431584-73b5-4ced-af79-8f011e020960
 
-	column 加载年月
-		dataType: string
+	column 加载日期
+		dataType: dateTime
+		formatString: yyyy-M-d
 		lineageTag: 7284d363-4974-49b0-a0bd-ec17ea367a5d
 		summarizeBy: none
-		sourceColumn: 加载年月
+		sourceColumn: 加载日期
 
 		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
 
 	column 指标名称
 		dataType: string
@@ -140,10 +143,10 @@ table 'L2-03-02 财务费用汇总表'
 				            
 				            // 获取结构唯一ID
 				            添加结构唯一ID = Table.AddColumn(Query, "结构唯一ID", each Cube.AttributeMemberProperty([结构], "[MEMBER_UNIQUE_NAME]")),
-				            // 附加加载年月
-				            附加加载年月 = Table.AddColumn(添加结构唯一ID, "加载年月", each month, type text)
+				            // 附加加载日期
+				            附加加载日期 = Table.AddColumn(添加结构唯一ID, "加载日期", each #date(Number.From(Text.Start(month, 4)), Number.From(Text.End(month, 2)), 1), type date)
 				        in
-				            附加加载年月,
+				            附加加载日期,
 				    
 				    // ========== 循环遍历月份，逐个取数 ==========
 				    各月结果 = List.Transform(月份文本列表, 查询单月),
@@ -152,11 +155,11 @@ table 'L2-03-02 财务费用汇总表'
 				    合并宽表 = Table.Combine(各月结果),
 				    
 				    // ========== 再逆透视（只做一次，不是每个月做一次） ==========
-				    // 保留的列：结构、结构唯一ID、加载年月
+				    // 保留的列：结构、结构唯一ID、加载日期
 				    // 被逆透视的列：所有18个Measure列
 				    逆透视长表 = Table.UnpivotOtherColumns(
 				        合并宽表, 
-				        {"结构", "结构唯一ID", "加载年月"}, 
+				        {"结构", "结构唯一ID", "加载日期"}, 
 				        "指标名称", 
 				        "指标值"
 				    ),

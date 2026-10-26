@@ -23,11 +23,11 @@
                       "Entity": "L2-01-02 集团合并利润汇总表"
                     }
                   },
-                  "Property": "加载年月"
+                  "Property": "加载日期"
                 }
               },
-              "queryRef": "L2-01-02 集团合并利润汇总表.加载年月",
-              "nativeQueryRef": "加载年月",
+              "queryRef": "L2-01-02 集团合并利润汇总表.加载日期",
+              "nativeQueryRef": "加载日期",
               "active": true
             }
           ]
@@ -43,7 +43,7 @@
                     "Entity": "L2-01-02 集团合并利润汇总表"
                   }
                 },
-                "Property": "加载年月"
+                "Property": "加载日期"
               }
             },
             "direction": "Descending"
@@ -90,7 +90,7 @@
                                   "Source": "l"
                                 }
                               },
-                              "Property": "加载年月"
+                              "Property": "加载日期"
                             }
                           }
                         ],
@@ -98,7 +98,7 @@
                           [
                             {
                               "Literal": {
-                                "Value": "'202603'"
+                                "Value": "'2026-03-01T00:00:00'"
                               }
                             }
                           ]

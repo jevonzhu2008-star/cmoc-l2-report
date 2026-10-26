@@ -31,13 +31,16 @@ table 'L2-01-03 快报-金融投资业务专属'
 
 		annotation SummarizationSetBy = Automatic
 
-	column 加载年月
-		dataType: string
+	column 加载日期
+		dataType: dateTime
+		formatString: yyyy-M-d
 		lineageTag: f56d50f9-5a7f-4e9c-8e80-a5b90d3ffb31
 		summarizeBy: none
-		sourceColumn: 加载年月
+		sourceColumn: 加载日期
 
 		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
 
 	column 指标名称
 		dataType: string
@@ -180,10 +183,10 @@ table 'L2-01-03 快报-金融投资业务专属'
 				                {Cube.AddAndExpandDimensionColumn, "[4ZRFI_CP012-CC_A_JRTZCP]", {"[4ZRFI_CP012-CC_A_JRTZCP].[LEVEL01]"}, {"金融投资产品"}}
 				            }),
 				            
-				            // 附加「加载年月」字段，标记本条数据对应的查询期间
-				            附加加载年月 = Table.AddColumn(Query, "加载年月", each month, type text)
+				            // 附加「加载日期」字段，标记本条数据对应的查询期间
+				            附加加载日期 = Table.AddColumn(Query, "加载日期", each #date(Number.From(Text.Start(month, 4)), Number.From(Text.End(month, 2)), 1), type date)
 				        in
-				            附加加载年月,
+				            附加加载日期,
 				    
 				    // ========== 第五步：循环遍历月份，逐个执行取数 ==========
 				    // 得到一个列表，每个元素是一个月份的表
@@ -195,11 +198,11 @@ table 'L2-01-03 快报-金融投资业务专属'
 				    
 				    // ========== 第七步：逆透视（宽表转长表） ==========
 				    // 原来17个指标是17列（宽表），逆透视后变成2列：「指标名称」+「指标值」
-				    // 保留不动的列：维度字段 + 加载年月
+				    // 保留不动的列：维度字段 + 加载日期
 				    // 被逆透视的列：所有17个Measure列
 				    已逆透视其他列 = Table.UnpivotOtherColumns(
 				        合并结果, 
-				        {"公司代码", "公司代码货币", "金融投资产品", "加载年月"},  // 保留的列
+				        {"公司代码", "公司代码货币", "金融投资产品", "加载日期"},  // 保留的列
 				        "指标名称",   // 新列名：存指标名称（如"年净值-成本"）
 				        "指标值"      // 新列名：存指标数值
 				    ),

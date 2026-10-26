@@ -23,11 +23,11 @@
                       "Entity": "L2-01-04 S3 C1成本变化步行图VS上月"
                     }
                   },
-                  "Property": "加载年月"
+                  "Property": "加载日期"
                 }
               },
-              "queryRef": "L2-01-04 TFM C1成本变化步行图.加载年月",
-              "nativeQueryRef": "加载年月",
+              "queryRef": "L2-01-04 TFM C1成本变化步行图.加载日期",
+              "nativeQueryRef": "加载日期",
               "active": true
             }
           ]
@@ -73,7 +73,7 @@
                                   "Source": "l"
                                 }
                               },
-                              "Property": "加载年月"
+                              "Property": "加载日期"
                             }
                           }
                         ],
@@ -81,7 +81,7 @@
                           [
                             {
                               "Literal": {
-                                "Value": "'202601'"
+                                "Value": "'2026-01-01T00:00:00'"
                               }
                             }
                           ]
