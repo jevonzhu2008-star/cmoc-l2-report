@@ -95,6 +95,15 @@ svg text{font-family:var(--sans)}
 <script>
 const DATA = [
   {
+    "short": "3c0c97f",
+    "date": "2026-10-26 11:28",
+    "msg": "新增 L2-01-25 工序成本完成情况与 L2-03-06 矿石成本分析表及页面",
+    "files": 28,
+    "add": 2869,
+    "del": 37,
+    "ms": true
+  },
+  {
     "short": "0eb8126",
     "date": "2026-10-26 10:00",
     "msg": "报表调整：加载年月改为加载日期（date 类型）",
@@ -332,6 +341,10 @@ const DATA = [
 
 // 完整提交备注（由 update-version-html.py 维护，去 Co-Authored-By）
 const NOTES = {
+  "3c0c97f": [
+    "- 新增两个财经事实表（均含「加载日期」列）与对应度量值、报表页面",
+    "- Power BI Desktop 规范化：隐藏部分未使用列（isHidden）、清理空的查询组、更新关系图布局"
+  ],
   "0eb8126": [
     "- 8 个财经事实表的「加载年月」列统一改为「加载日期」：类型 string → dateTime，格式 yyyy-M-d",
     "- Power Query 取数：加载日期列由 each month（YYYYMM 文本）改为 each #date(年,月,1)，BW 参数 [ZMSDQNY] 仍传 YYYYMM",
