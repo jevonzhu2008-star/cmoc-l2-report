@@ -95,6 +95,15 @@ svg text{font-family:var(--sans)}
 <script>
 const DATA = [
   {
+    "short": "0f95216",
+    "date": "2026-10-26 11:45",
+    "msg": "优化 DAX/M 代码与注释：统一格式、补齐度量值注释",
+    "files": 4,
+    "add": 11,
+    "del": 13,
+    "ms": false
+  },
+  {
     "short": "3c0c97f",
     "date": "2026-10-26 11:28",
     "msg": "新增 L2-01-25 工序成本完成情况与 L2-03-06 矿石成本分析表及页面",
@@ -341,6 +350,11 @@ const DATA = [
 
 // 完整提交备注（由 update-version-html.py 维护，去 Co-Authored-By）
 const NOTES = {
+  "0f95216": [
+    "- functions.tmdl：FormatAmount/FormatRatio 由多行代码块改为单行，补充注释说明用途",
+    "- 度量值.tmdl：L2-01-03指标值 改为单行，补齐 L2-01-04/14/25、L2-03-06 指标值缺失的注释",
+    "- 修复 L2-01-02、L2-05-01 中「加载日期」列的过时注释（YYYYMM/文本列 → 当月首日）"
+  ],
   "3c0c97f": [
     "- 新增两个财经事实表（均含「加载日期」列）与对应度量值、报表页面",
     "- Power BI Desktop 规范化：隐藏部分未使用列（isHidden）、清理空的查询组、更新关系图布局"
@@ -583,7 +597,7 @@ const NOTES = {
 const totalAdd = DATA.reduce((s,d)=>s+d.add,0);
 const totalDel = DATA.reduce((s,d)=>s+d.del,0);
 const totalFiles = DATA.reduce((s,d)=>s+d.files,0);
-const days = "5.7";
+const days = "5.8";
 
 document.getElementById('kpis').innerHTML = `
   <div class="kpi"><div class="n">${DATA.length}</div><div class="l">提交数（main）</div></div>
