@@ -26,7 +26,7 @@
                   "Property": "指标名称"
                 }
               },
-              "queryRef": "L2-01-04 TFM C1成本变化步行图.指标名称",
+              "queryRef": "L2-01-04 S3 C1成本变化步行图VS上月.指标名称",
               "nativeQueryRef": "指标名称",
               "active": true
             }
@@ -45,7 +45,7 @@
                   "Property": "矿体"
                 }
               },
-              "queryRef": "L2-01-04 TFM C1成本变化步行图.矿体",
+              "queryRef": "L2-01-04 S3 C1成本变化步行图VS上月.矿体",
               "nativeQueryRef": "矿体",
               "active": true
             },
@@ -60,7 +60,7 @@
                   "Property": "产品"
                 }
               },
-              "queryRef": "L2-01-04 TFM C1成本变化步行图.产品",
+              "queryRef": "L2-01-04 S3 C1成本变化步行图VS上月.产品",
               "nativeQueryRef": "产品",
               "active": true
             },
@@ -75,7 +75,7 @@
                   "Property": "单位"
                 }
               },
-              "queryRef": "L2-01-04 TFM C1成本变化步行图.单位",
+              "queryRef": "L2-01-04 S3 C1成本变化步行图VS上月.单位",
               "nativeQueryRef": "单位",
               "active": true
             }
@@ -99,7 +99,7 @@
                   "Function": 0
                 }
               },
-              "queryRef": "Sum(L2-01-04 TFM C1成本变化步行图.指标值)",
+              "queryRef": "Sum(L2-01-04 S3 C1成本变化步行图VS上月.指标值)",
               "nativeQueryRef": "指标值 的总和"
             }
           ]
@@ -114,19 +114,19 @@
         "levels": [
           {
             "queryRefs": [
-              "L2-01-04 TFM C1成本变化步行图.矿体"
+              "L2-01-04 S3 C1成本变化步行图VS上月.矿体"
             ],
             "isPinned": true
           },
           {
             "queryRefs": [
-              "L2-01-04 TFM C1成本变化步行图.产品"
+              "L2-01-04 S3 C1成本变化步行图VS上月.产品"
             ],
             "isPinned": true
           },
           {
             "queryRefs": [
-              "L2-01-04 TFM C1成本变化步行图.单位"
+              "L2-01-04 S3 C1成本变化步行图VS上月.单位"
             ],
             "isCollapsed": true,
             "isPinned": true
