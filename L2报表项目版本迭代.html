@@ -95,6 +95,15 @@ svg text{font-family:var(--sans)}
 <script>
 const DATA = [
   {
+    "short": "fdc4002",
+    "date": "2026-10-26 17:51",
+    "msg": "重写 CLAUDE.md：按当前模型与报表状态全面校正",
+    "files": 1,
+    "add": 82,
+    "del": 43,
+    "ms": false
+  },
+  {
     "short": "3d8daa4",
     "date": "2026-10-26 17:35",
     "msg": "新增 L2报表 首页并隐藏内容页，卡片统一改取度量值",
@@ -377,6 +386,17 @@ const DATA = [
 
 // 完整提交备注（由 update-version-html.py 维护，去 Co-Authored-By）
 const NOTES = {
+  "fdc4002": [
+    "- 修正过期表清单：删去已不存在的 KFM选冶厂月报 / L1-KFM日报 / 日报指标映射 / 月报指标映射，改为现存的 10 张 L2-* 事实表",
+    "- 修正 DAX 函数说明：只剩 FormatAmount / FormatRatio 两个无参函数，移除已删除的 SameMonthPriorYear",
+    "- queryGroup 更正为 参数/财经/辅助，并补充「模型没有任何 relationship」的设计说明",
+    "- 页面清单由 8 个更新为 11 个：新增「L2报表」首页，10 个内容页统一 HiddenInViewMode",
+    "- 度量值分组说明由 00辅助/01新口径/02月报/03日报 改为按源表名 displayFolder",
+    "- 数据源收敛为单一 QAS 参数 + 财经 SharePoint 站点，删去生产服务器与成本站点",
+    "- 新增「M 取数统一模式」章节：SharePoint 映射 → BW Cube → 月度循环 → 逆透视 → 左连接排序，并标出 month(YYYYMM) 与 加载日期(date) 的类型约束",
+    "- 新增「已知坑」5 条：CRLF 假修改、cache.abf 残留导致类型错误、Desktop 重写文件、PBIR queryRef 硬编码表名不同步、p_月报终止日期 需手动跨月",
+    "- 注明当前模型内已无 HTML 度量值，规范文件保留给后续新增使用"
+  ],
   "3d8daa4": [
     "- 新增落地页「L2报表」（1920×1080，圆角矩形标题），同时设为 activePageName 与 landingPageName",
     "- 原有 10 个内容页统一设置 visibility: HiddenInViewMode，改为由首页导航进入",
