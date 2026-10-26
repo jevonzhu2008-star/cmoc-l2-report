@@ -95,6 +95,15 @@ svg text{font-family:var(--sans)}
 <script>
 const DATA = [
   {
+    "short": "c3af322",
+    "date": "2026-10-26 13:23",
+    "msg": "修复报表 queryRef 表名不一致：TFM → S3 C1成本变化步行图VS上月",
+    "files": 2,
+    "add": 9,
+    "del": 9,
+    "ms": false
+  },
+  {
     "short": "0f95216",
     "date": "2026-10-26 11:45",
     "msg": "优化 DAX/M 代码与注释：统一格式、补齐度量值注释",
@@ -350,6 +359,9 @@ const DATA = [
 
 // 完整提交备注（由 update-version-html.py 维护，去 Co-Authored-By）
 const NOTES = {
+  "c3af322": [
+    "- L2-01-04 页面切片器与透视表视觉对象的 queryRef 残留旧表名「TFM C1成本变化步行图」，统一改为模型表名「S3 C1成本变化步行图VS上月」（共 9 处），与 Entity 源引用对齐"
+  ],
   "0f95216": [
     "- functions.tmdl：FormatAmount/FormatRatio 由多行代码块改为单行，补充注释说明用途",
     "- 度量值.tmdl：L2-01-03指标值 改为单行，补齐 L2-01-04/14/25、L2-03-06 指标值缺失的注释",
