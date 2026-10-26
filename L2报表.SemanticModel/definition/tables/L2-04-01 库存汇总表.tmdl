@@ -33,9 +33,12 @@ table 'L2-04-01 库存汇总表'
 
 	column 金额(人民币)
 		dataType: double
+		isHidden
 		lineageTag: d6453285-3835-4506-92ae-35903839c664
 		summarizeBy: sum
 		sourceColumn: 金额(人民币)
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -43,9 +46,12 @@ table 'L2-04-01 库存汇总表'
 
 	column 量(吨)
 		dataType: double
+		isHidden
 		lineageTag: 2d5ec4a3-756d-4715-8a15-16c9e4eb7dec
 		summarizeBy: sum
 		sourceColumn: 量(吨)
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -64,9 +70,12 @@ table 'L2-04-01 库存汇总表'
 
 	column 分类排序
 		dataType: double
+		isHidden
 		lineageTag: bb135ebc-1f84-4ec5-8ba0-a41301b17099
 		summarizeBy: sum
 		sourceColumn: 分类排序
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -74,9 +83,12 @@ table 'L2-04-01 库存汇总表'
 
 	column 结构排序
 		dataType: double
+		isHidden
 		lineageTag: 60e7bab6-a352-4ddc-be53-f42f8af5eec6
 		summarizeBy: sum
 		sourceColumn: 结构排序
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -84,9 +96,12 @@ table 'L2-04-01 库存汇总表'
 
 	column 矿体排序
 		dataType: double
+		isHidden
 		lineageTag: cd3d4b29-08cd-4f11-a247-8a72971c595b
 		summarizeBy: sum
 		sourceColumn: 矿体排序
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -94,7 +109,7 @@ table 'L2-04-01 库存汇总表'
 
 	partition 'L2-04-01 库存汇总表' = m
 		mode: import
-		queryGroup: 财经\多月
+		queryGroup: 财经
 		source = ```
 				let
 				    /*

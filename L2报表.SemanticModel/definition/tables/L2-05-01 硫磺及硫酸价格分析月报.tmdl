@@ -25,11 +25,14 @@ table 'L2-05-01 硫磺及硫酸价格分析月报'
 
 	column 期间排序
 		dataType: double
+		isHidden
 		lineageTag: 1c8aa649-b924-4a5c-a4b8-62be9806a8a1
 		summarizeBy: sum
 		sourceColumn: 期间排序
 
 		changedProperty = DataType
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -80,9 +83,12 @@ table 'L2-05-01 硫磺及硫酸价格分析月报'
 
 	column 指标值
 		dataType: double
+		isHidden
 		lineageTag: 51b9d7bb-bf64-421a-abc5-e13ae0443c40
 		summarizeBy: sum
 		sourceColumn: 指标值
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -90,9 +96,12 @@ table 'L2-05-01 硫磺及硫酸价格分析月报'
 
 	column 指标排序
 		dataType: double
+		isHidden
 		lineageTag: 7df05834-bab6-4be6-aa27-b377dc706159
 		summarizeBy: sum
 		sourceColumn: 指标排序
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -100,7 +109,7 @@ table 'L2-05-01 硫磺及硫酸价格分析月报'
 
 	partition 'L2-05-01 硫磺及硫酸价格分析月报' = m
 		mode: import
-		queryGroup: 财经\多月
+		queryGroup: 财经
 		source =
 				let
 				    /*

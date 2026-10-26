@@ -44,9 +44,12 @@ table 'L2-01-04 S3 C1成本变化步行图VS上月'
 
 	column 指标值
 		dataType: double
+		isHidden
 		lineageTag: c54d4b59-d4bf-405d-8f58-72af8c6770c8
 		summarizeBy: sum
 		sourceColumn: 指标值
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -65,9 +68,12 @@ table 'L2-01-04 S3 C1成本变化步行图VS上月'
 
 	column 指标名称排序
 		dataType: double
+		isHidden
 		lineageTag: 965a2ffd-3c09-4c01-abbb-aaf6e4946342
 		summarizeBy: sum
 		sourceColumn: 指标名称排序
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -75,9 +81,12 @@ table 'L2-01-04 S3 C1成本变化步行图VS上月'
 
 	column 产品排序
 		dataType: double
+		isHidden
 		lineageTag: 55a37f73-6f9b-4f1c-8f0e-8b5bd37757c7
 		summarizeBy: sum
 		sourceColumn: 产品排序
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -85,9 +94,12 @@ table 'L2-01-04 S3 C1成本变化步行图VS上月'
 
 	column 矿体排序
 		dataType: double
+		isHidden
 		lineageTag: d216269d-a399-4707-92f4-9e874593199f
 		summarizeBy: sum
 		sourceColumn: 矿体排序
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -95,7 +107,7 @@ table 'L2-01-04 S3 C1成本变化步行图VS上月'
 
 	partition 'L2-01-04 S3 C1成本变化步行图VS上月' = m
 		mode: import
-		queryGroup: 财经\多月
+		queryGroup: 财经
 		source =
 				let
 				    /*

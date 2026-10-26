@@ -1,0 +1,184 @@
+table 'L2-03-06 矿石成本分析'
+	lineageTag: 55b3a772-9658-404d-bf05-c2fbae4e59db
+
+	column 矿体
+		dataType: string
+		lineageTag: 48583cdd-b523-4dc4-a970-3642c8925f2b
+		summarizeBy: none
+		sourceColumn: 矿体
+		sortByColumn: 矿体排序
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column 指标项
+		dataType: string
+		lineageTag: d97b7ca0-4a39-415e-a34c-3eafa28d1250
+		summarizeBy: none
+		sourceColumn: 指标项
+		sortByColumn: 指标项排序
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column 加载日期
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: dfa6e2b4-6bee-47b0-b0ec-e44e4d24142f
+		summarizeBy: none
+		sourceColumn: 加载日期
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 指标名称
+		dataType: string
+		lineageTag: 499c9be2-2cfc-4da6-bf15-ae7053c71355
+		summarizeBy: none
+		sourceColumn: 指标名称
+		sortByColumn: 指标名称排序
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column 指标值
+		dataType: double
+		lineageTag: 6a340406-e808-4ff2-a282-21c4278c5e0f
+		summarizeBy: sum
+		sourceColumn: 指标值
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 指标名称排序
+		dataType: double
+		isHidden
+		lineageTag: 1057a4bb-0dc8-422a-bd26-e2167e217d2d
+		summarizeBy: sum
+		sourceColumn: 指标名称排序
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 矿体排序
+		dataType: double
+		isHidden
+		lineageTag: 2dd6e373-4af6-4dee-9cc8-4e735ddcc921
+		summarizeBy: sum
+		sourceColumn: 矿体排序
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 指标项排序
+		dataType: double
+		isHidden
+		lineageTag: f504e2ea-f0f6-4db3-8e22-0ebd840bb2f5
+		summarizeBy: sum
+		sourceColumn: 指标项排序
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition 'L2-03-06 矿石成本分析' = m
+		mode: import
+		queryGroup: 财经
+		source =
+				let
+				    /*
+				    【查询名称】ZRCO_CP005 矿体指标月报 BW取数
+				    【对应报表】L2-01-26 矿体指标月报
+				    【BW对象】Cube:ZRCO_CP005   Query:ZRCO_CP005_Q0003
+				    【说明】
+				        1、循环取数：从参数 p_月报起始日期 开始，取到 p_月报终止日期，逐月查询BW后合并成长表
+				        2、BW参数[ZMSDQNY]：YYYYMM格式年月
+				        3、维度：矿体、指标项
+				        4、指标：本年累计、本月实际、本月预算、差异%、差异±、环比%、环比±、累计比预算±、累计同比±、上年累计、上月实际、同比%、预算累计
+				        5、连接参数统一：QAS服务器、系统编号、客户端ID，和项目其他BW查询保持一套参数规范
+				        6、EnableStructures=true
+				        7、末尾逆透视，统一长表结构，方便矩阵报表排序展示
+				        8、新增：读取SharePoint指标映射表，左连接带出【指标名称排序、矿体排序、指标项排序】
+				    */
+				    // ========== 读取SharePoint上的映射表 ==========
+				    源 = SharePoint.Files(财经SharePoint站点, [ApiVersion = 15]),
+				    指标映射文件 = Table.SelectRows(源, each Text.Contains([Name], "L2-03-06 矿石成本分析指标映射") and [Extension] = ".xlsx"){0}[Content],
+				    指标名称排序映射表 = Excel.Workbook(指标映射文件, true){[Item = "指标名称排序", Kind = "Sheet"]}[Data],
+				    矿体排序映射表 = Excel.Workbook(指标映射文件, true){[Item = "矿体排序", Kind = "Sheet"]}[Data],
+				    指标项排序映射表 = Excel.Workbook(指标映射文件, true){[Item = "指标项排序", Kind = "Sheet"]}[Data],
+				
+				    // 1、连接BW QAS环境
+				    数据源 = SapBusinessWarehouse.Cubes(QAS服务器, 系统编号, 客户端ID, [Implementation="2.0", LanguageCode="ZH", EnableStructures=true, BatchSize=500000000]),
+				    // 2、定位Cube与目标BW查询
+				    立方体 = 数据源{[Name="ZRCO_CP005"]}[Data],
+				    基础查询 = 立方体{[Id="ZRCO_CP005/ZRCO_CP005_Q0003"]}[Data],
+				
+				    // ========== 月份循环配置 ==========
+				    起始月份 = p_月报起始日期,
+				    结束月份 = p_月报终止日期,
+				    月份序列 = List.Generate(() => 起始月份, each _ <= 结束月份, each Date.AddMonths(_, 1)),
+				    月份文本列表 = List.Transform(月份序列, each Text.From(Date.Year(_) * 100 + Date.Month(_))),
+				
+				    // 单月取数函数
+				    查询单月 = (month as text) =>
+				        let
+				            Query = Cube.Transform(基础查询, {
+				                {Cube.ApplyParameter, "[ZMSDQNY]", {month}},
+				                {Cube.AddAndExpandDimensionColumn, "[ZKT]", {"[ZKT].[LEVEL01]"}, {"矿体"}},
+				                {Cube.AddAndExpandDimensionColumn, "[4ZRCO_CP005-ZINDITEM]", {"[4ZRCO_CP005-ZINDITEM].[LEVEL01]"}, {"指标项"}},
+				                {Cube.AddMeasureColumn, "本年累计", "[4VGQHR12MHZ3FRW3M0EDN7QH4].[4VGQHR12MHZ3FRW4BZTZU5Q16]"},
+				                {Cube.AddMeasureColumn, "本月实际", "[4VGQHR12MHZ3FRW3M0EDN7QH4].[4VGQHR12MHZ3FRW4BZTZU5DE2]"},
+				                {Cube.AddMeasureColumn, "本月预算", "[4VGQHR12MHZ3FRW3M0EDN7QH4].[4VGQHR12MHZ3FRW4HCMQ14ETZ]"},
+				                {Cube.AddMeasureColumn, "差异%", "[4VGQHR12MHZ3FRW3M0EDN7QH4].[4VGQHR12MHZ3FRW4HVEV7AXW7]"},
+				                {Cube.AddMeasureColumn, "差异±", "[4VGQHR12MHZ3FRW3M0EDN7QH4].[4VGQHR12MHZ3FRW4HVEV7ARKN]"},
+				                {Cube.AddMeasureColumn, "环比%", "[4VGQHR12MHZ3FRW3M0EDN7QH4].[4VGQHR12MHZ3FRW4CNBAAF5SC]"},
+				                {Cube.AddMeasureColumn, "环比±", "[4VGQHR12MHZ3FRW3M0EDN7QH4].[4VGQHR12MHZ3FRW4CNBAAEZGS]"},
+				                {Cube.AddMeasureColumn, "累计比预算±", "[4VGQHR12MHZ3FRW3M0EDN7QH4].[4VGQHR12MHZ3FRW4HVEV7B47R]"},
+				                {Cube.AddMeasureColumn, "累计同比±", "[4VGQHR12MHZ3FRW3M0EDN7QH4].[4VGQHR12MHZ3FRW4CNBAAFOR0]"},
+				                {Cube.AddMeasureColumn, "上年累计", "[4VGQHR12MHZ3FRW3M0EDN7QH4].[4VGQHR12MHZ3FRW4BZTZU5WCQ]"},
+				                {Cube.AddMeasureColumn, "上月实际", "[4VGQHR12MHZ3FRW3M0EDN7QH4].[4VGQHR12MHZ3FRW4BZTZU572I]"},
+				                {Cube.AddMeasureColumn, "同比%", "[4VGQHR12MHZ3FRW3M0EDN7QH4].[4VGQHR12MHZ3FRW4CNBAAFV2K]"},
+				                {Cube.AddMeasureColumn, "预算累计", "[4VGQHR12MHZ3FRW3M0EDN7QH4].[4VGQHR12MHZ3FRW4HCMQ14L5J]"}
+				            }),
+				            // 加载日期标记
+				            附加月份 = Table.AddColumn(Query, "加载日期", each #date(Number.From(Text.Start(month, 4)), Number.From(Text.End(month, 2)), 1), type date),
+				            // 空值替换0
+				            空值替换为0 = Table.ReplaceValue(附加月份, null, 0, Replacer.ReplaceValue,
+				                {"本年累计","本月实际","本月预算","差异%","差异±","环比%","环比±","累计比预算±","累计同比±","上年累计","上月实际","同比%","预算累计"}
+				            ),
+				            // 逆透视，保留维度+加载日期
+				            逆透视 = Table.UnpivotOtherColumns(空值替换为0, {"矿体","指标项","加载日期"}, "指标名称", "指标值")
+				        in
+				            逆透视,
+				
+				    // 循环合并
+				    各月结果 = List.Transform(月份文本列表, 查询单月),
+				    合并结果 = Table.Combine(各月结果),
+				
+				    // ========== 依次左连接三张排序映射 ==========
+				    左连接指标名称排序 = Table.NestedJoin(合并结果, {"指标名称"}, 指标名称排序映射表, {"指标名称"}, "映射指标名称", JoinKind.LeftOuter),
+				    展开指标名称排序 = Table.ExpandTableColumn(左连接指标名称排序, "映射指标名称", {"指标名称排序"}, {"指标名称排序"}),
+				
+				    左连接矿体排序 = Table.NestedJoin(展开指标名称排序, {"矿体"}, 矿体排序映射表, {"矿体"}, "映射矿体", JoinKind.LeftOuter),
+				    展开矿体排序 = Table.ExpandTableColumn(左连接矿体排序, "映射矿体", {"矿体排序"}, {"矿体排序"}),
+				
+				    左连接指标项排序 = Table.NestedJoin(展开矿体排序, {"指标项"}, 指标项排序映射表, {"指标项"}, "映射指标项", JoinKind.LeftOuter),
+				    展开指标项排序 = Table.ExpandTableColumn(左连接指标项排序, "映射指标项", {"指标项排序"}, {"指标项排序"})
+				in
+				    展开指标项排序
+
+	annotation PBI_ResultType = Table
+

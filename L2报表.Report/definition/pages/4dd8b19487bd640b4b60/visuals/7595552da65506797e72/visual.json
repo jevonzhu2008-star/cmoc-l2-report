@@ -20,13 +20,13 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "L2-03-02 财务费用汇总表"
+                      "Entity": "L2-04-01 库存汇总表"
                     }
                   },
                   "Property": "加载日期"
                 }
               },
-              "queryRef": "L2-03-02 财务费用汇总表.加载日期",
+              "queryRef": "L2-04-01 库存汇总表.加载日期",
               "nativeQueryRef": "加载日期",
               "active": true
             }
@@ -40,15 +40,16 @@
               "Column": {
                 "Expression": {
                   "SourceRef": {
-                    "Entity": "L2-03-02 财务费用汇总表"
+                    "Entity": "L2-04-01 库存汇总表"
                   }
                 },
                 "Property": "加载日期"
               }
             },
-            "direction": "Descending"
+            "direction": "Ascending"
           }
-        ]
+        ],
+        "isDefaultSort": true
       }
     },
     "objects": {
@@ -74,7 +75,7 @@
                 "From": [
                   {
                     "Name": "l",
-                    "Entity": "L2-03-02 财务费用汇总表",
+                    "Entity": "L2-04-01 库存汇总表",
                     "Type": 0
                   }
                 ],
@@ -98,7 +99,7 @@
                           [
                             {
                               "Literal": {
-                                "Value": "'2026-03-01T00:00:00'"
+                                "Value": "datetime'2026-03-01T00:00:00'"
                               }
                             }
                           ]

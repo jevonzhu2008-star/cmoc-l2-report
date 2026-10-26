@@ -25,9 +25,12 @@ table 'L2-03-02 财务费用汇总表'
 
 	column 指标值
 		dataType: double
+		isHidden
 		lineageTag: 7ae2b930-2ec3-4378-8b24-cff7910ffe9f
 		summarizeBy: sum
 		sourceColumn: 指标值
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -35,9 +38,12 @@ table 'L2-03-02 财务费用汇总表'
 
 	column 指标排序
 		dataType: double
+		isHidden
 		lineageTag: ec83ced9-89b3-4a3b-b56f-47b8b4cfb989
 		summarizeBy: sum
 		sourceColumn: 指标排序
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -45,9 +51,12 @@ table 'L2-03-02 财务费用汇总表'
 
 	column 结构排序
 		dataType: double
+		isHidden
 		lineageTag: 2fdb517e-bc22-4bad-9c64-a339b554c75a
 		summarizeBy: sum
 		sourceColumn: 结构排序
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -55,9 +64,12 @@ table 'L2-03-02 财务费用汇总表'
 
 	column 结构唯一ID
 		dataType: string
+		isHidden
 		lineageTag: 05a13292-fb4c-445a-9c3a-ea9dbcf1c4fa
 		summarizeBy: none
 		sourceColumn: 结构唯一ID
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -74,7 +86,7 @@ table 'L2-03-02 财务费用汇总表'
 
 	partition 'L2-03-02 财务费用汇总表' = m
 		mode: import
-		queryGroup: 财经\多月
+		queryGroup: 财经
 		source = ```
 				let
 				    /*

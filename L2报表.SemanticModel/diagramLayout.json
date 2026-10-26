@@ -123,6 +123,30 @@
             "width": 234
           },
           "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 2255.2017606596851,
+            "y": 0
+          },
+          "nodeIndex": "L2-01-25 工序成本完成情况",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 2255.2017606596851,
+            "y": 0
+          },
+          "nodeIndex": "L2-03-06 矿石成本分析",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
         }
       ],
       "name": "所有表",

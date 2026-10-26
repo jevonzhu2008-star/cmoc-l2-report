@@ -38,9 +38,12 @@ table 'L2-01-14 物料单耗月表'
 
 	column 指标值
 		dataType: double
+		isHidden
 		lineageTag: aa09b239-21d9-47b6-992f-a8f2ddf37f5c
 		summarizeBy: sum
 		sourceColumn: 指标值
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -56,9 +59,12 @@ table 'L2-01-14 物料单耗月表'
 
 	column 指标名称排序
 		dataType: double
+		isHidden
 		lineageTag: 0e54ca48-7017-4642-a809-b6947cb402a6
 		summarizeBy: sum
 		sourceColumn: 指标名称排序
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -66,9 +72,12 @@ table 'L2-01-14 物料单耗月表'
 
 	column 单位排序
 		dataType: double
+		isHidden
 		lineageTag: 7c8cfcaf-854e-4366-8656-f018bf04a161
 		summarizeBy: sum
 		sourceColumn: 单位排序
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -76,9 +85,12 @@ table 'L2-01-14 物料单耗月表'
 
 	column 矿体排序
 		dataType: double
+		isHidden
 		lineageTag: 43468aab-87db-4964-a53d-25556ef83a7e
 		summarizeBy: sum
 		sourceColumn: 矿体排序
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -86,9 +98,12 @@ table 'L2-01-14 物料单耗月表'
 
 	column 中区东区排序
 		dataType: double
+		isHidden
 		lineageTag: a59cbde5-4177-4284-bfc2-108784dd32c3
 		summarizeBy: sum
 		sourceColumn: 中区东区排序
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -96,7 +111,7 @@ table 'L2-01-14 物料单耗月表'
 
 	partition 'L2-01-14 物料单耗月表' = m
 		mode: import
-		queryGroup: 财经\多月
+		queryGroup: 财经
 		source =
 				let
 				    /*

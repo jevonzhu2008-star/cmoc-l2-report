@@ -14,9 +14,12 @@ table 'L2-01-02 集团合并利润汇总表'
 
 	column 结构唯一ID
 		dataType: string
+		isHidden
 		lineageTag: 025e498d-472b-4fff-b056-e039191f1415
 		summarizeBy: none
 		sourceColumn: 结构唯一ID
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -30,9 +33,12 @@ table 'L2-01-02 集团合并利润汇总表'
 
 	column 当月YTD
 		dataType: double
+		isHidden
 		lineageTag: def87bfa-7341-4cc0-84ea-ff4b56ddf4d4
 		summarizeBy: sum
 		sourceColumn: 当月YTD
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -40,9 +46,12 @@ table 'L2-01-02 集团合并利润汇总表'
 
 	column 同比YTD
 		dataType: double
+		isHidden
 		lineageTag: 3ef97267-103b-406e-8082-94e6c0558f52
 		summarizeBy: sum
 		sourceColumn: 同比YTD
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -50,9 +59,12 @@ table 'L2-01-02 集团合并利润汇总表'
 
 	column 去年同期YTD
 		dataType: double
+		isHidden
 		lineageTag: b009c7b2-c87c-4549-b69c-27742f35400a
 		summarizeBy: sum
 		sourceColumn: 去年同期YTD
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -60,9 +72,12 @@ table 'L2-01-02 集团合并利润汇总表'
 
 	column 预算YTD
 		dataType: double
+		isHidden
 		lineageTag: fc2f9816-d535-4cd9-a0d8-2385ac4fb818
 		summarizeBy: sum
 		sourceColumn: 预算YTD
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -70,9 +85,12 @@ table 'L2-01-02 集团合并利润汇总表'
 
 	column 预算达成率
 		dataType: double
+		isHidden
 		lineageTag: 8821af94-eb8c-41e5-bfb2-65bbc2a934c8
 		summarizeBy: sum
 		sourceColumn: 预算达成率
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -80,9 +98,12 @@ table 'L2-01-02 集团合并利润汇总表'
 
 	column 环比MTD
 		dataType: double
+		isHidden
 		lineageTag: 2fa4d5a4-1781-40f8-a77d-2f25b1a586b0
 		summarizeBy: sum
 		sourceColumn: 环比MTD
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -90,9 +111,12 @@ table 'L2-01-02 集团合并利润汇总表'
 
 	column 当月MTD
 		dataType: double
+		isHidden
 		lineageTag: 1cf7f5c9-86fe-4266-b255-1b28125ff627
 		summarizeBy: sum
 		sourceColumn: 当月MTD
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -100,9 +124,12 @@ table 'L2-01-02 集团合并利润汇总表'
 
 	column 上月MTD
 		dataType: double
+		isHidden
 		lineageTag: ad2465c2-ae1e-45a7-a607-030d0173db58
 		summarizeBy: sum
 		sourceColumn: 上月MTD
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -118,9 +145,12 @@ table 'L2-01-02 集团合并利润汇总表'
 
 	column 实际值
 		dataType: double
+		isHidden
 		lineageTag: 2f02a163-b00c-48db-b7e6-438749742750
 		summarizeBy: sum
 		sourceColumn: 实际值
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -128,10 +158,13 @@ table 'L2-01-02 集团合并利润汇总表'
 
 	column 月份排序
 		dataType: int64
+		isHidden
 		formatString: 0
 		lineageTag: 5acdf999-f565-4a65-a648-681dfd6f9d32
 		summarizeBy: sum
 		sourceColumn: 月份排序
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -148,9 +181,12 @@ table 'L2-01-02 集团合并利润汇总表'
 
 	column 结构排序
 		dataType: double
+		isHidden
 		lineageTag: 3c6c65cf-49fa-419b-a6ea-05f52fef775f
 		summarizeBy: sum
 		sourceColumn: 结构排序
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -158,7 +194,7 @@ table 'L2-01-02 集团合并利润汇总表'
 
 	partition 'L2-01-02 集团合并利润汇总表' = m
 		mode: import
-		queryGroup: 财经\多月
+		queryGroup: 财经
 		source =
 				let
 				    /*

@@ -335,6 +335,18 @@ table 度量值
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	measure L2-01-25指标值 = SUM('L2-01-25 工序成本完成情况'[指标值])
+		displayFolder: L2-01-25 工序成本完成情况
+		lineageTag: c043b380-a857-4f96-bd06-709e56a0c038
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure L2-03-06指标值 = SUM('L2-03-06 矿石成本分析'[指标值])
+		displayFolder: L2-03-06 矿石成本分析
+		lineageTag: 5414a2e4-66df-4721-9803-d18cdfe0cf18
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
 	partition 度量值 = m
 		mode: import
 		queryGroup: 辅助

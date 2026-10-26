@@ -3,9 +3,12 @@ table 'L2-03-01 销售管理费用预算执行汇总表'
 
 	column 累计实际
 		dataType: double
+		isHidden
 		lineageTag: 0eb76c50-bac8-4a5e-a69a-35464f367376
 		summarizeBy: sum
 		sourceColumn: 累计实际
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -13,9 +16,12 @@ table 'L2-03-01 销售管理费用预算执行汇总表'
 
 	column 累计实际(千人民币)
 		dataType: double
+		isHidden
 		lineageTag: f18d6e02-54e8-4abd-8a1a-8d358838af83
 		summarizeBy: sum
 		sourceColumn: 累计实际(千人民币)
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -23,9 +29,12 @@ table 'L2-03-01 销售管理费用预算执行汇总表'
 
 	column 累计预算
 		dataType: double
+		isHidden
 		lineageTag: 72a33de3-96c8-48e6-afa8-417fcd24f6ba
 		summarizeBy: sum
 		sourceColumn: 累计预算
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -33,9 +42,12 @@ table 'L2-03-01 销售管理费用预算执行汇总表'
 
 	column 累计执行%
 		dataType: double
+		isHidden
 		lineageTag: 113391ce-a268-4095-8077-7c23861734cf
 		summarizeBy: sum
 		sourceColumn: 累计执行%
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -87,14 +99,18 @@ table 'L2-03-01 销售管理费用预算执行汇总表'
 
 	column 公司代码代码
 		dataType: string
+		isHidden
 		lineageTag: f72e7469-2bb4-49ac-ab70-d8a52926467b
 		summarizeBy: none
 		sourceColumn: 公司代码代码
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
 	column 销管费分类代码
 		dataType: int64
+		isHidden
 		formatString: 0
 		lineageTag: 3b37c15e-8466-49a4-9ccb-5175e7f4796d
 		summarizeBy: sum
@@ -102,21 +118,29 @@ table 'L2-03-01 销售管理费用预算执行汇总表'
 
 		changedProperty = DataType
 
+		changedProperty = IsHidden
+
 		annotation SummarizationSetBy = Automatic
 
 	column 利润中心代码
 		dataType: string
+		isHidden
 		lineageTag: cbf8b153-d7b3-40a4-b2fd-78237ddb2ff7
 		summarizeBy: none
 		sourceColumn: 利润中心代码
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
 	column 公司代码排序
 		dataType: double
+		isHidden
 		lineageTag: 92d6a9ff-b277-4302-b55a-3e3e499d9975
 		summarizeBy: sum
 		sourceColumn: 公司代码排序
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -124,9 +148,12 @@ table 'L2-03-01 销售管理费用预算执行汇总表'
 
 	column 销管费分类排序
 		dataType: double
+		isHidden
 		lineageTag: 1cacb813-def8-4601-95cb-7f072228578c
 		summarizeBy: sum
 		sourceColumn: 销管费分类排序
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -134,9 +161,12 @@ table 'L2-03-01 销售管理费用预算执行汇总表'
 
 	column 管理口径利润中心排序
 		dataType: double
+		isHidden
 		lineageTag: ddb1dcc8-df01-481f-8001-1624621828be
 		summarizeBy: sum
 		sourceColumn: 管理口径利润中心排序
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -144,7 +174,7 @@ table 'L2-03-01 销售管理费用预算执行汇总表'
 
 	partition 'L2-03-01 销售管理费用预算执行汇总表' = m
 		mode: import
-		queryGroup: 财经\多月
+		queryGroup: 财经
 		source =
 				let
 				    /*
