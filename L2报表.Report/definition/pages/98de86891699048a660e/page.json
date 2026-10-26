@@ -4,5 +4,6 @@
   "displayName": "L2-01-25 工序成本完成情况",
   "displayOption": "FitToPage",
   "height": 1080,
-  "width": 1920
+  "width": 1920,
+  "visibility": "HiddenInViewMode"
 }

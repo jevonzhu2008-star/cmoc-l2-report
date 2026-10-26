@@ -4,5 +4,6 @@
   "displayName": "L2-05-01 硫磺及硫酸价格分析月报",
   "displayOption": "FitToPage",
   "height": 1080,
-  "width": 1920
+  "width": 1920,
+  "visibility": "HiddenInViewMode"
 }

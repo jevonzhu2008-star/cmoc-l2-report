@@ -85,22 +85,17 @@
           "projections": [
             {
               "field": {
-                "Aggregation": {
+                "Measure": {
                   "Expression": {
-                    "Column": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "L2-01-04 S3 C1成本变化步行图VS上月"
-                        }
-                      },
-                      "Property": "指标值"
+                    "SourceRef": {
+                      "Entity": "度量值"
                     }
                   },
-                  "Function": 0
+                  "Property": "L2-01-04指标值"
                 }
               },
-              "queryRef": "Sum(L2-01-04 S3 C1成本变化步行图VS上月.指标值)",
-              "nativeQueryRef": "指标值 的总和"
+              "queryRef": "度量值.L2-01-04指标值",
+              "nativeQueryRef": "L2-01-04指标值"
             }
           ]
         }

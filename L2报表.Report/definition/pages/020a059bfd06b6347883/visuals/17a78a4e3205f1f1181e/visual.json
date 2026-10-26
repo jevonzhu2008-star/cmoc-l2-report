@@ -20,14 +20,14 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "L2-03-01 销售管理费用预算执行汇总表"
+                      "Entity": "L2-01-03 快报-金融投资业务专属"
                     }
                   },
                   "Property": "加载日期"
                 }
               },
-              "queryRef": "L2-03-01 销售管理费用预算执行汇总表.加载日期",
-              "nativeQueryRef": "加载日期1",
+              "queryRef": "L2-01-03 快报-金融投资业务专属.加载日期",
+              "nativeQueryRef": "加载日期",
               "active": true
             }
           ]
@@ -40,7 +40,7 @@
               "Column": {
                 "Expression": {
                   "SourceRef": {
-                    "Entity": "L2-03-01 销售管理费用预算执行汇总表"
+                    "Entity": "L2-01-03 快报-金融投资业务专属"
                   }
                 },
                 "Property": "加载日期"
@@ -74,7 +74,7 @@
                 "From": [
                   {
                     "Name": "l",
-                    "Entity": "L2-03-01 销售管理费用预算执行汇总表",
+                    "Entity": "L2-01-03 快报-金融投资业务专属",
                     "Type": 0
                   }
                 ],

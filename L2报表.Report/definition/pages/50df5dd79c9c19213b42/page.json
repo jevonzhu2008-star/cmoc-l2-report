@@ -5,6 +5,7 @@
   "displayOption": "FitToPage",
   "height": 1080,
   "width": 1920,
+  "visibility": "HiddenInViewMode",
   "visualInteractions": [
     {
       "source": "44bc85994c68c0c714f8",

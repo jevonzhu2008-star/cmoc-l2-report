@@ -2,8 +2,8 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "286acd836dac792ef581",
   "position": {
-    "x": 16,
-    "y": 80,
+    "x": 16.286948553475586,
+    "y": 59.718811362743814,
     "z": 0,
     "height": 960.00000000000011,
     "width": 1888,
@@ -85,22 +85,17 @@
           "projections": [
             {
               "field": {
-                "Aggregation": {
+                "Measure": {
                   "Expression": {
-                    "Column": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "L2-01-14 物料单耗月表"
-                        }
-                      },
-                      "Property": "指标值"
+                    "SourceRef": {
+                      "Entity": "度量值"
                     }
                   },
-                  "Function": 0
+                  "Property": "L2-01-14指标值"
                 }
               },
-              "queryRef": "Sum(L2-01-14 物料单耗月表.指标值)",
-              "nativeQueryRef": "指标值 的总和"
+              "queryRef": "度量值.L2-01-14指标值",
+              "nativeQueryRef": "L2-01-14指标值"
             }
           ]
         }

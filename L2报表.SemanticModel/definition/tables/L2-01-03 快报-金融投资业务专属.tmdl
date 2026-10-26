@@ -135,8 +135,8 @@ table 'L2-01-03 快报-金融投资业务专属'
 				    公司代码排序表 = Excel.Workbook(指标映射文件, true){[Item = "公司代码排序", Kind = "Sheet"]}[Data],
 				    
 				    // ========== 第一步：连接BW QAS环境 ==========
-				    // 连接 BW QAS 环境：Implementation=2.0 新版接口 / LanguageCode=ZH 返回中文 / EnableStructures=true 开启内置结构 / BatchSize 放大提升批量拉取性能
-				    数据源 = SapBusinessWarehouse.Cubes(QAS服务器, 系统编号, 客户端ID, [Implementation="2.0"]),
+				    // 连接 BW QAS 环境：Implementation=2.0 新版接口 / LanguageCode=ZH 返回中文
+				    数据源 = SapBusinessWarehouse.Cubes(QAS服务器, 系统编号, 客户端ID, [Implementation="2.0", LanguageCode="ZH"]),
 				    
 				    // ========== 第二步：定位Cube与目标BW查询 ==========
 				    // 按 Cube 名称定位 ZRFI_CP012

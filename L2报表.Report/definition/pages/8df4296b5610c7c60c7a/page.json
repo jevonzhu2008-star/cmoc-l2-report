@@ -4,5 +4,6 @@
   "displayName": "L2-01-04 S3 C1成本变化步行图VS上月",
   "displayOption": "FitToPage",
   "height": 1080,
-  "width": 1920
+  "width": 1920,
+  "visibility": "HiddenInViewMode"
 }
