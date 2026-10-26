@@ -141,39 +141,64 @@ table 'L2-01-25 工序成本完成情况'
 				        8、新增：读取SharePoint指标映射表，左连接带出【指标名称排序、大工序排序、矿体排序、单位排序】
 				    */
 				    // ========== 读取SharePoint上的映射表 ==========
+				    // 连接财经 SharePoint 站点，列出全部文件（ApiVersion=15 为较新 REST API），结果为文件列表表
 				    源 = SharePoint.Files(财经SharePoint站点, [ApiVersion = 15]),
+				    // 从文件列表筛选名称含该表「…指标映射」且扩展名为 .xlsx 的文件，取第一个并读取其 [Content]（二进制内容）
 				    指标映射文件 = Table.SelectRows(源, each Text.Contains([Name], "L2-01-25 工序成本完成情况指标映射") and [Extension] = ".xlsx"){0}[Content],
+				    // 用 Excel.Workbook 解析（true=首行为表头），取出「指标名称排序映射表」对应工作表作为映射表
 				    指标名称排序映射表 = Excel.Workbook(指标映射文件, true){[Item = "指标名称排序", Kind = "Sheet"]}[Data],
+				    // 用 Excel.Workbook 解析（true=首行为表头），取出「大工序排序映射表」对应工作表作为映射表
 				    大工序排序映射表 = Excel.Workbook(指标映射文件, true){[Item = "大工序排序", Kind = "Sheet"]}[Data],
+				    // 用 Excel.Workbook 解析（true=首行为表头），取出「矿体排序映射表」对应工作表作为映射表
 				    矿体排序映射表 = Excel.Workbook(指标映射文件, true){[Item = "矿体排序", Kind = "Sheet"]}[Data],
+				    // 用 Excel.Workbook 解析（true=首行为表头），取出「单位排序映射表」对应工作表作为映射表
 				    单位排序映射表 = Excel.Workbook(指标映射文件, true){[Item = "单位排序", Kind = "Sheet"]}[Data],
 				
 				    // 1、连接BW QAS环境
+				    // 连接 BW QAS 环境：Implementation=2.0 用新版接口 / LanguageCode=ZH 返回中文 / EnableStructures=true 开启内置结构 / BatchSize 放大提升批量拉取性能
 				    数据源 = SapBusinessWarehouse.Cubes(QAS服务器, 系统编号, 客户端ID, [Implementation="2.0", LanguageCode="ZH", EnableStructures=true, BatchSize=500000000]),
 				    // 2、定位Cube与目标BW查询
+				    // 按 Cube 名称定位；下一行再按 Query ID 定位该 Cube 内的目标查询
 				    立方体 = 数据源{[Name="ZRCO_CP004"]}[Data],
+				    // 按 Query ID 定位该 Cube 内的目标查询 ZRCO_CP004/ZRCO_CP004_Q0008
 				    基础查询 = 立方体{[Id="ZRCO_CP004/ZRCO_CP004_Q0008"]}[Data],
 				
 				    // ========== 月份循环配置 ==========
+				    // 循环起始月份，取自 Power BI 参数 p_月报起始日期（date 类型）
 				    起始月份 = p_月报起始日期,
+				    // 循环结束月份，取自 Power BI 参数 p_月报终止日期（date 类型）
 				    结束月份 = p_月报终止日期,
+				    // 生成连续月份序列：从起始月份起每月 +1，直到不超过结束月份（结果为 date 列表）
 				    月份序列 = List.Generate(() => 起始月份, each _ <= 结束月份, each Date.AddMonths(_, 1)),
+				    // 把每个日期转成 BW 要求的 YYYYMM 文本：年*100+月（如 2026年1月 → "202601"）
 				    月份文本列表 = List.Transform(月份序列, each Text.From(Date.Year(_) * 100 + Date.Month(_))),
 				
 				    // 单月取数函数
 				    查询单月 = (month as text) =>
 				        let
+				            // 对基础查询应用一组 BW 变换：设置期间参数、展开维度、添加度量值
 				            Query = Cube.Transform(基础查询, {
+				                // 设置 BW 期间参数 [ZMSDQNY] = 当前循环月份（BW 据此返回截止该月的累计数据）
 				                {Cube.ApplyParameter, "[ZMSDQNY]", {month}},
+				                // 展开维度并输出列名「大工序」
 				                {Cube.AddAndExpandDimensionColumn, "[ZEJGX]", {"[ZEJGX].[LEVEL01]"}, {"大工序"}},
+				                // 展开维度并输出列名「单位」
 				                {Cube.AddAndExpandDimensionColumn, "[4ZRCO_CP004-ZUNIT]", {"[4ZRCO_CP004-ZUNIT].[LEVEL01]"}, {"单位"}},
+				                // 展开维度并输出列名「矿体」
 				                {Cube.AddAndExpandDimensionColumn, "[ZKT]", {"[ZKT].[LEVEL01]"}, {"矿体"}},
+				                // 添加度量值「本月计划」
 				                {Cube.AddMeasureColumn, "本月计划", "[4VGQHR12MHZ3FQYRN4M06P70U].[4VGQHR12MHZ3FQYRN4M06DYHA]"},
+				                // 添加度量值「本月完成」
 				                {Cube.AddMeasureColumn, "本月完成", "[4VGQHR12MHZ3FQYRN4M06P70U].[4VGQHR12MHZ3FQYRN4M06DS5Q]"},
+				                // 添加度量值「累计完成率」
 				                {Cube.AddMeasureColumn, "累计完成率", "[4VGQHR12MHZ3FQYRN4M06P70U].[4VGQHR12MHZ1PGM5GIE7E7KFQ]"},
+				                // 添加度量值「年累计实际数」
 				                {Cube.AddMeasureColumn, "年累计实际数", "[4VGQHR12MHZ3FQYRN4M06P70U].[4VGQHR12MHZ3FQYRN4M06GEZ2]"},
+				                // 添加度量值「年累计预算数」
 				                {Cube.AddMeasureColumn, "年累计预算数", "[4VGQHR12MHZ3FQYRN4M06P70U].[4VGQHR12MHZ3FQYRN4M06GLAM]"},
+				                // 添加度量值「上月完成」
 				                {Cube.AddMeasureColumn, "上月完成", "[4VGQHR12MHZ3FQYRN4M06P70U].[4VGQHR12MHZ1PGM53NL89XZX5]"},
+				                // 添加度量值「完成率%」
 				                {Cube.AddMeasureColumn, "完成率%", "[4VGQHR12MHZ3FQYRN4M06P70U].[4VGQHR12MHZ3FQYRN4M06E4SU]"}
 				            }),
 				            // 加载日期标记
@@ -189,19 +214,28 @@ table 'L2-01-25 工序成本完成情况'
 				
 				    // 循环合并
 				    各月结果 = List.Transform(月份文本列表, 查询单月),
+				    // 把 N 个月的结果表上下合并成一张长表
 				    合并结果 = Table.Combine(各月结果),
 				
 				    // ========== 依次左连接四张排序映射 ==========
+				    // 左连接「指标排序」映射表（按业务主键 JoinKind.LeftOuter，未匹配行保留）
 				    左连接指标排序 = Table.NestedJoin(合并结果, {"指标名称"}, 指标名称排序映射表, {"指标名称"}, "映射指标", JoinKind.LeftOuter),
+				    // 展开临时映射列，带出「指标排序」相关排序字段
 				    展开指标排序 = Table.ExpandTableColumn(左连接指标排序, "映射指标", {"指标名称排序"}, {"指标名称排序"}),
 				
+				    // 左连接「大工序排序」映射表（按业务主键 JoinKind.LeftOuter，未匹配行保留）
 				    左连接大工序排序 = Table.NestedJoin(展开指标排序, {"大工序"}, 大工序排序映射表, {"大工序"}, "映射大工序", JoinKind.LeftOuter),
+				    // 展开临时映射列，带出「大工序排序」相关排序字段
 				    展开大工序排序 = Table.ExpandTableColumn(左连接大工序排序, "映射大工序", {"大工序排序"}, {"大工序排序"}),
 				
+				    // 左连接「矿体排序」映射表（按业务主键 JoinKind.LeftOuter，未匹配行保留）
 				    左连接矿体排序 = Table.NestedJoin(展开大工序排序, {"矿体"}, 矿体排序映射表, {"矿体"}, "映射矿体", JoinKind.LeftOuter),
+				    // 展开临时映射列，带出「矿体排序」相关排序字段
 				    展开矿体排序 = Table.ExpandTableColumn(左连接矿体排序, "映射矿体", {"矿体排序"}, {"矿体排序"}),
 				
+				    // 左连接「单位排序」映射表（按业务主键 JoinKind.LeftOuter，未匹配行保留）
 				    左连接单位排序 = Table.NestedJoin(展开矿体排序, {"单位"}, 单位排序映射表, {"单位"}, "映射单位", JoinKind.LeftOuter),
+				    // 展开临时映射列，带出「单位排序」相关排序字段
 				    展开单位排序 = Table.ExpandTableColumn(左连接单位排序, "映射单位", {"单位排序"}, {"单位排序"})
 				in
 				    展开单位排序

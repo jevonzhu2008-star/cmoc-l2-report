@@ -123,30 +123,48 @@ table 'L2-01-04 S3 C1成本变化步行图VS上月'
 				        6、末尾左连接SharePoint三张映射表，带出【指标名称排序】【产品排序】【矿体排序】
 				    */
 				    // ========== 读取SharePoint上的映射表 ==========
+				    // 连接财经 SharePoint 站点，列出全部文件（ApiVersion=15 为较新 REST API），结果为文件列表表
 				    源 = SharePoint.Files(财经SharePoint站点, [ApiVersion = 15]),
+				    // 从文件列表筛选名称含该表「…指标映射」且扩展名为 .xlsx 的文件，取第一个并读取其 [Content]（二进制内容）
 				    指标映射文件 = Table.SelectRows(源, each Text.Contains([Name], "L2-01-04 S3 C1成本变化步行图VS上月指标映射") and [Extension] = ".xlsx"){0}[Content],
+				    // 用 Excel.Workbook 解析（true=首行为表头），取出「指标排序映射表」对应工作表作为映射表
 				    指标排序映射表 = Excel.Workbook(指标映射文件, true){[Item = "指标名称排序", Kind = "Sheet"]}[Data],
+				    // 用 Excel.Workbook 解析（true=首行为表头），取出「产品排序映射表」对应工作表作为映射表
 				    产品排序映射表 = Excel.Workbook(指标映射文件, true){[Item = "产品排序", Kind = "Sheet"]}[Data],
+				    // 用 Excel.Workbook 解析（true=首行为表头），取出「矿体排序映射表」对应工作表作为映射表
 				    矿体排序映射表 = Excel.Workbook(指标映射文件, true){[Item = "矿体排序", Kind = "Sheet"]}[Data],
 				
 				    // ========== 连接BW QAS环境 ==========
+				    // 连接 BW QAS 环境：Implementation=2.0 新版接口 / LanguageCode=ZH 返回中文 / EnableStructures=true 开启内置结构 / BatchSize 放大提升批量拉取性能
 				    数据源 = SapBusinessWarehouse.Cubes(QAS服务器, 系统编号, 客户端ID, [Implementation="2.0", LanguageCode="ZH", EnableStructures=true, BatchSize=500000000]),
+				    // 按 Cube 名称定位 ZRCO_CP004
 				    立方体 = 数据源{[Name="ZRCO_CP004"]}[Data],
+				    // 按 Query ID 定位该 Cube 内的目标查询 ZRCO_CP004/ZRCO_CP004_Q0012
 				    基础查询 = 立方体{[Id="ZRCO_CP004/ZRCO_CP004_Q0012"]}[Data],
 				
 				    // ========== 月份循环配置 ==========
+				    // 循环起始月份，取自 Power BI 参数 p_月报起始日期（date 类型）
 				    起始月份 = p_月报起始日期,
+				    // 循环结束月份，取自 Power BI 参数 p_月报终止日期（date 类型）
 				    结束月份 = p_月报终止日期,
+				    // 生成连续月份序列：从起始月份起每月 +1，直到不超过结束月份（结果为 date 列表）
 				    月份序列 = List.Generate(() => 起始月份, each _ <= 结束月份, each Date.AddMonths(_, 1)),
+				    // 把每个日期转成 BW 要求的 YYYYMM 文本：年*100+月（如 2026年1月 → "202601"）
 				    月份文本列表 = List.Transform(月份序列, each Text.From(Date.Year(_) * 100 + Date.Month(_))),
 				
 				    // ========== 单月取数函数 ==========
+				    // 单月取数函数：输入 YYYYMM 文本，输出该月 BW 查询结果表
 				    查询单月 = (month as text) =>
 				        let
+				            // 对基础查询应用一组 BW 变换：设置期间参数、展开维度、添加度量值
 				            Query = Cube.Transform(基础查询, {
+				                // 设置 BW 期间参数 [ZMSDQNY] = 当前循环月份（BW 据此返回截止该月的累计数据）
 				                {Cube.ApplyParameter, "[ZMSDQNY]", {month}},
+				                // 展开维度并输出列名「产品」
 				                {Cube.AddAndExpandDimensionColumn, "[ZCP]", {"[ZCP].[LEVEL01]"}, {"产品"}},
+				                // 展开维度并输出列名「单位」
 				                {Cube.AddAndExpandDimensionColumn, "[4ZRCO_CP004-ZUNIT]", {"[4ZRCO_CP004-ZUNIT].[LEVEL01]"}, {"单位"}},
+				                // 展开维度并输出列名「矿体」
 				                {Cube.AddAndExpandDimensionColumn, "[ZKT]", {"[ZKT].[LEVEL01]"}, {"矿体"}},
 				                // M0（去年同期月）及成本要素分解
 				                // {Cube.AddMeasureColumn, "M0", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA1SEV]"},
@@ -172,41 +190,62 @@ table 'L2-01-04 S3 C1成本变化步行图VS上月'
 				                // C1成本及要素分解
 				                // {Cube.AddMeasureColumn, "备件", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA6047]"},
 				                {Cube.AddMeasureColumn, "本月C1", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA6PEF]"},
+				                // 添加度量值「产量」
 				                {Cube.AddMeasureColumn, "产量", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA54IF]"},
+				                // 添加度量值「递延剥离」
 				                {Cube.AddMeasureColumn, "递延剥离", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA66FR]"},
+				                // 添加度量值「勾稽差」
 				                {Cube.AddMeasureColumn, "勾稽差", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA6VPZ]"},
+				                // 添加度量值「耗材」
 				                {Cube.AddMeasureColumn, "耗材", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA5H5J]"},
+				                // 添加度量值「能源」
 				                {Cube.AddMeasureColumn, "能源", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA5NH3]"},
+				                // 添加度量值「其他及未归类」
 				                {Cube.AddMeasureColumn, "其他及未归类", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA6J2V]"},
+				                // 添加度量值「人工」
 				                {Cube.AddMeasureColumn, "人工", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA5ATZ]"},
+				                // 添加度量值「上月C1」
 				                {Cube.AddMeasureColumn, "上月C1", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA4Y6V]"},
+				                // 添加度量值「外包」
 				                {Cube.AddMeasureColumn, "外包", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA5TSN]"},
+				                // 添加度量值「在产品变动」
 				                {Cube.AddMeasureColumn, "在产品变动", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA6CRB]"}
 				            }),
+				            // 追加「加载日期」列：把当前循环 YYYYMM 转成当月首日 date（如 202601 → 2026-01-01），标记该行数据所属期间
 				            附加月份 = Table.AddColumn(Query, "加载日期", each #date(Number.From(Text.Start(month, 4)), Number.From(Text.End(month, 2)), 1), type date),
+				            // 把各指标列的 null 统一替换为 0（避免空值干扰报表）
 				            空值替换 = Table.ReplaceValue(附加月份, null, 0, Replacer.ReplaceValue,
 				                {/*"M0", "M0_E01", "M0_E02", "M0_E03", "M0_E04", "M0_E05", "M0_E14", "M0_E15",
 				                 "M1", "M1_E01", "M1_E02", "M1_E03", "M1_E04", "M1_E05", "M1_E14", "M1_E15",
 				                 "Q0", "Q1", "备件",*/ "本月C1", "产量", "递延剥离", "勾稽差",
 				                 "耗材", "能源", "其他及未归类", "人工", "上月C1", "外包", "在产品变动"}
 				            ),
+				            // 逆透视：把宽表的指标列转为两列「指标名称」「指标值」，形成长表
 				            逆透视 = Table.UnpivotOtherColumns(空值替换, {"产品", "矿体", "单位", "加载日期"}, "指标名称", "指标值")
 				        in
 				            逆透视,
 				
+				    // 遍历月份文本列表，对每个 YYYYMM 调用查询单月，得到 N 个月的结果表
 				    各月结果 = List.Transform(月份文本列表, 查询单月),
+				    // 把 N 个月的结果表上下合并成一张长表
 				    合并结果 = Table.Combine(各月结果),
 				
 				    // ========== 左连接①：指标排序 ==========
+				    // 左连接「指标排序」映射表（按业务主键 JoinKind.LeftOuter，未匹配行保留）
 				    左连接指标排序 = Table.NestedJoin(合并结果, {"指标名称"}, 指标排序映射表, {"指标名称"}, "映射指标", JoinKind.LeftOuter),
+				    // 展开临时映射列，带出「指标排序」相关排序字段
 				    展开指标排序 = Table.ExpandTableColumn(左连接指标排序, "映射指标", {"指标名称排序"}, {"指标名称排序"}),
 				
 				    // ========== 左连接②：产品排序 ==========
+				    // 左连接「产品排序」映射表（按业务主键 JoinKind.LeftOuter，未匹配行保留）
 				    左连接产品排序 = Table.NestedJoin(展开指标排序, {"产品"}, 产品排序映射表, {"产品"}, "映射产品", JoinKind.LeftOuter),
+				    // 展开临时映射列，带出「产品排序」相关排序字段
 				    展开产品排序 = Table.ExpandTableColumn(左连接产品排序, "映射产品", {"产品排序"}, {"产品排序"}),
 				
 				    // ========== 左连接③：矿体排序 ==========
+				    // 左连接「矿体排序」映射表（按业务主键 JoinKind.LeftOuter，未匹配行保留）
 				    左连接矿体排序 = Table.NestedJoin(展开产品排序, {"矿体"}, 矿体排序映射表, {"矿体"}, "映射矿体", JoinKind.LeftOuter),
+				    // 展开临时映射列，带出「矿体排序」相关排序字段
 				    展开矿体排序 = Table.ExpandTableColumn(左连接矿体排序, "映射矿体", {"矿体排序"}, {"矿体排序"})
 				in
 				    展开矿体排序

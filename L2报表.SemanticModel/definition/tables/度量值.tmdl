@@ -44,21 +44,21 @@ table 度量值
 		formatStringDefinition = FormatAmount()
 
 	/// 同比YTD：YTD 同比变化（百分比，平均值）
-	measure 同比YTD = AVERAGE('L2-01-02 集团合并利润汇总表'[同比YTD])/100
+	measure 同比YTD = AVERAGE('L2-01-02 集团合并利润汇总表'[同比YTD])
 		displayFolder: L2-01-02 集团合并利润汇总表
 		lineageTag: e3c8e2a2-af68-4765-8762-68f989a8358e
 
 		formatStringDefinition = FormatRatio()
 
 	/// 预算达成率：YTD 预算达成率（百分比，平均值）
-	measure 预算达成率 = AVERAGE('L2-01-02 集团合并利润汇总表'[预算达成率])/100
+	measure 预算达成率 = AVERAGE('L2-01-02 集团合并利润汇总表'[预算达成率])
 		displayFolder: L2-01-02 集团合并利润汇总表
 		lineageTag: 26ab2870-27e9-402e-b6db-2e3872777872
 
 		formatStringDefinition = FormatRatio()
 
 	/// 环比MTD：当月 MTD 环比上月 MTD（百分比，平均值）
-	measure 环比MTD = AVERAGE('L2-01-02 集团合并利润汇总表'[环比MTD])/100
+	measure 环比MTD = AVERAGE('L2-01-02 集团合并利润汇总表'[环比MTD])
 		displayFolder: L2-01-02 集团合并利润汇总表
 		lineageTag: 477af208-18aa-46b7-829c-7c26486843a6
 

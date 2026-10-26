@@ -190,36 +190,56 @@ table 'L2-03-01 销售管理费用预算执行汇总表'
 				        6、BatchSize调大，用于提升大批量BW数据拉取性能
 				    */
 				    // ========== 读取SharePoint上的排序映射表 ==========
+				    // 连接财经 SharePoint 站点，列出全部文件（ApiVersion=15 为较新 REST API），结果为文件列表表
 				    源 = SharePoint.Files(财经SharePoint站点, [ApiVersion = 15]),
+				    // 从文件列表筛选名称含该表「…指标映射」且扩展名为 .xlsx 的文件，取第一个并读取其 [Content]（二进制内容）
 				    指标映射文件 = Table.SelectRows(源, each Text.Contains([Name], "L2-03-01 销售管理费用预算执行汇总表指标映射") and [Extension] = ".xlsx"){0}[Content],
+				    // 用 Excel.Workbook 解析（true=首行为表头），取出「公司代码排序表」对应工作表作为映射表
 				    公司代码排序表 = Excel.Workbook(指标映射文件, true){[Item = "公司代码排序", Kind = "Sheet"]}[Data],
+				    // 用 Excel.Workbook 解析（true=首行为表头），取出「销管费分类排序表」对应工作表作为映射表
 				    销管费分类排序表 = Excel.Workbook(指标映射文件, true){[Item = "销管费分类排序", Kind = "Sheet"]}[Data],
+				    // 用 Excel.Workbook 解析（true=首行为表头），取出「管理口径利润中心排序表」对应工作表作为映射表
 				    管理口径利润中心排序表 = Excel.Workbook(指标映射文件, true){[Item = "管理口径利润中心排序", Kind = "Sheet"]}[Data],
 				
 				    // 1、连接BW QAS环境
+				    // 连接 BW QAS 环境：Implementation=2.0 用新版接口 / LanguageCode=ZH 返回中文 / EnableStructures=true 开启内置结构 / BatchSize 放大提升批量拉取性能
 				    数据源 = SapBusinessWarehouse.Cubes(QAS服务器, 系统编号, 客户端ID, [LanguageCode="ZH", Implementation="2.0", BatchSize=500000000]),
 				    // 2、定位Cube与目标BW查询
+				    // 按 Cube 名称定位；下一行再按 Query ID 定位该 Cube 内的目标查询
 				    立方体 = 数据源{[Name="ZRFI_CP005"]}[Data],
+				    // 按 Query ID 定位该 Cube 内的目标查询 ZRFI_CP005/ZRFI_CP005_Q0002
 				    基础查询 = 立方体{[Id="ZRFI_CP005/ZRFI_CP005_Q0002"]}[Data],
 				    // ========== 月份循环配置 ==========
+				    // 循环起始月份，取自 Power BI 参数 p_月报起始日期（date 类型）
 				    起始月份 = p_月报起始日期,
+				    // 循环结束月份，取自 Power BI 参数 p_月报终止日期（date 类型）
 				    结束月份 = p_月报终止日期,
+				    // 生成连续月份序列：从起始月份起每月 +1，直到不超过结束月份（结果为 date 列表）
 				    月份序列 = List.Generate(() => 起始月份, each _ <= 结束月份, each Date.AddMonths(_, 1)),
+				    // 把每个日期转成 BW 要求的 YYYYMM 文本：年*100+月（如 2026年1月 → "202601"）
 				    月份文本列表 = List.Transform(月份序列, each Text.From(Date.Year(_) * 100 + Date.Month(_))),
 				    // 单月取数函数
 				    查询单月 = (month as text) =>
 				        let
+				            // 对基础查询应用一组 BW 变换：设置期间参数、展开维度、添加度量值
 				            Query = Cube.Transform(基础查询, {
 				                // BW期间参数
 				                {Cube.ApplyParameter, "[ZMSDQNY]", {month}},
 				                // ========== 度量值：YTD累计指标 ==========
+				                // 添加度量值「累计实际」
 				                {Cube.AddMeasureColumn, "累计实际", "[Measures].[4VGQHR12MHZ3FT2S9KPZM93SH]"},
+				                // 添加度量值「累计实际(千人民币)」
 				                {Cube.AddMeasureColumn, "累计实际(千人民币)", "[Measures].[4VGQHR12MHZ3FT2S9KPZM9A41]"},
+				                // 添加度量值「累计预算」
 				                {Cube.AddMeasureColumn, "累计预算", "[Measures].[4VGQHR12MHZ3FT2S9KPZM9GFL]"},
+				                // 添加度量值「累计执行%」
 				                {Cube.AddMeasureColumn, "累计执行%", "[Measures].[4VGQHR12MHZ3FT2S9KPZM9MR5]"},
 				                // ========== 维度字段展开 ==========
+				                // 展开维度并输出列名「公司代码」
 				                {Cube.AddAndExpandDimensionColumn, "[ZBUKRS]", {"[ZBUKRS].[LEVEL01]"}, {"公司代码"}},
+				                // 展开维度并输出列名「销管费分类」
 				                {Cube.AddAndExpandDimensionColumn, "[ZXGFFL]", {"[ZXGFFL].[LEVEL01]"}, {"销管费分类"}},
+				                // 展开维度并输出列名「管理口径利润中心」
 				                {Cube.AddAndExpandDimensionColumn, "[ZPRCTR_GL]", {"[ZPRCTR_GL].[LEVEL01]"}, {"管理口径利润中心"}}
 				            }),
 				            // ========== 读取维度成员代码（AttributeMemberProperty） ==========
@@ -238,12 +258,15 @@ table 'L2-03-01 销售管理费用预算执行汇总表'
 				    // ========== 左连接映射表，带出三个排序 ==========
 				    // 左连接公司代码排序表（按公司代码代码）
 				    左连接公司排序 = Table.NestedJoin(合并结果, {"公司代码"}, 公司代码排序表, {"公司代码"}, "公司映射临时", JoinKind.LeftOuter),
+				    // 展开临时映射列，带出「公司排序」相关排序字段
 				    展开公司排序 = Table.ExpandTableColumn(左连接公司排序, "公司映射临时", {"公司代码排序"}, {"公司代码排序"}),
 				    // 左连接销管费分类排序表（按销管费分类代码）
 				    左连接分类排序 = Table.NestedJoin(展开公司排序, {"销管费分类"}, 销管费分类排序表, {"销管费分类"}, "分类映射临时", JoinKind.LeftOuter),
+				    // 展开临时映射列，带出「分类排序」相关排序字段
 				    展开分类排序 = Table.ExpandTableColumn(左连接分类排序, "分类映射临时", {"销管费分类排序"}, {"销管费分类排序"}),
 				    // 左连接管理口径利润中心排序表（按利润中心代码）
 				    左连接利润中心排序 = Table.NestedJoin(展开分类排序, {"管理口径利润中心"}, 管理口径利润中心排序表, {"管理口径利润中心"}, "利润中心映射临时", JoinKind.LeftOuter),
+				    // 展开临时映射列，带出「利润中心排序」相关排序字段
 				    展开利润中心排序 = Table.ExpandTableColumn(左连接利润中心排序, "利润中心映射临时", {"管理口径利润中心排序"}, {"管理口径利润中心排序"})
 				in
 				    展开利润中心排序

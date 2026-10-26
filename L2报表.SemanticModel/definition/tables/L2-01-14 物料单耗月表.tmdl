@@ -33,6 +33,9 @@ table 'L2-01-14 物料单耗月表'
 		lineageTag: 8fbd022f-7d5f-49ef-9fec-90349aec8e9f
 		summarizeBy: none
 		sourceColumn: 指标名称
+		sortByColumn: 指标名称排序
+
+		changedProperty = SortByColumn
 
 		annotation SummarizationSetBy = Automatic
 
@@ -127,56 +130,87 @@ table 'L2-01-14 物料单耗月表'
 				        6、末尾左连接SharePoint四张映射表，带出各维度排序
 				    */
 				    // ========== 读取SharePoint上的映射表 ==========
+				    // 连接财经 SharePoint 站点，列出全部文件（ApiVersion=15 为较新 REST API），结果为文件列表表
 				    源 = SharePoint.Files(财经SharePoint站点, [ApiVersion = 15]),
+				    // 从文件列表筛选名称含该表「…指标映射」且扩展名为 .xlsx 的文件，取第一个并读取其 [Content]（二进制内容）
 				    指标映射文件 = Table.SelectRows(源, each Text.Contains([Name], "L2-01-14 物料单耗月表指标映射") and [Extension] = ".xlsx"){0}[Content],
+				    // 用 Excel.Workbook 解析（true=首行为表头），取出「单位排序映射表」对应工作表作为映射表
 				    单位排序映射表 = Excel.Workbook(指标映射文件, true){[Item = "单位排序", Kind = "Sheet"]}[Data],
+				    // 用 Excel.Workbook 解析（true=首行为表头），取出「矿体排序映射表」对应工作表作为映射表
 				    矿体排序映射表 = Excel.Workbook(指标映射文件, true){[Item = "矿体排序", Kind = "Sheet"]}[Data],
+				    // 用 Excel.Workbook 解析（true=首行为表头），取出「中区东区排序映射表」对应工作表作为映射表
 				    中区东区排序映射表 = Excel.Workbook(指标映射文件, true){[Item = "中区东区排序", Kind = "Sheet"]}[Data],
+				    // 用 Excel.Workbook 解析（true=首行为表头），取出「指标名称排序映射表」对应工作表作为映射表
 				    指标名称排序映射表 = Excel.Workbook(指标映射文件, true){[Item = "指标名称排序", Kind = "Sheet"]}[Data],
 				
 				    // ========== 连接BW QAS环境 ==========
+				    // 连接 BW QAS 环境：Implementation=2.0 新版接口 / LanguageCode=ZH 返回中文 / EnableStructures=true 开启内置结构 / BatchSize 放大提升批量拉取性能
 				    数据源 = SapBusinessWarehouse.Cubes(QAS服务器, 系统编号, 客户端ID, [Implementation="2.0", LanguageCode="ZH", EnableStructures=true, BatchSize=500000000]),
+				    // 按 Cube 名称定位 ZRCO_CP004
 				    立方体 = 数据源{[Name="ZRCO_CP004"]}[Data],
+				    // 按 Query ID 定位该 Cube 内的目标查询 ZRCO_CP004/ZRCO_CP004_Q0011
 				    基础查询 = 立方体{[Id="ZRCO_CP004/ZRCO_CP004_Q0011"]}[Data],
 				
 				    // ========== 月份循环配置 ==========
+				    // 循环起始月份，取自 Power BI 参数 p_月报起始日期（date 类型）
 				    起始月份 = p_月报起始日期,
+				    // 循环结束月份，取自 Power BI 参数 p_月报终止日期（date 类型）
 				    结束月份 = p_月报终止日期,
+				    // 生成连续月份序列：从起始月份起每月 +1，直到不超过结束月份（结果为 date 列表）
 				    月份序列 = List.Generate(() => 起始月份, each _ <= 结束月份, each Date.AddMonths(_, 1)),
+				    // 把每个日期转成 BW 要求的 YYYYMM 文本：年*100+月（如 2026年1月 → "202601"）
 				    月份文本列表 = List.Transform(月份序列, each Text.From(Date.Year(_) * 100 + Date.Month(_))),
 				
 				    // ========== 单月取数函数 ==========
+				    // 单月取数函数：输入 YYYYMM 文本，输出该月 BW 查询结果表
 				    查询单月 = (month as text) =>
 				        let
+				            // 对基础查询应用一组 BW 变换：设置期间参数、展开维度、添加度量值
 				            Query = Cube.Transform(基础查询, {
+				                // 设置 BW 期间参数 [ZMSDQNY] = 当前循环月份（BW 据此返回截止该月的累计数据）
 				                {Cube.ApplyParameter, "[ZMSDQNY]", {month}},
 				                // 维度展开
 				                {Cube.AddAndExpandDimensionColumn, "[4ZRCO_CP004-ZUNIT]", {"[4ZRCO_CP004-ZUNIT].[LEVEL01]"}, {"单位"}},
+				                // 展开维度并输出列名「矿体」
 				                {Cube.AddAndExpandDimensionColumn, "[ZKT]", {"[ZKT].[LEVEL01]"}, {"矿体"}},
+				                // 展开维度并输出列名「中区东区」
 				                {Cube.AddAndExpandDimensionColumn, "[ZTDISTRCT]", {"[ZTDISTRCT].[LEVEL01]"}, {"中区东区"}},
 				                // 目标类
 				                {Cube.AddMeasureColumn, "26年目标", "[4VGQHR12MHZ1PH0QD0454F134].[4VGQHR12MHZ1PH0RGAVD1MOPL]"},
+				                // 添加度量值「比目标±%」
 				                {Cube.AddMeasureColumn, "比目标±%", "[4VGQHR12MHZ1PH0QD0454F134].[4VGQHR12MHZ1PH0RGAVD1N7O9]"},
+				                // 添加度量值「累计比目标」
 				                {Cube.AddMeasureColumn, "累计比目标", "[4VGQHR12MHZ1PH0QD0454F134].[4VGQHR12MHZ1PH0RGAVD1N1CP]"},
 				                // 当月/上月/环比类
 				                {Cube.AddMeasureColumn, "当月", "[4VGQHR12MHZ1PH0QD0454F134].[4VGQHR12MHZ1PH0RGAVD1M5QX]"},
+				                // 添加度量值「当月累计」
 				                {Cube.AddMeasureColumn, "当月累计", "[4VGQHR12MHZ1PH0QD0454F134].[4VGQHR12MHZ1PH0RGAVD1MV15]"},
+				                // 添加度量值「上月」
 				                {Cube.AddMeasureColumn, "上月", "[4VGQHR12MHZ1PH0QD0454F134].[4VGQHR12MHZ1PH0RGAVD1LZFD]"},
+				                // 添加度量值「环比」
 				                {Cube.AddMeasureColumn, "环比", "[4VGQHR12MHZ1PH0QD0454F134].[4VGQHR12MHZ1PH0RGAVD1MC2H]"},
+				                // 添加度量值「环比±%」
 				                {Cube.AddMeasureColumn, "环比±%", "[4VGQHR12MHZ1PH0QD0454F134].[4VGQHR12MHZ1PH0RGAVD1MIE1]"},
+				                // 添加度量值「环比实际量LAM」
 				                {Cube.AddMeasureColumn, "环比实际量LAM", "[4VGQHR12MHZ1PH0QD0454F134].[4VGQHR12MHZ1PH0QD0454FQDC]"},
+				                // 添加度量值「环比实际数LAM」
 				                {Cube.AddMeasureColumn, "环比实际数LAM", "[4VGQHR12MHZ1PH0QD0454F134].[4VGQHR12MHZ1PH0QD0454FK1S]"},
 				                // 实际类（AM=当月实际）
 				                {Cube.AddMeasureColumn, "实际量AM", "[4VGQHR12MHZ1PH0QD0454F134].[4VGQHR12MHZ1PH0QD0454FDQ8]"},
+				                // 添加度量值「实际数AM」
 				                {Cube.AddMeasureColumn, "实际数AM", "[4VGQHR12MHZ1PH0QD0454F134].[4VGQHR12MHZ1PH0QD0454F7EO]"},
 				                // 年累类（AY=年度累计）
 				                {Cube.AddMeasureColumn, "年累实际量AY", "[4VGQHR12MHZ1PH0QD0454F134].[4VGQHR12MHZ1PH0QD0454G30G]"},
+				                // 添加度量值「年累实际数AY」
 				                {Cube.AddMeasureColumn, "年累实际数AY", "[4VGQHR12MHZ1PH0QD0454F134].[4VGQHR12MHZ1PH0QD0454FWOW]"},
 				                // 预算类（BM=当月预算）
 				                {Cube.AddMeasureColumn, "预算量BM", "[4VGQHR12MHZ1PH0QD0454F134].[4VGQHR12MHZ1PH0QD0454GFNK]"},
+				                // 添加度量值「预算数BM」
 				                {Cube.AddMeasureColumn, "预算数BM", "[4VGQHR12MHZ1PH0QD0454F134].[4VGQHR12MHZ1PH0QD0454G9C0]"}
 				            }),
+				            // 追加「加载日期」列：把当前循环 YYYYMM 转成当月首日 date（如 202601 → 2026-01-01），标记该行数据所属期间
 				            附加月份 = Table.AddColumn(Query, "加载日期", each #date(Number.From(Text.Start(month, 4)), Number.From(Text.End(month, 2)), 1), type date),
+				            // 把各指标列的 null 统一替换为 0（避免空值干扰报表）
 				            空值替换 = Table.ReplaceValue(附加月份, null, 0, Replacer.ReplaceValue,
 				                {"26年目标", "比目标±%", "当月", "当月累计", "环比", "环比±%",
 				                 "环比实际量LAM", "环比实际数LAM", "累计比目标", "年累实际量AY", "年累实际数AY",
@@ -187,23 +221,33 @@ table 'L2-01-14 物料单耗月表'
 				        in
 				            逆透视,
 				
+				    // 遍历月份文本列表，对每个 YYYYMM 调用查询单月，得到 N 个月的结果表
 				    各月结果 = List.Transform(月份文本列表, 查询单月),
+				    // 把 N 个月的结果表上下合并成一张长表
 				    合并结果 = Table.Combine(各月结果),
 				
 				    // ========== 左连接①：指标名称排序 ==========
+				    // 左连接「指标排序」映射表（按业务主键 JoinKind.LeftOuter，未匹配行保留）
 				    左连接指标排序 = Table.NestedJoin(合并结果, {"指标名称"}, 指标名称排序映射表, {"指标名称"}, "映射指标", JoinKind.LeftOuter),
+				    // 展开临时映射列，带出「指标排序」相关排序字段
 				    展开指标排序 = Table.ExpandTableColumn(左连接指标排序, "映射指标", {"指标名称排序"}, {"指标名称排序"}),
 				
 				    // ========== 左连接②：单位排序 ==========
+				    // 左连接「单位排序」映射表（按业务主键 JoinKind.LeftOuter，未匹配行保留）
 				    左连接单位排序 = Table.NestedJoin(展开指标排序, {"单位"}, 单位排序映射表, {"单位"}, "映射单位", JoinKind.LeftOuter),
+				    // 展开临时映射列，带出「单位排序」相关排序字段
 				    展开单位排序 = Table.ExpandTableColumn(左连接单位排序, "映射单位", {"单位排序"}, {"单位排序"}),
 				
 				    // ========== 左连接③：矿体排序 ==========
+				    // 左连接「矿体排序」映射表（按业务主键 JoinKind.LeftOuter，未匹配行保留）
 				    左连接矿体排序 = Table.NestedJoin(展开单位排序, {"矿体"}, 矿体排序映射表, {"矿体"}, "映射矿体", JoinKind.LeftOuter),
+				    // 展开临时映射列，带出「矿体排序」相关排序字段
 				    展开矿体排序 = Table.ExpandTableColumn(左连接矿体排序, "映射矿体", {"矿体排序"}, {"矿体排序"}),
 				
 				    // ========== 左连接④：中区/东区排序 ==========
+				    // 左连接「中区东区排序」映射表（按业务主键 JoinKind.LeftOuter，未匹配行保留）
 				    左连接中区东区排序 = Table.NestedJoin(展开矿体排序, {"中区东区"}, 中区东区排序映射表, {"中区东区"}, "映射中区东区", JoinKind.LeftOuter),
+				    // 展开临时映射列，带出「中区东区排序」相关排序字段
 				    展开中区东区排序 = Table.ExpandTableColumn(左连接中区东区排序, "映射中区东区", {"中区东区排序"}, {"中区东区排序"})
 				in
 				    展开中区东区排序
