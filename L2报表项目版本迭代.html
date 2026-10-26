@@ -95,6 +95,15 @@ svg text{font-family:var(--sans)}
 <script>
 const DATA = [
   {
+    "short": "0eb8126",
+    "date": "2026-10-26 10:00",
+    "msg": "报表调整：加载年月改为加载日期（date 类型）",
+    "files": 18,
+    "add": 179,
+    "del": 155,
+    "ms": false
+  },
+  {
     "short": "8f52e64",
     "date": "2026-10-25 19:01",
     "msg": "更新 CLAUDE.md 页面 UUID 对照：补齐 8 个页面并移除过期说明",
@@ -323,6 +332,12 @@ const DATA = [
 
 // 完整提交备注（由 update-version-html.py 维护，去 Co-Authored-By）
 const NOTES = {
+  "0eb8126": [
+    "- 8 个财经事实表的「加载年月」列统一改为「加载日期」：类型 string → dateTime，格式 yyyy-M-d",
+    "- Power Query 取数：加载日期列由 each month（YYYYMM 文本）改为 each #date(年,月,1)，BW 参数 [ZMSDQNY] 仍传 YYYYMM",
+    "- 同步更新 zh-CN 翻译、报表切片器列名引用与预选值（'202601' → '2026-01-01T00:00:00'）",
+    "- 报表活动页切换至 L2-01-02 集团合并利润汇总表"
+  ],
   "8f52e64": [
     "- 补齐缺失页面：L2-01-03 快报-金融投资业务专属、L2-01-04 S3 C1成本变化步行图VS上月、L2-01-14 物料单耗月表、L2-04-01库存汇总表",
     "- 移除已删除的三个隐藏页（月报、日报、月报数据导出，023b12f 中删除）及不存在的 landingPageName 字段说明",
@@ -555,7 +570,7 @@ const NOTES = {
 const totalAdd = DATA.reduce((s,d)=>s+d.add,0);
 const totalDel = DATA.reduce((s,d)=>s+d.del,0);
 const totalFiles = DATA.reduce((s,d)=>s+d.files,0);
-const days = "5.1";
+const days = "5.7";
 
 document.getElementById('kpis').innerHTML = `
   <div class="kpi"><div class="n">${DATA.length}</div><div class="l">提交数（main）</div></div>
