@@ -4,83 +4,122 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 项目性质
 
-这是「L2 集团合并报表」的 Power BI 项目（PBIP 格式），属于声明式项目：没有构建、测试或 lint 命令，也没有「运行」入口。开发通过 Power BI Desktop 打开 `L2报表.pbip`，或直接编辑 TMDL / PBIR 定义文件，或用 powerbi-modeling MCP 工具操作语义模型。提交信息与模型对象命名均使用中文。
+「L2 集团合并报表」的 Power BI 项目（PBIP 格式），声明式项目：**没有构建、测试、lint 或「运行」入口**。开发只有三条路——Power BI Desktop 打开 `L2报表.pbip`、直接编辑 TMDL / PBIR 文本、或用 powerbi-modeling MCP 操作语义模型。提交信息与模型对象命名一律用中文。
+
+## 常用命令
+
+```bash
+python update-version-html.py      # 手动重建版本迭代页（post-commit 会跑，一般不手工执行）
+git add -A && git commit -m "…"    # 唯一的日常工作流入口
+```
+
+- 语义模型操作走 MCP：连目录（`powerbi-modeling` 的 connection 操作指向本目录）→ 改对象 / 跑 DAX → 断开。改完最好连一次确认表数、度量值数、错误数为预期。
+- `generate_mock_data.py` 是一次性辅助脚本（依赖 `openpyxl`），给 L2-01-02 生成模拟 Excel。`OUTPUT_FILE` 仍是旧机器路径 `C:\Users\Zhujh\…`，用前先改。
 
 ## 顶层结构
 
-- `L2报表.pbip` —— 项目入口，声明 report artifact
-- `L2报表.Report/` —— 报告定义（PBIR，报告定义版本 4.0）
-- `L2报表.SemanticModel/` —— 语义模型（TMDL，版本 4.2，兼容级别 1702）
+- `L2报表.pbip` —— 入口，只声明 report artifact
+- `L2报表.Report/` —— 报告定义（PBIR，definition version 2.0.0）
+- `L2报表.SemanticModel/` —— 语义模型（TMDL，compatibilityLevel 1702）
+- `L2报表HTML格式规范.md` —— HTML 度量值配色 / 数值格式规范（见文末）
 - `update-version-html.py` + `L2报表项目版本迭代.html` —— 版本迭代页（见「Git 工作流」）
 - `.git/hooks/post-commit` —— 提交后自动刷新版本迭代页
 
-## 报表 ↔ 语义模型的连接
+## 报表 ↔ 语义模型
 
-`L2报表.Report/definition.pbir` 的 `datasetReference.byPath` 指向 `../L2报表.SemanticModel`，这是报表绑定语义模型的唯一连接点。两者是 PBIP 内两个独立 artifact，改动语义模型会影响报表。
+`L2报表.Report/definition.pbir` 的 `datasetReference.byPath` 指向 `../L2报表.SemanticModel`，这是唯一连接点。两者是 PBIP 内的两个独立 artifact，改语义模型会直接影响报表。
 
 ## 语义模型（TMDL）
 
 `L2报表.SemanticModel/definition/` 下：
 
-- `database.tmdl` —— `compatibilityLevel: 1702`（支持最新 TMDL 特性）
-- `model.tmdl` —— 模型级定义：culture `zh-CN`、queryGroup（参数/成本/财经/辅助）、全部表引用、`PBI_QueryOrder`
-- `expressions.tmdl` —— Power Query 表达式与**取数参数**（`IsParameterQuery`），以及 L2-03-02 的「指标排序/结构排序」辅助查询
-- `functions.tmdl` —— DAX 用户函数（UDF）
-- `tables/` —— 每个表一个 `.tmdl` 文件
-- `cultures/zh-CN.tmdl` —— 中文翻译（体积大，改动需谨慎）
-
-### DAX 用户函数
-
-- `FormatAmount` / `FormatRatio` —— 读取「单位」列（`%` / `t/t` / 吨）返回动态格式字符串，度量值通过 `formatStringDefinition` 引用
-- `SameMonthPriorYear` —— 同期（去年同月）计算。解析「月份-筛选器」切片器的两种取值形态（「最近月份」或具体月份文本如 `202608`），利用 YYYYMM 编码减 100 得去年同月（`202608 → 202508`）
+- `database.tmdl` —— `compatibilityLevel: 1702`
+- `model.tmdl` —— culture `zh-CN`、queryGroup（**参数 / 财经 / 辅助**）、全部 `ref table`、`PBI_QueryOrder`。**模型没有任何 relationship**，筛选靠各表独立（`valueFilterBehavior: independent`）与报表内切片器
+- `expressions.tmdl` —— 全部取数参数（`IsParameterQuery`），共 7 个：`QAS服务器`、`系统编号`、`客户端ID`、`p_月报起始日期`、`p_月报终止日期`、`财经SharePoint站点`、`动态年月偏移`
+- `functions.tmdl` —— DAX 用户函数，只有两个：`FormatAmount`（`"#,0;(#,0);0"`）与 `FormatRatio`（`"+0.00%;-0.00%;0.00%"`），无参数、直接返回格式字符串，度量值通过 `formatStringDefinition` 引用
+- `tables/` —— 每个表一个 `.tmdl`（10 张事实表 + `度量值` 表）
+- `cultures/zh-CN.tmdl` —— Q&A 语言架构（`linguisticMetadata`，约 2000 行自动生成）。改列名/表名后不必手改，里面有历史遗留的孤儿条目（如 `_has_…`）属正常现象
 
 ### 表的业务组织
 
-语义模型是「集团合并」的单一模型，同时承载两套数据：
+10 张事实表，全部是 L2 编号的集团财经表，命名格式 `L2-编号 业务名称`：
 
-- **选冶厂事实表**（承自 L3）：`KFM选冶厂月报`、`L1-KFM日报`
-- **集团财经事实表**（L2 编号规则）：`L2-01-02 集团合并利润汇总表`、`L2-01-03 快报-金融投资业务专属`、`L2-03-01 销售管理费用预算执行汇总表`、`L2-03-02 财务费用汇总表`、`L2-05-01 硫磺及硫酸价格分析月报`
-- **映射表**：`日报指标映射`、`月报指标映射`
+`L2-01-02 集团合并利润汇总表`、`L2-01-03 快报-金融投资业务专属`、`L2-01-04 S3 C1成本变化步行图VS上月`、`L2-01-14 物料单耗月表`、`L2-01-25 工序成本完成情况`、`L2-03-01 销售管理费用预算执行汇总表`、`L2-03-02 财务费用汇总表`、`L2-03-06 矿石成本分析`、`L2-04-01 库存汇总表`、`L2-05-01 硫磺及硫酸价格分析月报`。
+
+映射/排序数据**不进模型表**，而是在各自的 M 查询里读 SharePoint 上的「<表名>指标映射.xlsx」并 `NestedJoin` 物化进事实表（带出 `结构排序`、`指标名称排序` 等隐藏排序列，供 `sortByColumn` 使用）。
+
+### M 取数统一模式
+
+每张事实表的 M 查询骨架一致，读一张就能推断其余：
+
+1. `SharePoint.Files(财经SharePoint站点, [ApiVersion=15])` 筛出该表的指标映射 xlsx，`Excel.Workbook` 取排序工作表
+2. `SapBusinessWarehouse.Cubes(QAS服务器, 系统编号, 客户端ID, [Implementation="2.0", LanguageCode="ZH", …])` → `{[Name=Cube]}` → `{[Id="Cube/Query"]}`
+3. `List.Generate(() => p_月报起始日期, each _ <= p_月报终止日期, each Date.AddMonths(_, 1))` 生成月份序列，再转成 **YYYYMM 文本**
+4. 每月 `Cube.Transform`：`Cube.ApplyParameter "[ZMSDQNY]"` → 展开维度 → `AddMeasureColumn`
+5. 追加 `加载日期` = 该月 1 日（**date 类型**，格式 `yyyy-M-d`）
+6. null → 0，`Table.UnpivotOtherColumns` 逆透视成「指标名称 / 指标值」长表（L2-01-02 例外：逆透视成「月份 / 实际值」，再派生 `月份排序`、`季度`）
+7. 左连接排序映射表，展开排序字段
+
+**关键约束**：循环里的 `month` 变量是 **YYYYMM 文本**（BW 参数 `[ZMSDQNY]` 的要求），而 `加载日期` 列是 **date**。两者不能混用——直接把 `month` 赋给日期列会抛类型错误，必须 `#date(Number.From(Text.Start(month,4)), Number.From(Text.End(month,2)), 1)`。
 
 ### 度量值集中管理
 
-所有度量值集中在 `tables/度量值.tmdl` 的「度量值」表里，用 `displayFolder` 分组：`00辅助` / `01新口径` / `02月报` / `03日报`。新增/修改度量值时保持这个分组约定，不要把度量值散落到事实表。
+22 个度量值全部在 `tables/度量值.tmdl` 的「度量值」表里，**不散落到事实表**。`displayFolder` 用**源表名**分组（如 `L2-01-02 集团合并利润汇总表`），新增度量值沿用。
+
+格式约定：金额类 + `formatStringDefinition = FormatAmount()`；比率类 + `FormatRatio()`；混合口径的长表指标值（`L2-01-04指标值`、`L2-01-14指标值`、`L2-01-25指标值`、`L2-03-06指标值`）不用 UDF，改打 `annotation PBI_FormatHint = {"isGeneralNumber":true}`。
 
 ## 报告（PBIR）
 
-`L2报表.Report/definition/pages/` 下每个页面是一个 **UUID 命名的目录**（`page.json` + `visuals/`）。页面顺序与活动页由 `pages/pages.json` 的 `pageOrder` / `activePageName` 维护，值都是页面目录的 UUID。切换报告活动页只需改 `activePageName`；隐藏某一页则在该页 `page.json` 里加 `"visibility": "HiddenInViewMode"`。
+`L2报表.Report/definition/pages/` 下每个页面是一个 **UUID 命名目录**（`page.json` + `visuals/<uuid>/visual.json`）。顺序、活动页、落地页都在 `pages/pages.json` 的 `pageOrder` / `activePageName` / `landingPageName` 里，值是页面目录的 UUID。
 
-页面 UUID → 业务名称对照（业务名在各页 `page.json` 的 `displayName`，按 `pageOrder` 顺序排列；改动 `activePageName` / `pageOrder` 时用）：
+当前 **11 个页面，1 个可见 + 10 个隐藏**。按 `pageOrder`：
 
-- `50df5dd79c9c19213b42` → L2-01-02 集团合并利润汇总表
-- `020a059bfd06b6347883` → L2-01-03 快报-金融投资业务专属
-- `8df4296b5610c7c60c7a` → L2-01-04 S3 C1成本变化步行图VS上月
-- `540ff71af184f11c2116` → L2-01-14 物料单耗月表
-- `e16279b10e3df23fa8cb` → L2-03-01 销售管理费用预算执行汇总表
-- `4effe47efe2ace12b72b` → L2-03-02 财务费用汇总表
-- `4dd8b19487bd640b4b60` → L2-04-01库存汇总表
-- `4782da4e728bfbbefc8c` → L2-05-01 硫磺及硫酸价格分析月报
+| UUID | displayName | 说明 |
+|---|---|---|
+| `e6f9a94ed6eff9e91d95` | L2报表 | **首页 / 落地页**，仅一个圆角矩形标题形状 |
+| `50df5dd79c9c19213b42` | L2-01-02 集团合并利润汇总表 | 2 个矩阵 + 切片器 |
+| `020a059bfd06b6347883` | L2-01-03 快报-金融投资业务专属 | |
+| `8df4296b5610c7c60c7a` | L2-01-04 S3 C1成本变化步行图VS上月 | 多一个瀑布图 `waterfallChart` |
+| `540ff71af184f11c2116` | L2-01-14 物料单耗月表 | |
+| `98de86891699048a660e` | L2-01-25 工序成本完成情况 | |
+| `e16279b10e3df23fa8cb` | L2-03-01 销售管理费用预算执行汇总表 | |
+| `4effe47efe2ace12b72b` | L2-03-02 财务费用汇总表 | |
+| `feed276a3075012f7e94` | L2-03-06 矿石成本分析 | |
+| `4dd8b19487bd640b4b60` | L2-04-01库存汇总表 | |
+| `4782da4e728bfbbefc8c` | L2-05-01 硫磺及硫酸价格分析月报 | |
 
-当前活动页以 `pages/pages.json` 的 `activePageName` 为准（Power BI Desktop 里切换页面会改写它，容易随操作变动）。当前 8 个页面画布均为 1920 × 1080，无隐藏页（早先的「月报 / 日报 / 月报数据导出」三个隐藏页已在 `023b12f` 中移除）。
-
-主题在 `definition/report.json`：基础主题 Fluent2-CY26SU09 + 自定义主题（RegisteredResources）。
+- 除首页外，10 个内容页都在 `page.json` 里带 `"visibility": "HiddenInViewMode"`，画布统一 1920 × 1080。
+- **每个内容页的标准构成 = 1 个矩阵（`pivotTable`）+ 1 个「加载日期」切片器**。切片器选 `加载日期` 列并按日期区间筛选，是各页唯一的交互入口。
+- 首页导航按钮**尚未添加**——当前 view 模式只能看到首页那一个标题形状，这是预期状态，不要当成 bug。
+- 主题在 `definition/report.json`：基础主题 `Fluent2-CY26SU09` + 自定义主题 `StaticResources/RegisteredResources/dba7299791721089146.json`。
 
 ## 数据源
 
-数据经 Power Query 从 **SAP BW**（服务器 `10.43.11.32` / QAS `10.43.15.32`）与 **SharePoint**（成本站点 `cmocco.sharepoint.com` / 财经站点 `xsyzz.sharepoint.com`）取数。连接参数全部在 `expressions.tmdl` 中以 `IsParameterQuery` 参数暴露（如 `服务器`、`系统编号`、`客户端ID`、`动态年月偏移`），本地连接凭据在 `.pbi/localSettings.json`（已 gitignore）。
+- **SAP BW**：只保留了 QAS 环境 `10.43.15.32`（参数 `QAS服务器`，10 张表全部引用它）。切生产就是改这一个参数值，不存在单独的「生产服务器」参数。
+- **SharePoint**：财经站点 `https://xsyzz.sharepoint.com/sites/CMOCGroup/`（参数 `财经SharePoint站点`），用于读指标映射 xlsx。
+- 连接凭据在 `.pbi/localSettings.json`（已 gitignore）。
 
 ## Git 工作流
 
-- 提交后 `post-commit` hook 自动运行 `python update-version-html.py` 刷新 `L2报表项目版本迭代.html`，并补录一次「更新 L2报表项目版本迭代页：补录本次提交」提交。**不要手动编辑或提交这个 html。**
-- `update-version-html.py` 的 `NOTES` 字典（按短 hash 键控）手动维护各里程碑的「完整备注」；提交信息正文（body）会自动作为「完整备注」的兜底。写提交信息时写清楚正文，它会显示在版本迭代页上。
-- `.gitignore` 已排除 `**/.pbi/localSettings.json`（本地连接凭据）与 `**/.pbi/cache.abf`（数据缓存）。
-- 已知坑：Windows 上 `core.autocrlf=true` 会让 `.tmdl` 文件出现仅行尾差异的「假修改」（`git diff` 为空）。遇到时 `git add -A` 会将其规范化掉，或加 `.gitattributes` 固定 `*.tmdl text eol=lf`。
+- 提交后 `post-commit` hook 自动跑 `python update-version-html.py` 刷新 `L2报表项目版本迭代.html`，再补录一次「更新 L2报表项目版本迭代页：补录本次提交」。**不要手动编辑或提交这个 html。**
+- `update-version-html.py` 的 `NOTES` 字典按短 hash 手动维护里程碑「完整备注」；没写进 `NOTES` 的提交，其 **commit body 会自动作为备注显示在版本迭代页上**——所以提交信息要写正文，别只写标题。
+- `.gitignore` 排除 `**/.pbi/localSettings.json` 与 `**/.pbi/cache.abf`。
+
+## 已知坑
+
+1. **`core.autocrlf=true` 造成假修改**：`.tmdl` 会出现仅行尾差异的「已修改」，`git diff` 却是空的。`git add -A` 会规范化掉，或加 `.gitattributes` 固定 `*.tmdl text eol=lf`。
+2. **残留数据缓存导致类型错误**：改过列数据类型或表结构后，Desktop 刷新报「类型不匹配，无法对值 … 执行数据类型转换」——先关 Desktop，删 `L2报表.SemanticModel/.pbi/cache.abf`，再重新打开。
+3. **Desktop 会重写文件**：打开再保存会补 `isHidden`、清理空 queryGroup、把整数坐标扩写成 `960.00000000000011` 这类浮点。提交前用 `git diff` 确认改动符合真实意图，别把无意义 diff 一起提交。
+4. **PBIR 硬编码表名**：视觉对象用 `queryRef` / `SourceRef.Entity` 写死表名，模型里改表名后 Desktop 不会同步，必须全局搜 `Entity`、`queryRef` 一并替换，否则打开报「找不到表」或静默显示空。
+5. **`p_月报终止日期` 是手写值**（当前 `2026-03-01`）：跨月后要手动往后调，否则取不到新月份数据。
 
 ## HTML 度量值规范
 
-报表里用「HTML 内容」视觉渲染的度量值（生成 HTML 表格，如「利润汇总表」），其**配色、数值格式、颜色判断、表格结构**必须遵循 `L2报表HTML格式规范.md`（项目根目录）。要点：金额 `#,0;(#,0);0` 正黑负红、百分比 2 位小数带 `+`/`-` 号正绿负红、颜色用内联 `style` 属性（不依赖 `<style>` 的 class）、分月值 0 不显示、无数据月份整列隐藏、环比MTD 末列。
+用「HTML 内容」视觉渲染的度量值，其配色、数值格式、颜色判断、表格结构必须遵循 `L2报表HTML格式规范.md`（项目根目录）。要点：金额 `#,0;(#,0);0` 正黑负红、百分比 2 位小数带 `+`/`-` 号正绿负红、颜色用内联 `style` 属性（不依赖 class）、分月值 0 不显示、无数据月份整列隐藏、环比MTD 末列。
+
+注意：**当前模型内没有任何 HTML 度量值**（原「利润汇总表」已在 `3d8daa4` 删除）。规范文件保留，作为以后新增 HTML 视觉的标准。
 
 ## 可用工具
 
-- 语义模型操作可用 **powerbi-modeling MCP**（连接本地 TMDL/PBIP、DAX 查询、增删改表/度量值/列/关系等）。
-- 涉及语义模型设计/重构决策时，参考 `powerbi-semantic-model-methodology` 技能（含本项目 SAP BW 取数、命名规范等约定）。
+- **powerbi-modeling MCP**：连接本地 TMDL/PBIP、DAX 查询、增删改表/度量值/列/关系等。
+- 涉及语义模型设计/重构决策时，参考 `powerbi-semantic-model-methodology` 技能（含 SAP BW 循环取数、维度建模决策、命名与注释规范）。
