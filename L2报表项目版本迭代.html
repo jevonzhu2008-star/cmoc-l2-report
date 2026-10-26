@@ -95,6 +95,15 @@ svg text{font-family:var(--sans)}
 <script>
 const DATA = [
   {
+    "short": "3d8daa4",
+    "date": "2026-10-26 17:35",
+    "msg": "新增 L2报表 首页并隐藏内容页，卡片统一改取度量值",
+    "files": 19,
+    "add": 143,
+    "del": 236,
+    "ms": false
+  },
+  {
     "short": "eaf5324",
     "date": "2026-10-26 15:12",
     "msg": "优化 M 代码注释：为 10 个表取数逻辑逐行补充详细说明",
@@ -368,6 +377,15 @@ const DATA = [
 
 // 完整提交备注（由 update-version-html.py 维护，去 Co-Authored-By）
 const NOTES = {
+  "3d8daa4": [
+    "- 新增落地页「L2报表」（1920×1080，圆角矩形标题），同时设为 activePageName 与 landingPageName",
+    "- 原有 10 个内容页统一设置 visibility: HiddenInViewMode，改为由首页导航进入",
+    "- L2-01-03 页「加载日期」切片器改绑本表字段（原误绑 L2-03-01 销售管理费用预算执行汇总表）",
+    "- L2-01-14 页、L2-01-04 页卡片改取「度量值」表中的同名度量值（L2-01-14指标值 / L2-01-04指标值），替代原先直接 Sum 事实表[指标值]",
+    "- L2-01-03 BW 取数增加 LanguageCode=ZH（返回中文描述），同步修正顶部注释",
+    "- p_月报终止日期 由 2026-04-01 回退为 2026-03-01",
+    "- 删除已无任何报表视觉引用的 HTML利润汇总表 度量值（约 190 行）"
+  ],
   "eaf5324": [
     "- 10 个表的 partition M 代码逐行补注释：SharePoint 映射表读取、BW 连接参数、Cube/Query 定位、月份循环、单月取数变换（期间参数/维度展开/度量值）、加载日期、空值替换、逆透视、合并、排序映射左连接",
     "- L2-01-02 手动精修，其余 9 表按统一模式补充",
@@ -623,7 +641,7 @@ const NOTES = {
 const totalAdd = DATA.reduce((s,d)=>s+d.add,0);
 const totalDel = DATA.reduce((s,d)=>s+d.del,0);
 const totalFiles = DATA.reduce((s,d)=>s+d.files,0);
-const days = "5.9";
+const days = "6.0";
 
 document.getElementById('kpis').innerHTML = `
   <div class="kpi"><div class="n">${DATA.length}</div><div class="l">提交数（main）</div></div>
