@@ -95,6 +95,15 @@ svg text{font-family:var(--sans)}
 <script>
 const DATA = [
   {
+    "short": "eaf5324",
+    "date": "2026-10-26 15:12",
+    "msg": "优化 M 代码注释：为 10 个表取数逻辑逐行补充详细说明",
+    "files": 15,
+    "add": 462,
+    "del": 33,
+    "ms": false
+  },
+  {
     "short": "c3af322",
     "date": "2026-10-26 13:23",
     "msg": "修复报表 queryRef 表名不一致：TFM → S3 C1成本变化步行图VS上月",
@@ -359,6 +368,11 @@ const DATA = [
 
 // 完整提交备注（由 update-version-html.py 维护，去 Co-Authored-By）
 const NOTES = {
+  "eaf5324": [
+    "- 10 个表的 partition M 代码逐行补注释：SharePoint 映射表读取、BW 连接参数、Cube/Query 定位、月份循环、单月取数变换（期间参数/维度展开/度量值）、加载日期、空值替换、逆透视、合并、排序映射左连接",
+    "- L2-01-02 手动精修，其余 9 表按统一模式补充",
+    "- 同步：活动页切换、去掉同比YTD/预算达成率/环比MTD 的 /100、视觉对象位置调整"
+  ],
   "c3af322": [
     "- L2-01-04 页面切片器与透视表视觉对象的 queryRef 残留旧表名「TFM C1成本变化步行图」，统一改为模型表名「S3 C1成本变化步行图VS上月」（共 9 处），与 Entity 源引用对齐"
   ],
@@ -609,7 +623,7 @@ const NOTES = {
 const totalAdd = DATA.reduce((s,d)=>s+d.add,0);
 const totalDel = DATA.reduce((s,d)=>s+d.del,0);
 const totalFiles = DATA.reduce((s,d)=>s+d.files,0);
-const days = "5.8";
+const days = "5.9";
 
 document.getElementById('kpis').innerHTML = `
   <div class="kpi"><div class="n">${DATA.length}</div><div class="l">提交数（main）</div></div>
