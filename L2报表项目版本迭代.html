@@ -95,6 +95,15 @@ svg text{font-family:var(--sans)}
 <script>
 const DATA = [
   {
+    "short": "d157a67",
+    "date": "2026-10-27 14:02",
+    "msg": "新增 L2-06-01 主要产品价格波动汇总表及其报表页",
+    "files": 16,
+    "add": 1300,
+    "del": 11,
+    "ms": false
+  },
+  {
     "short": "767bfd1",
     "date": "2026-10-27 08:15",
     "msg": "删除废弃的 HTML 规范与辅助脚本",
@@ -395,6 +404,12 @@ const DATA = [
 
 // 完整提交备注（由 update-version-html.py 维护，去 Co-Authored-By）
 const NOTES = {
+  "d157a67": [
+    "- 在语义模型中新增 L2-06-01 主要产品价格波动汇总表",
+    "- 在报表中添加对应页面（默认隐藏）",
+    "- 在度量值表中新增 L2-06-01指标值 度量值",
+    "- 更新 model.tmdl 的表引用与 PBI_QueryOrder"
+  ],
   "767bfd1": [
     "- 移除已废弃的 L2报表HTML格式规范.md、L2报表数据转换逻辑.html",
     "- 移除一次性辅助脚本 generate_mock_data.py"
@@ -674,7 +689,7 @@ const NOTES = {
 const totalAdd = DATA.reduce((s,d)=>s+d.add,0);
 const totalDel = DATA.reduce((s,d)=>s+d.del,0);
 const totalFiles = DATA.reduce((s,d)=>s+d.files,0);
-const days = "6.6";
+const days = "6.8";
 
 document.getElementById('kpis').innerHTML = `
   <div class="kpi"><div class="n">${DATA.length}</div><div class="l">提交数（main）</div></div>
