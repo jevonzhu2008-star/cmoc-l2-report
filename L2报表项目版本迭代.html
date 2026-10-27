@@ -95,6 +95,15 @@ svg text{font-family:var(--sans)}
 <script>
 const DATA = [
   {
+    "short": "ab32861",
+    "date": "2026-10-27 14:06",
+    "msg": "优化 L2-06-01 M 查询并完善注释",
+    "files": 1,
+    "add": 60,
+    "del": 27,
+    "ms": false
+  },
+  {
     "short": "d157a67",
     "date": "2026-10-27 14:02",
     "msg": "新增 L2-06-01 主要产品价格波动汇总表及其报表页",
@@ -404,6 +413,12 @@ const DATA = [
 
 // 完整提交备注（由 update-version-html.py 维护，去 Co-Authored-By）
 const NOTES = {
+  "ab32861": [
+    "- 将硬编码的系统编号/客户端ID改为参数引用（系统编号、客户端ID）",
+    "- 一次性解析 Excel 工作簿后取 3 张排序 Sheet，避免重复解析",
+    "- 补充各步骤中文注释，统一项目注释风格",
+    "- 修正顶部说明中的报表名称"
+  ],
   "d157a67": [
     "- 在语义模型中新增 L2-06-01 主要产品价格波动汇总表",
     "- 在报表中添加对应页面（默认隐藏）",
@@ -689,7 +704,7 @@ const NOTES = {
 const totalAdd = DATA.reduce((s,d)=>s+d.add,0);
 const totalDel = DATA.reduce((s,d)=>s+d.del,0);
 const totalFiles = DATA.reduce((s,d)=>s+d.files,0);
-const days = "6.8";
+const days = "6.9";
 
 document.getElementById('kpis').innerHTML = `
   <div class="kpi"><div class="n">${DATA.length}</div><div class="l">提交数（main）</div></div>
