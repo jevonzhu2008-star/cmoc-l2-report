@@ -95,6 +95,15 @@ svg text{font-family:var(--sans)}
 <script>
 const DATA = [
   {
+    "short": "767bfd1",
+    "date": "2026-10-27 08:15",
+    "msg": "删除废弃的 HTML 规范与辅助脚本",
+    "files": 3,
+    "add": 0,
+    "del": 299,
+    "ms": false
+  },
+  {
     "short": "fdc4002",
     "date": "2026-10-26 17:51",
     "msg": "重写 CLAUDE.md：按当前模型与报表状态全面校正",
@@ -386,6 +395,10 @@ const DATA = [
 
 // 完整提交备注（由 update-version-html.py 维护，去 Co-Authored-By）
 const NOTES = {
+  "767bfd1": [
+    "- 移除已废弃的 L2报表HTML格式规范.md、L2报表数据转换逻辑.html",
+    "- 移除一次性辅助脚本 generate_mock_data.py"
+  ],
   "fdc4002": [
     "- 修正过期表清单：删去已不存在的 KFM选冶厂月报 / L1-KFM日报 / 日报指标映射 / 月报指标映射，改为现存的 10 张 L2-* 事实表",
     "- 修正 DAX 函数说明：只剩 FormatAmount / FormatRatio 两个无参函数，移除已删除的 SameMonthPriorYear",
@@ -661,7 +674,7 @@ const NOTES = {
 const totalAdd = DATA.reduce((s,d)=>s+d.add,0);
 const totalDel = DATA.reduce((s,d)=>s+d.del,0);
 const totalFiles = DATA.reduce((s,d)=>s+d.files,0);
-const days = "6.0";
+const days = "6.6";
 
 document.getElementById('kpis').innerHTML = `
   <div class="kpi"><div class="n">${DATA.length}</div><div class="l">提交数（main）</div></div>
