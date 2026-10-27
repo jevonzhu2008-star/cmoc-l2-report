@@ -155,6 +155,12 @@ table 度量值
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	measure L2-06-01指标值 = SUM('L2-06-01 主要产品价格波动汇总表'[指标值])
+		displayFolder: L2-06-01 主要产品价格波动汇总表
+		lineageTag: d8cd5fe4-4ddc-4b1e-ad63-6f11f929e323
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
 	partition 度量值 = m
 		mode: import
 		queryGroup: 辅助

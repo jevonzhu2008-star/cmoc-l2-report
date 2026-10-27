@@ -3,7 +3,7 @@ table 'L2-05-01 硫磺及硫酸价格分析月报'
 
 	column 加载日期
 		dataType: dateTime
-		formatString: yyyy-M-d
+		formatString: Long Date
 		lineageTag: 60b489c7-c3ae-4948-b113-b743eba22f2a
 		summarizeBy: none
 		sourceColumn: 加载日期

@@ -57,7 +57,7 @@ table 'L2-01-04 S3 C1成本变化步行图VS上月'
 
 	column 加载日期
 		dataType: dateTime
-		formatString: yyyy-M-d
+		formatString: Long Date
 		lineageTag: bfaee3e5-dbc8-42b0-92d2-698fea1b964d
 		summarizeBy: none
 		sourceColumn: 加载日期

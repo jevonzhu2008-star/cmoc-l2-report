@@ -59,7 +59,7 @@ table 'L2-04-01 库存汇总表'
 
 	column 加载日期
 		dataType: dateTime
-		formatString: yyyy-M-d
+		formatString: Long Date
 		lineageTag: 9bce5392-abbe-450c-b6cc-a7c38d11bc8d
 		summarizeBy: none
 		sourceColumn: 加载日期

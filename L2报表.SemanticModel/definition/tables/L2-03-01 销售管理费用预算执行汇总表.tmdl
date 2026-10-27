@@ -88,7 +88,7 @@ table 'L2-03-01 销售管理费用预算执行汇总表'
 
 	column 加载日期
 		dataType: dateTime
-		formatString: yyyy-M-d
+		formatString: Long Date
 		lineageTag: 1986833c-5b38-4394-aed1-814611a90e0e
 		summarizeBy: none
 		sourceColumn: 加载日期

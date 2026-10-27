@@ -4,7 +4,7 @@
     {
       "ordinal": 0,
       "scrollPosition": {
-        "x": 0,
+        "x": 313.54596738590413,
         "y": 0
       },
       "nodes": [
@@ -142,6 +142,18 @@
             "y": 0
           },
           "nodeIndex": "L2-03-06 矿石成本分析",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 2255.2017606596851,
+            "y": 0
+          },
+          "nodeIndex": "L2-06-01 主要产品价格波动汇总表",
           "size": {
             "height": 300,
             "width": 234

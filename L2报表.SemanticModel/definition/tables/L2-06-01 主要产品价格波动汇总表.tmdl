@@ -1,0 +1,182 @@
+table 'L2-06-01 主要产品价格波动汇总表'
+	lineageTag: 500b7b5d-0be7-4ac0-a987-c1917b0876a6
+
+	column 产品
+		dataType: string
+		lineageTag: 9b536679-a851-4372-9b15-6b049f85e5f7
+		summarizeBy: none
+		sourceColumn: 产品
+		sortByColumn: 产品排序
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column 指标名称
+		dataType: string
+		lineageTag: c32529dd-15e5-4f28-9141-21879ca1a669
+		summarizeBy: none
+		sourceColumn: 指标名称
+		sortByColumn: 指标名称排序
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column 加载日期
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 44b0e6ae-82ea-4c94-9279-0c27ed47e640
+		summarizeBy: none
+		sourceColumn: 加载日期
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 指标口径
+		dataType: string
+		lineageTag: 9c124f1d-3356-4ef9-8dd1-a4c52068c7ed
+		summarizeBy: none
+		sourceColumn: 指标口径
+		sortByColumn: 指标口径排序
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column 指标值
+		dataType: double
+		lineageTag: c17d2abc-b279-4059-9635-c98aa4d751cc
+		summarizeBy: sum
+		sourceColumn: 指标值
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 指标口径排序
+		dataType: double
+		lineageTag: ca3c085b-90b8-498b-bac1-a2ac7740831b
+		summarizeBy: sum
+		sourceColumn: 指标口径排序
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 指标名称排序
+		dataType: double
+		lineageTag: 2051efa0-4dc5-47e5-b7de-3fc927436f61
+		summarizeBy: sum
+		sourceColumn: 指标名称排序
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 产品排序
+		dataType: double
+		lineageTag: d67d1770-fafb-464c-892d-155535616d23
+		summarizeBy: sum
+		sourceColumn: 产品排序
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition 'L2-06-01 主要产品价格波动汇总表' = m
+		mode: import
+		queryGroup: 财经
+		source =
+				let
+				    /*
+				    【查询名称】ZRSD_CP001 产品指标多期对比 BW取数
+				    【对应报表】Lx‑xx‑xx 产品多期指标对比表
+				    【BW对象】Cube:ZRSD_CP001   Query:ZRSD_CP001_Q0001
+				    【说明】
+				      1、循环取数：从参数 p_月报起始日期 开始，取到 p_月报终止日期，逐月查询BW后合并成长表
+				      2、BW参数[ZMSDQNY]：YYYYMM格式年月，BW根据该参数自动返回截止该月的多期对比数据
+				      3、维度：产品、指标名称
+				      4、指标：FY(Y-2)/FY(Y-1)/当年预算/Q-2/Q-1季度/季度环比%/M-3/M-2/M-1/当月/月度环比%
+				      5、连接参数统一：QAS服务器、系统编号、客户端ID，和项目其他BW查询保持一套参数规范
+				      6、EnableStructures=true 开启结构解析
+				      7、末尾逆透视多口径列，统一长表结构
+				      8、读取SharePoint同一份Excel，3个Sheet：产品排序、指标名称排序、指标口径排序，依次左连接带出全部排序字段
+				    */
+				    // ========== 读取SharePoint上的映射Excel，一次性加载3张排序Sheet ==========
+				    源SP = SharePoint.Files(财经SharePoint站点, [ApiVersion = 15]),
+				    指标映射文件 = Table.SelectRows(源SP, each Text.Contains([Name], "L2-06-01 主要产品价格波动汇总表指标映射") and [Extension] = ".xlsx"){0}[Content],
+				    产品排序映射表 = Excel.Workbook(指标映射文件, true){[Item = "产品排序", Kind = "Sheet"]}[Data],
+				    指标名称映射表 = Excel.Workbook(指标映射文件, true){[Item = "指标名称排序", Kind = "Sheet"]}[Data],
+				    指标口径映射表 = Excel.Workbook(指标映射文件, true){[Item = "指标口径排序", Kind = "Sheet"]}[Data],
+				
+				    // ========== BW连接配置 ==========
+				    数据源 = SapBusinessWarehouse.Cubes(QAS服务器, "00", "100", [Implementation="2.0", LanguageCode="ZH", EnableStructures=true, BatchSize=500000000]),
+				    立方体 = 数据源{[Name="ZRSD_CP001"]}[Data],
+				    基础查询 = 立方体{[Id="ZRSD_CP001/ZRSD_CP001_Q0001"]}[Data],
+				
+				    // ========== 月份循环配置 ==========
+				    起始月份 = p_月报起始日期,
+				    结束月份 = p_月报终止日期,
+				    月份序列 = List.Generate(() => 起始月份, each _ <= 结束月份, each Date.AddMonths(_, 1)),
+				    月份文本列表 = List.Transform(月份序列, each Text.From(Date.Year(_) * 100 + Date.Month(_))),
+				
+				    // ========== 单月取数函数 ==========
+				    查询单月 = (month as text) =>
+				        let
+				            Query = Cube.Transform(基础查询,
+				                {
+				                    {Cube.ApplyParameter, "[ZMSDQNY]", {month}},
+				                    {Cube.AddAndExpandDimensionColumn, "[4ZRSD_CP001-ZCP]", {"[4ZRSD_CP001-ZCP].[LEVEL01]"}, {"产品"}},
+				                    {Cube.AddAndExpandDimensionColumn, "[4ZRSD_CP001-ZINDNAME]", {"[4ZRSD_CP001-ZINDNAME].[LEVEL01]"}, {"指标名称"}},
+				                    {Cube.AddMeasureColumn, "FY（Y-2）", "[4VGQHR12MHZ1PHK1NB6E6C649].[4VGQHR12MHZ1PJ8W4FO18FRJE]"},
+				                    {Cube.AddMeasureColumn, "FY（Y-1）", "[4VGQHR12MHZ1PHK1NB6E6C649].[4VGQHR12MHZ1PJ8W5EFCBP92K]"},
+				                    {Cube.AddMeasureColumn, "（当年）预算", "[4VGQHR12MHZ1PHK1NB6E6C649].[4VGQHR12MHZ1PJ8W5EFCBPFE4]"},
+				                    {Cube.AddMeasureColumn, "（Q-2）季度", "[4VGQHR12MHZ1PHK1NB6E6C649].[4VGQHR12MHZ1PJ8W9TN0HJ5TP]"},
+				                    {Cube.AddMeasureColumn, "（Q-1）季度", "[4VGQHR12MHZ1PHK1NB6E6C649].[4VGQHR12MHZ1PJ8W9TN0HK1FH]"},
+				                    {Cube.AddMeasureColumn, "季度环比%", "[4VGQHR12MHZ1PHK1NB6E6C649].[4VGQHR12MHZ1PJ8WADGXTKX1B]"},
+				                    {Cube.AddMeasureColumn, "（M-3）月", "[4VGQHR12MHZ1PHK1NB6E6C649].[4VGQHR12MHZ1PLXJHO3QTX3S2]"},
+				                    {Cube.AddMeasureColumn, "（M-2）月", "[4VGQHR12MHZ1PHK1NB6E6C649].[4VGQHR12MHZ1PLXJEVKLS4IFW]"},
+				                    {Cube.AddMeasureColumn, "（M-1）月", "[4VGQHR12MHZ1PHK1NB6E6C649].[4VGQHR12MHZ1PJ8WA0MQ79932]"},
+				                    {Cube.AddMeasureColumn, "当月", "[4VGQHR12MHZ1PHK1NB6E6C649].[4VGQHR12MHZ1PJ8WA0MQ7A4OU]"},
+				                    {Cube.AddMeasureColumn, "月度环比%", "[4VGQHR12MHZ1PHK1NB6E6C649].[4VGQHR12MHZ1PJ8WADGXTL3CV]"}
+				                }),
+				            附加加载日期 = Table.AddColumn(Query, "加载日期", each #date(Number.From(Text.Start(month,4)), Number.From(Text.End(month,2)),1), type date),
+				            空值替换为0 = Table.ReplaceValue(
+				                附加加载日期,
+				                null,
+				                0,
+				                Replacer.ReplaceValue,
+				                {"FY（Y-2）","FY（Y-1）","（当年）预算","（Q-2）季度","（Q-1）季度","季度环比%","（M-3）月","（M-2）月","（M-1）月","当月","月度环比%"}
+				            ),
+				            逆透视口径列 = Table.UnpivotOtherColumns(
+				                空值替换为0,
+				                {"产品","指标名称","加载日期"},
+				                "指标口径",
+				                "指标值"
+				            )
+				        in
+				            逆透视口径列,
+				
+				    // 循环取数 & 合并
+				    各月结果 = List.Transform(月份文本列表, 查询单月),
+				    合并结果 = Table.Combine(各月结果),
+				
+				    // ========== 依次左连接三张排序映射表 ==========
+				    // 1、关联指标口径排序
+				    关联口径排序 = Table.NestedJoin(合并结果, {"指标口径"}, 指标口径映射表, {"指标口径"}, "临时口径", JoinKind.LeftOuter),
+				    展开口径排序 = Table.ExpandTableColumn(关联口径排序, "临时口径", {"指标口径排序"}, {"指标口径排序"}),
+				
+				    // 2、关联指标名称排序
+				    关联指标名称排序 = Table.NestedJoin(展开口径排序, {"指标名称"}, 指标名称映射表, {"指标名称"}, "临时指标名称", JoinKind.LeftOuter),
+				    展开指标名称排序 = Table.ExpandTableColumn(关联指标名称排序, "临时指标名称", {"指标名称排序"}, {"指标名称排序"}),
+				
+				    // 3、关联产品排序
+				    关联产品排序 = Table.NestedJoin(展开指标名称排序, {"产品"}, 产品排序映射表, {"产品"}, "临时产品", JoinKind.LeftOuter),
+				    展开全部排序 = Table.ExpandTableColumn(关联产品排序, "临时产品", {"产品排序"}, {"产品排序"})
+				in
+				    展开全部排序
+
+	annotation PBI_ResultType = Table
+

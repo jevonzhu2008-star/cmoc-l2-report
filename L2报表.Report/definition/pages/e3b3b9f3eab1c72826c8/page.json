@@ -1,0 +1,9 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
+  "name": "e3b3b9f3eab1c72826c8",
+  "displayName": "L2-06-01 主要产品价格波动汇总表",
+  "displayOption": "FitToPage",
+  "height": 1080,
+  "width": 1920,
+  "visibility": "HiddenInViewMode"
+}
