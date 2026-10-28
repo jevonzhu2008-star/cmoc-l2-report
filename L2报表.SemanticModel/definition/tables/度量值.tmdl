@@ -71,13 +71,6 @@ table 度量值
 
 		formatStringDefinition = FormatAmount()
 
-	/// 累计实际(千人民币)：YTD 累计实际千元（求和）
-	measure 累计实际(千人民币) = SUM('L2-03-01 销售管理费用预算执行汇总表'[累计实际(千人民币)])
-		displayFolder: L2-03-01 销售管理费用预算执行汇总表
-		lineageTag: d8a9dbec-ffe4-45c6-b97a-85d82e6610f9
-
-		formatStringDefinition = FormatAmount()
-
 	/// 累计预算：YTD 累计预算金额（求和）
 	measure 累计预算 = SUM('L2-03-01 销售管理费用预算执行汇总表'[累计预算])
 		displayFolder: L2-03-01 销售管理费用预算执行汇总表
@@ -86,7 +79,7 @@ table 度量值
 		formatStringDefinition = FormatAmount()
 
 	/// 累计执行%：YTD 预算执行率（百分比，取单值）
-	measure 累计执行% = MAX('L2-03-01 销售管理费用预算执行汇总表'[累计执行%])
+	measure 累计执行% = DIVIDE([累计实际],[累计预算],0)
 		displayFolder: L2-03-01 销售管理费用预算执行汇总表
 		lineageTag: 8ce40fec-ae04-4341-8207-464e656cb996
 

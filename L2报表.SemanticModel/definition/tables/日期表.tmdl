@@ -1,0 +1,96 @@
+table 日期表
+	lineageTag: df0a8718-772c-4e4a-9063-c45ed6ec6480
+
+	column 日期
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: c413d148-c971-4a39-b1eb-8558ccb82ce6
+		summarizeBy: none
+		sourceColumn: 日期
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 年
+		dataType: string
+		lineageTag: 87a0752f-a4f9-4238-b1f4-7bed75d57549
+		summarizeBy: none
+		sourceColumn: 年
+
+		annotation SummarizationSetBy = Automatic
+
+	column 月
+		dataType: string
+		lineageTag: 6bd5a14f-3806-42cf-b00b-cb8fb4cfe2ad
+		summarizeBy: none
+		sourceColumn: 月
+
+		annotation SummarizationSetBy = Automatic
+
+	column 年月
+		dataType: int64
+		formatString: 0
+		lineageTag: a08d4dd2-ba49-444e-9c6b-965937a4f432
+		summarizeBy: sum
+		sourceColumn: 年月
+
+		annotation SummarizationSetBy = Automatic
+
+	column 年排序
+		dataType: int64
+		formatString: 0
+		lineageTag: 2de7929c-7dc3-4502-9075-c51472faab07
+		summarizeBy: sum
+		sourceColumn: 年排序
+
+		annotation SummarizationSetBy = Automatic
+
+	column 月排序
+		dataType: int64
+		formatString: 0
+		lineageTag: 0f39ddae-02df-4a34-803d-eeec19d686e1
+		summarizeBy: sum
+		sourceColumn: 月排序
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 日期表 = m
+		mode: import
+		queryGroup: 辅助
+		source =
+				let
+				    // ① 起止日期
+				    起始日期 = #date(2025, 1, 1),
+				    结束日期 = #date(2026, 12, 31),
+				
+				    // ② 生成连续日期列表（含首尾，共 731 天）
+				    天数 = Duration.Days(结束日期 - 起始日期) + 1,
+				    日期列表 = List.Dates(起始日期, 天数, #duration(1, 0, 0, 0)),
+				
+				    // ③ 列表转表并设日期类型
+				    日期表 = Table.FromList(日期列表, Splitter.SplitByNothing(), {"日期"}, null, ExtraValues.Error),
+				    日期类型 = Table.TransformColumnTypes(日期表, {{"日期", type date}}),
+				
+				    // ④ 年：文本格式（2025年 / 2026年）
+				    加年 = Table.AddColumn(日期类型, "年", each Text.From(Date.Year([日期])) & "年", type text),
+				
+				    // ⑤ 月：文本格式（1月–12月）
+				    加月 = Table.AddColumn(加年, "月", each Text.From(Date.Month([日期])) & "月", type text),
+				
+				    // ⑥ 年月：数值键，如 202501、202612（= 年×100 + 月）
+				    加年月 = Table.AddColumn(加月, "年月", each Date.Year([日期]) * 100 + Date.Month([日期]), Int64.Type),
+				
+				    // ⑦ 年排序：按年份数值排序的键
+				    加年排序 = Table.AddColumn(加年月, "年排序", each Date.Year([日期]), Int64.Type),
+				
+				    // ⑧ 月排序：按月份数值排序的键
+				    加月排序 = Table.AddColumn(加年排序, "月排序", each Date.Month([日期]), Int64.Type),
+				
+				    // ⑨ 按日期升序排列
+				    结果 = Table.Sort(加月排序, {{"日期", Order.Ascending}})
+				in
+				    结果
+
+	annotation PBI_ResultType = Table
+

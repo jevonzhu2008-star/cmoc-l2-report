@@ -1,0 +1,40 @@
+relationship 8ef17213-e9f5-e433-ad46-59eeb0905f8e
+	fromColumn: 'L2-05-01 硫磺及硫酸价格分析月报'.加载日期
+	toColumn: 日期表.日期
+
+relationship e339c4f2-1f05-a08c-e3c1-e21217f6ba87
+	fromColumn: 'L2-03-01 销售管理费用预算执行汇总表'.加载日期
+	toColumn: 日期表.日期
+
+relationship f2e4108a-a844-89ef-40bd-43ba01da483c
+	fromColumn: 'L2-03-02 财务费用汇总表'.加载日期
+	toColumn: 日期表.日期
+
+relationship 9f721049-bcc8-72c8-1485-f44bf58fe9b3
+	fromColumn: 'L2-01-02 集团合并利润汇总表'.加载日期
+	toColumn: 日期表.日期
+
+relationship d4e92feb-e9d7-e0d8-d431-2472d4729b55
+	fromColumn: 'L2-01-04 S3 C1成本变化步行图VS上月'.加载日期
+	toColumn: 日期表.日期
+
+relationship 06921883-0bcd-b099-897b-a496b9221ad0
+	fromColumn: 'L2-01-14 物料单耗月表'.加载日期
+	toColumn: 日期表.日期
+
+relationship c011b747-3d43-9eb7-1760-16c5fadd5e66
+	fromColumn: 'L2-03-06 矿石成本分析'.加载日期
+	toColumn: 日期表.日期
+
+relationship 3a4af7e0-9cea-b589-7703-77c5fb445ab8
+	fromColumn: 'L2-06-01 主要产品价格波动汇总表'.加载日期
+	toColumn: 日期表.日期
+
+relationship c2310b81-b30d-834b-0cc0-6a3d66800fca
+	fromColumn: 'L2-04-01 库存汇总表'.加载日期
+	toColumn: 日期表.日期
+
+relationship a315a8fb-a33b-2200-f509-4fb9552c8762
+	fromColumn: 'L2-01-03 快报-金融投资业务专属'.加载日期
+	toColumn: 日期表.日期
+

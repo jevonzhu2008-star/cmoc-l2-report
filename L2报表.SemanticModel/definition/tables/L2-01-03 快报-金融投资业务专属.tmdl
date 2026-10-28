@@ -218,7 +218,7 @@ table 'L2-01-03 快报-金融投资业务专属'
 				                // 展开维度并输出列名「公司代码」
 				                {Cube.AddAndExpandDimensionColumn, "[ZBUKRS]", {"[ZBUKRS].[LEVEL01]"}, {"公司代码"}},
 				                // 展开维度并输出列名「公司代码货币」
-				                {Cube.AddAndExpandDimensionColumn, "[4ZRFI_CP012-RHCUR]", {"[4ZRFI_CP012-RHCUR].[LEVEL01]"}, {"公司代码货币"}},
+				                {Cube.AddAndExpandDimensionColumn, "[0LOC_CURRCY]", {"[0LOC_CURRCY].[LEVEL01]"}, {"公司代码货币"}},
 				                // 展开维度并输出列名「金融投资产品」
 				                {Cube.AddAndExpandDimensionColumn, "[4ZRFI_CP012-CC_A_JRTZCP]", {"[4ZRFI_CP012-CC_A_JRTZCP].[LEVEL01]"}, {"金融投资产品"}}
 				            }),

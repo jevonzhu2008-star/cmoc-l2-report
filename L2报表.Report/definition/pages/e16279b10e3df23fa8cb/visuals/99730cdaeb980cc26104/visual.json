@@ -2,8 +2,8 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "99730cdaeb980cc26104",
   "position": {
-    "x": 16,
-    "y": 64,
+    "x": 23.730817796924903,
+    "y": 73.0179009136151,
     "z": 0,
     "height": 1007.9999999999999,
     "width": 1872,
@@ -23,26 +23,11 @@
                       "Entity": "L2-03-01 销售管理费用预算执行汇总表"
                     }
                   },
-                  "Property": "公司代码"
+                  "Property": "业务板块"
                 }
               },
-              "queryRef": "L2-03-01 销售管理费用预算执行汇总表.公司代码",
-              "nativeQueryRef": "公司代码",
-              "active": true
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "L2-03-01 销售管理费用预算执行汇总表"
-                    }
-                  },
-                  "Property": "管理口径利润中心"
-                }
-              },
-              "queryRef": "L2-03-01 销售管理费用预算执行汇总表.管理口径利润中心",
-              "nativeQueryRef": "管理口径利润中心",
+              "queryRef": "L2-03-01 销售管理费用预算执行汇总表.业务板块",
+              "nativeQueryRef": "业务板块",
               "active": true
             }
           ]
@@ -209,7 +194,7 @@
             "rowSubtotals": {
               "expr": {
                 "Literal": {
-                  "Value": "false"
+                  "Value": "true"
                 }
               }
             },
@@ -224,6 +209,27 @@
               "expr": {
                 "Literal": {
                   "Value": "false"
+                }
+              }
+            },
+            "rowSubtotalsPosition": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Bottom'"
+                }
+              }
+            },
+            "perColumnLevel": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "rowSubtotalsLabel": {
+              "expr": {
+                "Literal": {
+                  "Value": "'小计'"
                 }
               }
             }
@@ -434,83 +440,6 @@
                                           "Entity": "度量值"
                                         }
                                       },
-                                      "Property": "累计实际"
-                                    }
-                                  },
-                                  "Right": {
-                                    "Literal": {
-                                      "Value": "-9999999999999D"
-                                    }
-                                  }
-                                }
-                              },
-                              "Right": {
-                                "Comparison": {
-                                  "ComparisonKind": 3,
-                                  "Left": {
-                                    "Measure": {
-                                      "Expression": {
-                                        "SourceRef": {
-                                          "Entity": "度量值"
-                                        }
-                                      },
-                                      "Property": "累计实际"
-                                    }
-                                  },
-                                  "Right": {
-                                    "Literal": {
-                                      "Value": "0D"
-                                    }
-                                  }
-                                }
-                              }
-                            }
-                          },
-                          "Value": {
-                            "Literal": {
-                              "Value": "'#B91C1C'"
-                            }
-                          }
-                        }
-                      ]
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "selector": {
-            "data": [
-              {
-                "dataViewWildcard": {
-                  "matchingOption": 1
-                }
-              }
-            ],
-            "metadata": "度量值.累计实际"
-          }
-        },
-        {
-          "properties": {
-            "fontColor": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Conditional": {
-                      "Cases": [
-                        {
-                          "Condition": {
-                            "And": {
-                              "Left": {
-                                "Comparison": {
-                                  "ComparisonKind": 2,
-                                  "Left": {
-                                    "Measure": {
-                                      "Expression": {
-                                        "SourceRef": {
-                                          "Entity": "度量值"
-                                        }
-                                      },
                                       "Property": "累计预算"
                                     }
                                   },
@@ -695,6 +624,19 @@
               }
             },
             "showBorder": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "columnTotal": [
+        {
+          "properties": {
+            "applyToHeaders": {
               "expr": {
                 "Literal": {
                   "Value": "false"
@@ -1142,34 +1084,6 @@
         "howCreated": "User"
       },
       {
-        "name": "528aaa649de0b42a20b1",
-        "field": {
-          "Column": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "L2-03-01 销售管理费用预算执行汇总表"
-              }
-            },
-            "Property": "公司代码"
-          }
-        },
-        "type": "Categorical"
-      },
-      {
-        "name": "7e781ddd8f17274bd5fe",
-        "field": {
-          "Column": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "L2-03-01 销售管理费用预算执行汇总表"
-              }
-            },
-            "Property": "管理口径利润中心"
-          }
-        },
-        "type": "Categorical"
-      },
-      {
         "name": "1277a745552985a59ac3",
         "field": {
           "Column": {
@@ -1182,20 +1096,6 @@
           }
         },
         "type": "Categorical"
-      },
-      {
-        "name": "172a4a2b908aea3edfe3",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "度量值"
-              }
-            },
-            "Property": "累计实际"
-          }
-        },
-        "type": "Advanced"
       },
       {
         "name": "8ffaaf973dbb21c6ac70",

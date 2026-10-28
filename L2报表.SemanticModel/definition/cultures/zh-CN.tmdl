@@ -361,28 +361,6 @@ cultureInfo zh-CN
 			        }
 			      ]
 			    },
-			    "L20301_销售管理费用预算执行汇总表.累计实际千人民币": {
-			      "Definition": {
-			        "Binding": {
-			          "ConceptualEntity": "L2-03-01 销售管理费用预算执行汇总表",
-			          "ConceptualProperty": "累计实际(千人民币)"
-			        }
-			      },
-			      "State": "Generated",
-			      "Terms": [
-			        {
-			          "累计实际(千人民币)": {
-			            "State": "Generated"
-			          }
-			        },
-			        {
-			          "累计实际": {
-			            "State": "Generated",
-			            "Weight": 0.75
-			          }
-			        }
-			      ]
-			    },
 			    "L20301_销售管理费用预算执行汇总表.累计预算": {
 			      "Definition": {
 			        "Binding": {
@@ -395,42 +373,6 @@ cultureInfo zh-CN
 			        {
 			          "累计预算": {
 			            "State": "Generated"
-			          }
-			        }
-			      ]
-			    },
-			    "L20301_销售管理费用预算执行汇总表.累计执行": {
-			      "Definition": {
-			        "Binding": {
-			          "ConceptualEntity": "L2-03-01 销售管理费用预算执行汇总表",
-			          "ConceptualProperty": "累计执行%"
-			        }
-			      },
-			      "State": "Generated",
-			      "Terms": [
-			        {
-			          "累计执行%": {
-			            "State": "Generated"
-			          }
-			        },
-			        {
-			          "累计执行 percentage": {
-			            "Type": "Noun",
-			            "State": "Suggested",
-			            "Source": {
-			              "Agent": "Thesaurus"
-			            },
-			            "Weight": 0.75
-			          }
-			        },
-			        {
-			          "累计执行 pct": {
-			            "Type": "Noun",
-			            "State": "Suggested",
-			            "Source": {
-			              "Agent": "Thesaurus"
-			            },
-			            "Weight": 0.727
 			          }
 			        }
 			      ]

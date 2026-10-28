@@ -114,7 +114,7 @@ table 'L2-06-01 主要产品价格波动汇总表'
 				    产品排序映射表 = 指标映射工作簿{[Item = "产品排序", Kind = "Sheet"]}[Data],
 				    指标名称映射表 = 指标映射工作簿{[Item = "指标名称排序", Kind = "Sheet"]}[Data],
 				    指标口径映射表 = 指标映射工作簿{[Item = "指标口径排序", Kind = "Sheet"]}[Data],
-
+				
 				    // ========== BW连接配置 ==========
 				    // 连接 BW QAS 环境：Implementation=2.0 用新版接口 / LanguageCode=ZH 返回中文 / EnableStructures=true 开启内置结构 / BatchSize 放大提升批量拉取性能
 				    数据源 = SapBusinessWarehouse.Cubes(QAS服务器, 系统编号, 客户端ID, [Implementation="2.0", LanguageCode="ZH", EnableStructures=true, BatchSize=500000000]),
@@ -122,7 +122,7 @@ table 'L2-06-01 主要产品价格波动汇总表'
 				    立方体 = 数据源{[Name="ZRSD_CP001"]}[Data],
 				    // 按 Query ID 定位该 Cube 内的目标查询
 				    基础查询 = 立方体{[Id="ZRSD_CP001/ZRSD_CP001_Q0001"]}[Data],
-
+				
 				    // ========== 月份循环配置 ==========
 				    // 月报起始月份，取自PowerBI参数 p_月报起始日期
 				    起始月份 = p_月报起始日期,
@@ -132,7 +132,7 @@ table 'L2-06-01 主要产品价格波动汇总表'
 				    月份序列 = List.Generate(() => 起始月份, each _ <= 结束月份, each Date.AddMonths(_, 1)),
 				    // 转换为BW要求的 YYYYMM 文本格式
 				    月份文本列表 = List.Transform(月份序列, each Text.From(Date.Year(_) * 100 + Date.Month(_))),
-
+				
 				    // ========== 单月取数函数 ==========
 				    // 输入年月文本，返回当月BW查询结果，追加【加载日期】标记列、null替换为0，并逆透视多口径列
 				    查询单月 = (month as text) =>
@@ -190,21 +190,21 @@ table 'L2-06-01 主要产品价格波动汇总表'
 				            )
 				        in
 				            逆透视口径列,
-
+				
 				    // 遍历月份列表，逐个执行单月查询
 				    各月结果 = List.Transform(月份文本列表, 查询单月),
 				    // 将所有月份结果合并为一张长表
 				    合并结果 = Table.Combine(各月结果),
-
+				
 				    // ========== 依次左连接三张排序映射表 ==========
 				    // 1、关联指标口径排序（未匹配行保留）
 				    关联口径排序 = Table.NestedJoin(合并结果, {"指标口径"}, 指标口径映射表, {"指标口径"}, "临时口径", JoinKind.LeftOuter),
 				    展开口径排序 = Table.ExpandTableColumn(关联口径排序, "临时口径", {"指标口径排序"}, {"指标口径排序"}),
-
+				
 				    // 2、关联指标名称排序
 				    关联指标名称排序 = Table.NestedJoin(展开口径排序, {"指标名称"}, 指标名称映射表, {"指标名称"}, "临时指标名称", JoinKind.LeftOuter),
 				    展开指标名称排序 = Table.ExpandTableColumn(关联指标名称排序, "临时指标名称", {"指标名称排序"}, {"指标名称排序"}),
-
+				
 				    // 3、关联产品排序
 				    关联产品排序 = Table.NestedJoin(展开指标名称排序, {"产品"}, 产品排序映射表, {"产品"}, "临时产品", JoinKind.LeftOuter),
 				    展开全部排序 = Table.ExpandTableColumn(关联产品排序, "临时产品", {"产品排序"}, {"产品排序"})

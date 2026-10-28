@@ -172,7 +172,7 @@ table 'L2-04-01 库存汇总表'
 				                {Cube.AddAndExpandDimensionColumn, "[ZKT]", {"[ZKT].[LEVEL01]"}, {"矿体"}},
 				                
 				                // 度量值
-				                {Cube.AddMeasureColumn, "金额(人民币)", "[4VGQHR12MHZ3FVOJ91YJ55HTH].[4VGQHR12MHZ1PLG0H34K5L7V0]"},
+				                {Cube.AddMeasureColumn, "金额(人民币)", "[4VGQHR12MHZ3FVOJ91YJ55HTH].[4VGQHR12MHZ3FWDMUA1T7TGC0]"},
 				                // 添加度量值「量(吨)」
 				                {Cube.AddMeasureColumn, "量(吨)", "[4VGQHR12MHZ3FVOJ91YJ55HTH].[4VGQHR12MHZ1PLG0H34K5L1JG]"}
 				            }),

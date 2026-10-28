@@ -107,6 +107,14 @@ table 'L2-05-01 硫磺及硫酸价格分析月报'
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	column 指标单位
+		dataType: string
+		lineageTag: e77b88ac-f96a-403c-8dda-e6eab79ffcab
+		summarizeBy: none
+		sourceColumn: 指标单位
+
+		annotation SummarizationSetBy = Automatic
+
 	partition 'L2-05-01 硫磺及硫酸价格分析月报' = m
 		mode: import
 		queryGroup: 财经
@@ -213,7 +221,7 @@ table 'L2-05-01 硫磺及硫酸价格分析月报'
 				    // 左连接「指标排序」映射表（按业务主键 JoinKind.LeftOuter，未匹配行保留）
 				    左连接指标排序 = Table.NestedJoin(已逆透视其他列, {"指标名称"}, 指标排序表, {"指标名称"}, "指标映射临时", JoinKind.LeftOuter),
 				    // 展开临时映射列，带出「指标排序」相关排序字段
-				    展开指标排序 = Table.ExpandTableColumn(左连接指标排序, "指标映射临时", {"指标排序"}, {"指标排序"})
+				    展开指标排序 = Table.ExpandTableColumn(左连接指标排序, "指标映射临时", {"指标排序", "指标单位"}, {"指标排序", "指标单位"})
 				in
 				    展开指标排序
 

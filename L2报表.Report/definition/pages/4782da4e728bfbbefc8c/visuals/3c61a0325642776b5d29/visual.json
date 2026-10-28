@@ -29,6 +29,21 @@
               "queryRef": "L2-05-01 硫磺及硫酸价格分析月报.指标名称",
               "nativeQueryRef": "指标名称",
               "active": true
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "L2-05-01 硫磺及硫酸价格分析月报"
+                    }
+                  },
+                  "Property": "指标单位"
+                }
+              },
+              "queryRef": "L2-05-01 硫磺及硫酸价格分析月报.指标单位",
+              "nativeQueryRef": "第一个 指标单位",
+              "active": true
             }
           ]
         },
