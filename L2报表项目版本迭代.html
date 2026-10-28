@@ -95,6 +95,15 @@ svg text{font-family:var(--sans)}
 <script>
 const DATA = [
   {
+    "short": "5c6257e",
+    "date": "2026-10-28 13:15",
+    "msg": "新增日期表与全事实表日期关系，重构 L2-03-01 业务板块",
+    "files": 18,
+    "add": 337,
+    "del": 483,
+    "ms": false
+  },
+  {
     "short": "ab32861",
     "date": "2026-10-27 14:06",
     "msg": "优化 L2-06-01 M 查询并完善注释",
@@ -413,6 +422,18 @@ const DATA = [
 
 // 完整提交备注（由 update-version-html.py 维护，去 Co-Authored-By）
 const NOTES = {
+  "5c6257e": [
+    "- 新增「日期表」（辅助 queryGroup）：2025-01-01～2026-12-31 连续日期，年/月/年月及年排序、月排序键",
+    "- 新增 relationships.tmdl：10 张事实表的「加载日期」多对一指向「日期表.日期」，L2-03-01 页切片器改由日期表驱动",
+    "- 新增「库存情况报表」查询：ZRMM_CP002 / ZRMM_CP002_Q0001，QAS 环境单月 202603 试取",
+    "- L2-03-01：公司代码维度改取「公司名称」再派生公司代码；新增业务板块三级匹配（双键 > 仅利润中心代码 > 仅公司代码，兜底「待定」）并关联业务板块排序",
+    "- L2-03-01：BW 侧不再取「累计实际(千人民币)」「累计执行%」，累计执行% 改为 DIVIDE([累计实际],[累计预算],0)",
+    "- L2-01-03：「公司代码货币」维度由 4ZRFI_CP012-RHCUR 改为 0LOC_CURRCY",
+    "- L2-05-01：映射表带出「指标单位」列，矩阵增加单位字段",
+    "- L2-04-01：「金额(人民币)」度量值 key 更新为 4VGQHR12MHZ3FWDMUA1T7TGC0",
+    "- 报表：L2-03-01 页矩阵改按业务板块展示，L2-01-04 页删除瀑布图、矩阵铺满画布",
+    "- L2-06-01：仅清理步骤间空行空白"
+  ],
   "ab32861": [
     "- 将硬编码的系统编号/客户端ID改为参数引用（系统编号、客户端ID）",
     "- 一次性解析 Excel 工作簿后取 3 张排序 Sheet，避免重复解析",
@@ -704,7 +725,7 @@ const NOTES = {
 const totalAdd = DATA.reduce((s,d)=>s+d.add,0);
 const totalDel = DATA.reduce((s,d)=>s+d.del,0);
 const totalFiles = DATA.reduce((s,d)=>s+d.files,0);
-const days = "6.9";
+const days = "7.8";
 
 document.getElementById('kpis').innerHTML = `
   <div class="kpi"><div class="n">${DATA.length}</div><div class="l">提交数（main）</div></div>
