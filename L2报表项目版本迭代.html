@@ -95,6 +95,15 @@ svg text{font-family:var(--sans)}
 <script>
 const DATA = [
   {
+    "short": "24b3025",
+    "date": "2026-10-28 14:51",
+    "msg": "优化全模型 M 与 DAX：工作簿单次解析、映射表去重、注释清理",
+    "files": 16,
+    "add": 125,
+    "del": 270,
+    "ms": false
+  },
+  {
     "short": "6f65055",
     "date": "2026-10-28 13:46",
     "msg": "优化 L2-03-01 M 查询，报表切片器统一改由日期表驱动",
@@ -431,6 +440,19 @@ const DATA = [
 
 // 完整提交备注（由 update-version-html.py 维护，去 Co-Authored-By）
 const NOTES = {
+  "24b3025": [
+    "- M：9 张事实表的 Excel.Workbook 改为「工作簿只解析一次」，24 处重复解析收敛为每表 1 次",
+    "- M：27 张排序映射表在 join 前按匹配键 Table.Distinct，避免一键多映射导致事实行翻倍且不报错",
+    "- M：L2-01-02 月份排序/季度的 if 链改为算式（Text.BeforeDelimiter + RoundUp），并删掉 12 行逐列重复注释",
+    "- M：L2-03-02 的 MeasureCube 改名「度量前缀」，修正「把 null 和 0 都换成 null」这条与代码不符的注释",
+    "- M：L2-04-01 维度去空格从「结构」扩到「分类/结构/矿体」，映射表键列同步转文本并 Trim，避免两边不一致丢排序",
+    "- M：L2-01-03、L2-05-01 的逆透视步骤统一命名为「逆透视长表」",
+    "- M：删除 98 行仅重复列名的注释（添加度量值「X」/展开维度并输出列名「X」），头部注释去掉「新增」「✅」等施工期措辞",
+    "- M：库存情况报表补说明注释，连接参数由硬编码 \"00\"/\"100\" 改为 系统编号/客户端ID",
+    "- DAX：累计执行% 注释与 DIVIDE 实现对齐；L2-03-02指标值、L2-06-01指标值 说明补齐；8 个 AVERAGE 度量值补充「为何用平均」的口径原因；displayFolder 统一为「L2-04-01 库存汇总表」",
+    "- 模型：日期表「年」「月」补 sortByColumn（年排序/月排序），两个排序键列隐藏且不再汇总，「年月」不再被求和",
+    "- 待确认（未改）：日期表日期范围仍写死 2025-01-01～2026-12-31；L2-03-02 将 0 置为 null 的口径保留"
+  ],
   "6f65055": [
     "- L2-03-01 M：指标映射工作簿只解析一次，替换原来 5 次 Excel.Workbook；不再读取已无引用的【公司代码排序】【管理口径利润中心排序】Sheet",
     "- L2-03-01 M：业务板块三级匹配由 14 步精简为 8 步（三级各展开一列后按优先级取值），匹配键统一转文本，映射子集与排序表按匹配键去重，避免一键多映射导致事实行翻倍",
@@ -744,7 +766,7 @@ const NOTES = {
 const totalAdd = DATA.reduce((s,d)=>s+d.add,0);
 const totalDel = DATA.reduce((s,d)=>s+d.del,0);
 const totalFiles = DATA.reduce((s,d)=>s+d.files,0);
-const days = "7.8";
+const days = "7.9";
 
 document.getElementById('kpis').innerHTML = `
   <div class="kpi"><div class="n">${DATA.length}</div><div class="l">提交数（main）</div></div>
