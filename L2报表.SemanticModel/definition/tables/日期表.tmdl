@@ -17,6 +17,9 @@ table 日期表
 		lineageTag: 87a0752f-a4f9-4238-b1f4-7bed75d57549
 		summarizeBy: none
 		sourceColumn: 年
+		sortByColumn: 年排序
+
+		changedProperty = SortByColumn
 
 		annotation SummarizationSetBy = Automatic
 
@@ -25,6 +28,9 @@ table 日期表
 		lineageTag: 6bd5a14f-3806-42cf-b00b-cb8fb4cfe2ad
 		summarizeBy: none
 		sourceColumn: 月
+		sortByColumn: 月排序
+
+		changedProperty = SortByColumn
 
 		annotation SummarizationSetBy = Automatic
 
@@ -32,26 +38,32 @@ table 日期表
 		dataType: int64
 		formatString: 0
 		lineageTag: a08d4dd2-ba49-444e-9c6b-965937a4f432
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: 年月
 
 		annotation SummarizationSetBy = Automatic
 
 	column 年排序
 		dataType: int64
+		isHidden
 		formatString: 0
 		lineageTag: 2de7929c-7dc3-4502-9075-c51472faab07
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: 年排序
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
 	column 月排序
 		dataType: int64
+		isHidden
 		formatString: 0
 		lineageTag: 0f39ddae-02df-4a34-803d-eeec19d686e1
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: 月排序
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -61,8 +73,8 @@ table 日期表
 		source =
 				let
 				    // ① 起止日期
-				    起始日期 = #date(2025, 1, 1),
-				    结束日期 = #date(2026, 12, 31),
+				    起始日期 = p_月报起始日期,
+				    结束日期 = p_月报终止日期,
 				
 				    // ② 生成连续日期列表（含首尾，共 731 天）
 				    天数 = Duration.Days(结束日期 - 起始日期) + 1,

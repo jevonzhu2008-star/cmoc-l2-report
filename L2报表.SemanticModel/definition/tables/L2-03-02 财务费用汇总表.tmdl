@@ -110,11 +110,10 @@ table 'L2-03-02 财务费用汇总表'
 				    源 = SharePoint.Files(财经SharePoint站点, [ApiVersion = 15]),
 				    // 从文件列表筛选名称含该表「…指标映射」且扩展名为 .xlsx 的文件，取第一个并读取其 [Content]（二进制内容）
 				    指标映射文件 = Table.SelectRows(源, each Text.Contains([Name], "L2-03-02 财务费用汇总表指标映射") and [Extension] = ".xlsx"){0}[Content],
-				    // 用 Excel.Workbook 解析（true=首行为表头），取出「指标排序表」对应工作表作为映射表
-				    指标排序表 = Excel.Workbook(指标映射文件, true){[Item = "指标排序", Kind = "Sheet"]}[Data],
-				    // 用 Excel.Workbook 解析（true=首行为表头），取出「结构排序表」对应工作表作为映射表
-				    结构排序表 = Excel.Workbook(指标映射文件, true){[Item = "结构排序", Kind = "Sheet"]}[Data],
-				    
+				    // 工作簿只解析一次，后续各 Sheet 直接取用（同一 xlsx 反复解析会拖慢刷新）
+				    指标映射工作簿 = Excel.Workbook(指标映射文件, true),
+				    指标排序表 = Table.Distinct(指标映射工作簿{[Item = "指标排序", Kind = "Sheet"]}[Data], {"指标名称"}),
+				    结构排序表 = Table.Distinct(指标映射工作簿{[Item = "结构排序", Kind = "Sheet"]}[Data], {"结构UniqueName"}),
 				    // ========== 连接BW QAS环境 ==========
 				    // 连接 BW QAS 环境：Implementation=2.0 新版接口 / LanguageCode=ZH 返回中文 / EnableStructures=true 开启内置结构 / BatchSize 放大提升批量拉取性能
 				    数据源 = SapBusinessWarehouse.Cubes(QAS服务器, 系统编号, 客户端ID, [Implementation="2.0", LanguageCode="ZH", EnableStructures=true, BatchSize=500000000]),
@@ -133,8 +132,8 @@ table 'L2-03-02 财务费用汇总表'
 				    // 把每个日期转成 BW 要求的 YYYYMM 文本：年*100+月（如 2026年1月 → "202601"）
 				    月份文本列表 = List.Transform(月份序列, each Text.From(Date.Year(_) * 100 + Date.Month(_))),
 				    
-				    // ========== Measure公共前缀（提取出来，避免重复写） ==========
-				    MeasureCube = "[4VGQHR12MHZ1PJONR9LZX5FVY].[4VGQHR12MHZ1PJONR9LZX",
+				    // ========== 度量值公共前缀（提取出来避免每行重复写） ==========
+				    度量前缀 = "[4VGQHR12MHZ1PJONR9LZX5FVY].[4VGQHR12MHZ1PJONR9LZX",
 				    
 				    // ========== 单月取数函数（只做BW查询，不做逆透视） ==========
 				    // 单月取数函数：输入 YYYYMM 文本，输出该月 BW 查询结果表
@@ -149,41 +148,24 @@ table 'L2-03-02 财务费用汇总表'
 				                {Cube.AddAndExpandDimensionColumn, "[4VGQHR12MHZ1PJONR9LZX6HTA]", {"[4VGQHR12MHZ1PJONR9LZX6HTA]"}, {"结构"}},
 				                
 				                // 财务费用分项度量值
-				                {Cube.AddMeasureColumn, "财务费用", MeasureCube & "9AY6]"},
-				                // 添加度量值「筹资费用」
-				                {Cube.AddMeasureColumn, "筹资费用", MeasureCube & "BL4E]"},
-				                // 添加度量值「汇兑损益」
-				                {Cube.AddMeasureColumn, "汇兑损益", MeasureCube & "BRFY]"},
-				                // 添加度量值「集团内部资金占用费收入」
-				                {Cube.AddMeasureColumn, "集团内部资金占用费收入", MeasureCube & "B25Q]"},
-				                // 添加度量值「集团内部资金占用费支出」
-				                {Cube.AddMeasureColumn, "集团内部资金占用费支出", MeasureCube & "A6JY]"},
-				                // 添加度量值「金属流、邦普借款及其他利息支出」
-				                {Cube.AddMeasureColumn, "金属流、邦普借款及其他利息支出", MeasureCube & "ACVI]"},
-				                // 添加度量值「净利息支出(利息支出+利息资本化)」
-				                {Cube.AddMeasureColumn, "净利息支出(利息支出+利息资本化)", MeasureCube & "9H9Q]"},
-				                // 添加度量值「利息收入」
-				                {Cube.AddMeasureColumn, "利息收入", MeasureCube & "AVU6]"},
-				                // 添加度量值「利息收入-小计」
-				                {Cube.AddMeasureColumn, "利息收入-小计", MeasureCube & "APIM]"},
-				                // 添加度量值「利息支出」
-				                {Cube.AddMeasureColumn, "利息支出", MeasureCube & "9NLA]"},
-				                // 添加度量值「利息支出资本化」
-				                {Cube.AddMeasureColumn, "利息支出资本化", MeasureCube & "AJ72]"},
-				                // 添加度量值「其他利息收入」
-				                {Cube.AddMeasureColumn, "其他利息收入", MeasureCube & "B8HA]"},
-				                // 添加度量值「手续费」
-				                {Cube.AddMeasureColumn, "手续费", MeasureCube & "BESU]"},
-				                // 添加度量值「外汇套保损益」
-				                {Cube.AddMeasureColumn, "外汇套保损益", MeasureCube & "CAEM]"},
-				                // 添加度量值「银行借款利息支出」
-				                {Cube.AddMeasureColumn, "银行借款利息支出", MeasureCube & "A08E]"},
-				                // 添加度量值「银行理财收益及票据贴现利息」
-				                {Cube.AddMeasureColumn, "银行理财收益及票据贴现利息", MeasureCube & "C432]"},
-				                // 添加度量值「债券利息支出」
-				                {Cube.AddMeasureColumn, "债券利息支出", MeasureCube & "9TWU]"},
-				                // 添加度量值「折现费用」
-				                {Cube.AddMeasureColumn, "折现费用", MeasureCube & "BXRI]"}
+				                {Cube.AddMeasureColumn, "财务费用", 度量前缀 & "9AY6]"},
+				                {Cube.AddMeasureColumn, "筹资费用", 度量前缀 & "BL4E]"},
+				                {Cube.AddMeasureColumn, "汇兑损益", 度量前缀 & "BRFY]"},
+				                {Cube.AddMeasureColumn, "集团内部资金占用费收入", 度量前缀 & "B25Q]"},
+				                {Cube.AddMeasureColumn, "集团内部资金占用费支出", 度量前缀 & "A6JY]"},
+				                {Cube.AddMeasureColumn, "金属流、邦普借款及其他利息支出", 度量前缀 & "ACVI]"},
+				                {Cube.AddMeasureColumn, "净利息支出(利息支出+利息资本化)", 度量前缀 & "9H9Q]"},
+				                {Cube.AddMeasureColumn, "利息收入", 度量前缀 & "AVU6]"},
+				                {Cube.AddMeasureColumn, "利息收入-小计", 度量前缀 & "APIM]"},
+				                {Cube.AddMeasureColumn, "利息支出", 度量前缀 & "9NLA]"},
+				                {Cube.AddMeasureColumn, "利息支出资本化", 度量前缀 & "AJ72]"},
+				                {Cube.AddMeasureColumn, "其他利息收入", 度量前缀 & "B8HA]"},
+				                {Cube.AddMeasureColumn, "手续费", 度量前缀 & "BESU]"},
+				                {Cube.AddMeasureColumn, "外汇套保损益", 度量前缀 & "CAEM]"},
+				                {Cube.AddMeasureColumn, "银行借款利息支出", 度量前缀 & "A08E]"},
+				                {Cube.AddMeasureColumn, "银行理财收益及票据贴现利息", 度量前缀 & "C432]"},
+				                {Cube.AddMeasureColumn, "债券利息支出", 度量前缀 & "9TWU]"},
+				                {Cube.AddMeasureColumn, "折现费用", 度量前缀 & "BXRI]"}
 				            }),
 				            
 				            // 获取结构唯一ID
@@ -211,8 +193,8 @@ table 'L2-03-02 财务费用汇总表'
 				        "指标值"
 				    ),
 				    
-				    // ========== 统一处理空值（最后做一次，不是每个月做一次） ==========
-				    // 把null和0都换成null，避免报表展示0干扰
+				    // ========== 空值处理（合并后统一做一次） ==========
+				    // 把 0 统一置为 null，避免报表展示无意义的 0；副作用是真实为 0 的行也会变空
 				    清洗空值 = Table.ReplaceValue(逆透视长表, 0, null, Replacer.ReplaceValue, {"指标值"}),
 				    
 				    // ========== 左连接映射表，带出【指标排序】 ==========

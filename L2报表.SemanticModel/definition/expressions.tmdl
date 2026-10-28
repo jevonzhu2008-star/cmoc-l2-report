@@ -53,15 +53,3 @@ expression 财经SharePoint站点 = "https://xsyzz.sharepoint.com/sites/CMOCGrou
 
 	annotation PBI_ResultType = Text
 
-expression 库存情况报表 =
-		let
-		    源 = SapBusinessWarehouse.Cubes(QAS服务器, "00", "100", [Implementation="2.0", EnableStructures=true]),
-		    ZRMM_CP002 = 源{[Name="ZRMM_CP002"]}[Data],
-		    #"ZRMM_CP002/ZRMM_CP002_Q0001" = ZRMM_CP002{[Id="ZRMM_CP002/ZRMM_CP002_Q0001"]}[Data],
-		    添加的项 = Cube.Transform(#"ZRMM_CP002/ZRMM_CP002_Q0001", {{Cube.ApplyParameter, "[ZMSDQNY]", {"202603"}}, {Cube.AddMeasureColumn, "量(吨)#(cr)#(lf)", "[4VGQHR12MHZ3FVOJ91YJ55HTH].[4VGQHR12MHZ1PLG0H34K5L1JG]"}, {Cube.AddAndExpandDimensionColumn, "[4VGQHR12MHZ3FVOJ91YJ55O51]", {"[4VGQHR12MHZ3FVOJ91YJ55O51]"}, {"结构"}}, {Cube.AddAndExpandDimensionColumn, "[ZKT]", {"[ZKT].[LEVEL01]"}, {"矿体 级别 01"}}, {Cube.AddAndExpandDimensionColumn, "[4ZRMM_CP002-ZKL]", {"[4ZRMM_CP002-ZKL].[LEVEL01]"}, {"分类 级别 01"}}})
-		in
-		    添加的项
-	lineageTag: dd7e35f6-2777-4abc-9392-9efd0bb876f7
-
-	annotation PBI_ResultType = Table
-

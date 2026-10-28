@@ -133,13 +133,11 @@ table 'L2-04-01 库存汇总表'
 				    源 = SharePoint.Files(财经SharePoint站点, [ApiVersion = 15]),
 				    // 从文件列表筛选名称含该表「…指标映射」且扩展名为 .xlsx 的文件，取第一个并读取其 [Content]（二进制内容）
 				    指标映射文件 = Table.SelectRows(源, each Text.Contains([Name], "L2-04-01库存汇总表指标映射") and [Extension] = ".xlsx"){0}[Content],
-				    // 用 Excel.Workbook 解析（true=首行为表头），取出「分类排序表」对应工作表作为映射表
-				    分类排序表 = Excel.Workbook(指标映射文件, true){[Item = "分类排序", Kind = "Sheet"]}[Data],
-				    // 用 Excel.Workbook 解析（true=首行为表头），取出「结构排序表」对应工作表作为映射表
-				    结构排序表 = Excel.Workbook(指标映射文件, true){[Item = "结构排序", Kind = "Sheet"]}[Data],
-				    // 用 Excel.Workbook 解析（true=首行为表头），取出「矿体排序表」对应工作表作为映射表
-				    矿体排序表 = Excel.Workbook(指标映射文件, true){[Item = "矿体排序", Kind = "Sheet"]}[Data],
-				    
+				    // 工作簿只解析一次，后续各 Sheet 直接取用（同一 xlsx 反复解析会拖慢刷新）
+				    指标映射工作簿 = Excel.Workbook(指标映射文件, true),
+				    分类排序表 = Table.Distinct(Table.TransformColumns(指标映射工作簿{[Item = "分类排序", Kind = "Sheet"]}[Data], {{"分类", each try Text.Trim(Text.From(_)) otherwise _, type text}}), {"分类"}),
+				    结构排序表 = Table.Distinct(Table.TransformColumns(指标映射工作簿{[Item = "结构排序", Kind = "Sheet"]}[Data], {{"结构", each try Text.Trim(Text.From(_)) otherwise _, type text}}), {"结构"}),
+				    矿体排序表 = Table.Distinct(Table.TransformColumns(指标映射工作簿{[Item = "矿体排序", Kind = "Sheet"]}[Data], {{"矿体", each try Text.Trim(Text.From(_)) otherwise _, type text}}), {"矿体"}),
 				    // ========== 连接BW QAS环境 ==========
 				    // 连接 BW QAS 环境：Implementation=2.0 新版接口 / LanguageCode=ZH 返回中文 / EnableStructures=true 开启内置结构 / BatchSize 放大提升批量拉取性能
 				    数据源 = SapBusinessWarehouse.Cubes(QAS服务器, 系统编号, 客户端ID, [LanguageCode="ZH", Implementation="2.0", EnableStructures=true, BatchSize=500000000]),
@@ -169,22 +167,19 @@ table 'L2-04-01 库存汇总表'
 				                
 				                // 维度字段展开
 				                {Cube.AddAndExpandDimensionColumn, "[4ZRMM_CP002-ZKL]", {"[4ZRMM_CP002-ZKL].[LEVEL01]"}, {"分类"}},
-				                // 展开维度并输出列名「结构」
 				                {Cube.AddAndExpandDimensionColumn, "[4VGQHR12MHZ3FVOJ91YJ55O51]", {"[4VGQHR12MHZ3FVOJ91YJ55O51]"}, {"结构"}},
-				                // 展开维度并输出列名「矿体」
 				                {Cube.AddAndExpandDimensionColumn, "[ZKT]", {"[ZKT].[LEVEL01]"}, {"矿体"}},
 				                
 				                // 度量值
 				                {Cube.AddMeasureColumn, "金额(人民币)", "[4VGQHR12MHZ3FVOJ91YJ55HTH].[4VGQHR12MHZ3FWDMUA1T7TGC0]"},
-				                // 添加度量值「量(吨)」
 				                {Cube.AddMeasureColumn, "量(吨)", "[4VGQHR12MHZ3FVOJ91YJ55HTH].[4VGQHR12MHZ1PLG0H34K5L1JG]"}
 				            }),
 				            
-				            // ✅ 新增：对结构列做前后截断（去掉空格）
-				            截断结构列 = Table.TransformColumns(Query, {{"结构", Text.Trim, type text}}),
+				            // 维度值统一去首尾空格：BW 返回的分类/结构/矿体偶带空格，与映射表键对不上会丢排序
+				            截断维度空格 = Table.TransformColumns(Query, {{"分类", Text.Trim, type text}, {"结构", Text.Trim, type text}, {"矿体", Text.Trim, type text}}),
 				            
 				            // 增加加载日期列
-				            附加月份 = Table.AddColumn(截断结构列, "加载日期", each #date(Number.From(Text.Start(month, 4)), Number.From(Text.End(month, 2)), 1), type date)
+				            附加月份 = Table.AddColumn(截断维度空格, "加载日期", each #date(Number.From(Text.Start(month, 4)), Number.From(Text.End(month, 2)), 1), type date)
 				        in
 				            附加月份,
 				    

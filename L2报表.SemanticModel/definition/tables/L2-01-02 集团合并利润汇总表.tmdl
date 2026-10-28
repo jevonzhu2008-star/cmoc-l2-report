@@ -213,15 +213,16 @@ table 'L2-01-02 集团合并利润汇总表'
 				        6、EnableStructures=true 必须开启，否则内置Structure行维度无法解析
 				        7、末尾逆透视分月列、添加月份排序，统一长表结构，方便矩阵报表排序展示
 				        8、【季度】由【月份排序】1~12计算，代表该行分月所属季度
-				        9、新增：读取SharePoint指标映射表，左连接【结构】字段，带出【结构排序】
+				        9、读取SharePoint指标映射表，按【结构】成员的 UniqueName 左连接，带出【结构排序】
 				    */
 				    // ========== 读取SharePoint上的结构排序映射表 ==========
 				    // 连接财经 SharePoint 站点，列出全部文件（ApiVersion=15 为较新 REST API），结果为文件列表表
 				    源 = SharePoint.Files(财经SharePoint站点, [ApiVersion = 15]),
 				    // 筛选文件名含「L2-01-02 集团合并利润汇总表指标映射」且扩展名为 .xlsx 的文件，取第一个并读取其 [Content]（二进制内容）
 				    指标映射文件 = Table.SelectRows(源, each Text.Contains([Name], "L2-01-02 集团合并利润汇总表指标映射") and [Extension] = ".xlsx"){0}[Content],
-				    // 用 Excel.Workbook 解析该文件（true 表示首行为表头），取出「结构排序」工作表作为映射表
-				    结构排序映射表 = Excel.Workbook(指标映射文件, true){[Item = "结构排序", Kind = "Sheet"]}[Data],
+				    // 工作簿只解析一次，后续各 Sheet 直接取用（同一 xlsx 反复解析会拖慢刷新）
+				    指标映射工作簿 = Excel.Workbook(指标映射文件, true),
+				    结构排序映射表 = Table.Distinct(指标映射工作簿{[Item = "结构排序", Kind = "Sheet"]}[Data], {"结构UniqueName"}),
 				    // 连接 BW QAS 环境：Implementation=2.0 用新版接口 / LanguageCode=ZH 返回中文 / EnableStructures=true 开启内置结构解析 / BatchSize 放大提升批量拉取性能
 				    数据源 = SapBusinessWarehouse.Cubes(QAS服务器, 系统编号, 客户端ID, [Implementation="2.0", LanguageCode="ZH", EnableStructures=true, BatchSize=500000000]),
 				    // 按 Cube 名称定位 ZRFI_CP011
@@ -296,32 +297,13 @@ table 'L2-01-02 集团合并利润汇总表'
 				            ),
 				            // 逆透视 1-12 月分月列：把宽表的「1月..12月」列转为两列「月份」「实际值」，形成长表
 				            逆透视分月列 = Table.UnpivotOtherColumns(空值替换为0, {"结构","结构唯一ID","环比MTD", "当月MTD", "上月MTD", "加载日期", "预算达成率", "预算YTD", "去年同期YTD", "同比YTD", "当月YTD"}, "月份", "实际值"),
-				            // 追加「月份排序」整数列：把「1月..12月」映射为 1..12，供报表按数值正确排序（未知月份给 999）
+				            // 追加「月份排序」整数列：从「N月」中取出 N，供报表按数值排序（无法解析时给 999）
 				            添加月份排序 = Table.AddColumn(逆透视分月列, "月份排序", each
-				                if [月份] = "1月" then 1
-				                else if [月份] = "2月" then 2
-				                else if [月份] = "3月" then 3
-				                else if [月份] = "4月" then 4
-				                else if [月份] = "5月" then 5
-				                else if [月份] = "6月" then 6
-				                else if [月份] = "7月" then 7
-				                else if [月份] = "8月" then 8
-				                else if [月份] = "9月" then 9
-				                else if [月份] = "10月" then 10
-				                else if [月份] = "11月" then 11
-				                else if [月份] = "12月" then 12
-				                else 999
+				                try Number.FromText(Text.BeforeDelimiter([月份], "月")) otherwise 999
 				            , Int64.Type),
-				            // 追加「季度」列：根据月份排序 1-12 计算所属季度 Q1/Q2/Q3/Q4（未知月份为 null）
+				            // 追加「季度」列：由月份排序 1-12 推算 Q1-Q4（非 1-12 时为 null）
 				            添加季度 = Table.AddColumn(添加月份排序, "季度", each
-				                let
-				                    mSort = [月份排序]
-				                in
-				                    if mSort <= 3 then "Q1"
-				                    else if mSort <= 6 then "Q2"
-				                    else if mSort <= 9 then "Q3"
-				                    else if mSort <= 12 then "Q4"
-				                    else null
+				                if [月份排序] >= 1 and [月份排序] <= 12 then "Q" & Text.From(Number.RoundUp([月份排序] / 3)) else null
 				            , type text)
 				        in
 				        添加季度,

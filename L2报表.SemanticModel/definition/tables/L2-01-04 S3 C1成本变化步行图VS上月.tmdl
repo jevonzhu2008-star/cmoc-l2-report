@@ -111,7 +111,7 @@ table 'L2-01-04 S3 C1成本变化步行图VS上月'
 	partition 'L2-01-04 S3 C1成本变化步行图VS上月' = m
 		mode: import
 		queryGroup: 财经
-		source =
+		source = ```
 				let
 				    /*
 				    【查询名称】ZRCO_CP004 S3 C1成本变化步行图VS上月 BW取数
@@ -130,13 +130,11 @@ table 'L2-01-04 S3 C1成本变化步行图VS上月'
 				    源 = SharePoint.Files(财经SharePoint站点, [ApiVersion = 15]),
 				    // 从文件列表筛选名称含该表「…指标映射」且扩展名为 .xlsx 的文件，取第一个并读取其 [Content]（二进制内容）
 				    指标映射文件 = Table.SelectRows(源, each Text.Contains([Name], "L2-01-04 S3 C1成本变化步行图VS上月指标映射") and [Extension] = ".xlsx"){0}[Content],
-				    // 用 Excel.Workbook 解析（true=首行为表头），取出「指标排序映射表」对应工作表作为映射表
-				    指标排序映射表 = Excel.Workbook(指标映射文件, true){[Item = "指标名称排序", Kind = "Sheet"]}[Data],
-				    // 用 Excel.Workbook 解析（true=首行为表头），取出「产品排序映射表」对应工作表作为映射表
-				    产品排序映射表 = Excel.Workbook(指标映射文件, true){[Item = "产品排序", Kind = "Sheet"]}[Data],
-				    // 用 Excel.Workbook 解析（true=首行为表头），取出「矿体排序映射表」对应工作表作为映射表
-				    矿体排序映射表 = Excel.Workbook(指标映射文件, true){[Item = "矿体排序", Kind = "Sheet"]}[Data],
-				
+				    // 工作簿只解析一次，后续各 Sheet 直接取用（同一 xlsx 反复解析会拖慢刷新）
+				    指标映射工作簿 = Excel.Workbook(指标映射文件, true),
+				    指标排序映射表 = Table.Distinct(指标映射工作簿{[Item = "指标名称排序", Kind = "Sheet"]}[Data], {"指标名称"}),
+				    产品排序映射表 = Table.Distinct(指标映射工作簿{[Item = "产品排序", Kind = "Sheet"]}[Data], {"产品"}),
+				    矿体排序映射表 = Table.Distinct(指标映射工作簿{[Item = "矿体排序", Kind = "Sheet"]}[Data], {"矿体"}),
 				    // ========== 连接BW QAS环境 ==========
 				    // 连接 BW QAS 环境：Implementation=2.0 新版接口 / LanguageCode=ZH 返回中文 / EnableStructures=true 开启内置结构 / BatchSize 放大提升批量拉取性能
 				    数据源 = SapBusinessWarehouse.Cubes(QAS服务器, 系统编号, 客户端ID, [Implementation="2.0", LanguageCode="ZH", EnableStructures=true, BatchSize=500000000]),
@@ -163,12 +161,10 @@ table 'L2-01-04 S3 C1成本变化步行图VS上月'
 				            Query = Cube.Transform(基础查询, {
 				                // 设置 BW 期间参数 [ZMSDQNY] = 当前循环月份（BW 据此返回截止该月的累计数据）
 				                {Cube.ApplyParameter, "[ZMSDQNY]", {month}},
-				                // 展开维度并输出列名「产品」
 				                {Cube.AddAndExpandDimensionColumn, "[ZCP]", {"[ZCP].[LEVEL01]"}, {"产品"}},
-				                // 展开维度并输出列名「单位」
 				                {Cube.AddAndExpandDimensionColumn, "[4ZRCO_CP004-ZUNIT]", {"[4ZRCO_CP004-ZUNIT].[LEVEL01]"}, {"单位"}},
-				                // 展开维度并输出列名「矿体」
 				                {Cube.AddAndExpandDimensionColumn, "[ZKT]", {"[ZKT].[LEVEL01]"}, {"矿体"}},
+				                
 				                // M0（去年同期月）及成本要素分解
 				                // {Cube.AddMeasureColumn, "M0", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA1SEV]"},
 				                // {Cube.AddMeasureColumn, "M0_E01", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA2HP3]"},
@@ -190,28 +186,19 @@ table 'L2-01-04 S3 C1成本变化步行图VS上月'
 				                // Q0/Q1（季度指标）
 				                // {Cube.AddMeasureColumn, "Q0", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA251Z]"},
 				                // {Cube.AddMeasureColumn, "Q1", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA2BDJ]"},
+				
 				                // C1成本及要素分解
 				                // {Cube.AddMeasureColumn, "备件", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA6047]"},
 				                {Cube.AddMeasureColumn, "本月C1", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA6PEF]"},
-				                // 添加度量值「产量」
 				                {Cube.AddMeasureColumn, "产量", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA54IF]"},
-				                // 添加度量值「递延剥离」
 				                {Cube.AddMeasureColumn, "递延剥离", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA66FR]"},
-				                // 添加度量值「勾稽差」
 				                {Cube.AddMeasureColumn, "勾稽差", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA6VPZ]"},
-				                // 添加度量值「耗材」
 				                {Cube.AddMeasureColumn, "耗材", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA5H5J]"},
-				                // 添加度量值「能源」
 				                {Cube.AddMeasureColumn, "能源", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA5NH3]"},
-				                // 添加度量值「其他及未归类」
 				                {Cube.AddMeasureColumn, "其他及未归类", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA6J2V]"},
-				                // 添加度量值「人工」
 				                {Cube.AddMeasureColumn, "人工", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA5ATZ]"},
-				                // 添加度量值「上月C1」
 				                {Cube.AddMeasureColumn, "上月C1", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA4Y6V]"},
-				                // 添加度量值「外包」
 				                {Cube.AddMeasureColumn, "外包", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA5TSN]"},
-				                // 添加度量值「在产品变动」
 				                {Cube.AddMeasureColumn, "在产品变动", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA6CRB]"}
 				            }),
 				            // 追加「加载日期」列：把当前循环 YYYYMM 转成当月首日 date（如 202601 → 2026-01-01），标记该行数据所属期间
@@ -252,6 +239,7 @@ table 'L2-01-04 S3 C1成本变化步行图VS上月'
 				    展开矿体排序 = Table.ExpandTableColumn(左连接矿体排序, "映射矿体", {"矿体排序"}, {"矿体排序"})
 				in
 				    展开矿体排序
+				```
 
 	annotation PBI_ResultType = Table
 

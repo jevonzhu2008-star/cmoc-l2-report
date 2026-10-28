@@ -117,20 +117,18 @@ table 'L2-03-06 矿石成本分析'
 				        5、连接参数统一：QAS服务器、系统编号、客户端ID，和项目其他BW查询保持一套参数规范
 				        6、EnableStructures=true
 				        7、末尾逆透视，统一长表结构，方便矩阵报表排序展示
-				        8、新增：读取SharePoint指标映射表，左连接带出【指标名称排序、矿体排序、指标项排序】
+				        8、读取SharePoint指标映射表，左连接带出【指标名称排序、矿体排序、指标项排序】
 				    */
 				    // ========== 读取SharePoint上的映射表 ==========
 				    // 连接财经 SharePoint 站点，列出全部文件（ApiVersion=15 为较新 REST API），结果为文件列表表
 				    源 = SharePoint.Files(财经SharePoint站点, [ApiVersion = 15]),
 				    // 从文件列表筛选名称含该表「…指标映射」且扩展名为 .xlsx 的文件，取第一个并读取其 [Content]（二进制内容）
 				    指标映射文件 = Table.SelectRows(源, each Text.Contains([Name], "L2-03-06 矿石成本分析指标映射") and [Extension] = ".xlsx"){0}[Content],
-				    // 用 Excel.Workbook 解析（true=首行为表头），取出「指标名称排序映射表」对应工作表作为映射表
-				    指标名称排序映射表 = Excel.Workbook(指标映射文件, true){[Item = "指标名称排序", Kind = "Sheet"]}[Data],
-				    // 用 Excel.Workbook 解析（true=首行为表头），取出「矿体排序映射表」对应工作表作为映射表
-				    矿体排序映射表 = Excel.Workbook(指标映射文件, true){[Item = "矿体排序", Kind = "Sheet"]}[Data],
-				    // 用 Excel.Workbook 解析（true=首行为表头），取出「指标项排序映射表」对应工作表作为映射表
-				    指标项排序映射表 = Excel.Workbook(指标映射文件, true){[Item = "指标项排序", Kind = "Sheet"]}[Data],
-				
+				    // 工作簿只解析一次，后续各 Sheet 直接取用（同一 xlsx 反复解析会拖慢刷新）
+				    指标映射工作簿 = Excel.Workbook(指标映射文件, true),
+				    指标名称排序映射表 = Table.Distinct(指标映射工作簿{[Item = "指标名称排序", Kind = "Sheet"]}[Data], {"指标名称"}),
+				    矿体排序映射表 = Table.Distinct(指标映射工作簿{[Item = "矿体排序", Kind = "Sheet"]}[Data], {"矿体"}),
+				    指标项排序映射表 = Table.Distinct(指标映射工作簿{[Item = "指标项排序", Kind = "Sheet"]}[Data], {"指标项"}),
 				    // 1、连接BW QAS环境
 				    // 连接 BW QAS 环境：Implementation=2.0 用新版接口 / LanguageCode=ZH 返回中文 / EnableStructures=true 开启内置结构 / BatchSize 放大提升批量拉取性能
 				    数据源 = SapBusinessWarehouse.Cubes(QAS服务器, 系统编号, 客户端ID, [Implementation="2.0", LanguageCode="ZH", EnableStructures=true, BatchSize=500000000]),
@@ -157,35 +155,20 @@ table 'L2-03-06 矿石成本分析'
 				            Query = Cube.Transform(基础查询, {
 				                // 设置 BW 期间参数 [ZMSDQNY] = 当前循环月份（BW 据此返回截止该月的累计数据）
 				                {Cube.ApplyParameter, "[ZMSDQNY]", {month}},
-				                // 展开维度并输出列名「矿体」
 				                {Cube.AddAndExpandDimensionColumn, "[ZKT]", {"[ZKT].[LEVEL01]"}, {"矿体"}},
-				                // 展开维度并输出列名「指标项」
 				                {Cube.AddAndExpandDimensionColumn, "[4ZRCO_CP005-ZINDITEM]", {"[4ZRCO_CP005-ZINDITEM].[LEVEL01]"}, {"指标项"}},
-				                // 添加度量值「本年累计」
 				                {Cube.AddMeasureColumn, "本年累计", "[4VGQHR12MHZ3FRW3M0EDN7QH4].[4VGQHR12MHZ3FRW4BZTZU5Q16]"},
-				                // 添加度量值「本月实际」
 				                {Cube.AddMeasureColumn, "本月实际", "[4VGQHR12MHZ3FRW3M0EDN7QH4].[4VGQHR12MHZ3FRW4BZTZU5DE2]"},
-				                // 添加度量值「本月预算」
 				                {Cube.AddMeasureColumn, "本月预算", "[4VGQHR12MHZ3FRW3M0EDN7QH4].[4VGQHR12MHZ3FRW4HCMQ14ETZ]"},
-				                // 添加度量值「差异%」
 				                {Cube.AddMeasureColumn, "差异%", "[4VGQHR12MHZ3FRW3M0EDN7QH4].[4VGQHR12MHZ3FRW4HVEV7AXW7]"},
-				                // 添加度量值「差异±」
 				                {Cube.AddMeasureColumn, "差异±", "[4VGQHR12MHZ3FRW3M0EDN7QH4].[4VGQHR12MHZ3FRW4HVEV7ARKN]"},
-				                // 添加度量值「环比%」
 				                {Cube.AddMeasureColumn, "环比%", "[4VGQHR12MHZ3FRW3M0EDN7QH4].[4VGQHR12MHZ3FRW4CNBAAF5SC]"},
-				                // 添加度量值「环比±」
 				                {Cube.AddMeasureColumn, "环比±", "[4VGQHR12MHZ3FRW3M0EDN7QH4].[4VGQHR12MHZ3FRW4CNBAAEZGS]"},
-				                // 添加度量值「累计比预算±」
 				                {Cube.AddMeasureColumn, "累计比预算±", "[4VGQHR12MHZ3FRW3M0EDN7QH4].[4VGQHR12MHZ3FRW4HVEV7B47R]"},
-				                // 添加度量值「累计同比±」
 				                {Cube.AddMeasureColumn, "累计同比±", "[4VGQHR12MHZ3FRW3M0EDN7QH4].[4VGQHR12MHZ3FRW4CNBAAFOR0]"},
-				                // 添加度量值「上年累计」
 				                {Cube.AddMeasureColumn, "上年累计", "[4VGQHR12MHZ3FRW3M0EDN7QH4].[4VGQHR12MHZ3FRW4BZTZU5WCQ]"},
-				                // 添加度量值「上月实际」
 				                {Cube.AddMeasureColumn, "上月实际", "[4VGQHR12MHZ3FRW3M0EDN7QH4].[4VGQHR12MHZ3FRW4BZTZU572I]"},
-				                // 添加度量值「同比%」
 				                {Cube.AddMeasureColumn, "同比%", "[4VGQHR12MHZ3FRW3M0EDN7QH4].[4VGQHR12MHZ3FRW4CNBAAFV2K]"},
-				                // 添加度量值「预算累计」
 				                {Cube.AddMeasureColumn, "预算累计", "[4VGQHR12MHZ3FRW3M0EDN7QH4].[4VGQHR12MHZ3FRW4HCMQ14L5J]"}
 				            }),
 				            // 加载日期标记

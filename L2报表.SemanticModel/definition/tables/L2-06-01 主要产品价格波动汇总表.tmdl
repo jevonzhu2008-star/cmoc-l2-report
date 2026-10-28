@@ -121,12 +121,11 @@ table 'L2-06-01 主要产品价格波动汇总表'
 				    源 = SharePoint.Files(财经SharePoint站点, [ApiVersion = 15]),
 				    // 从文件列表筛选名称含该表「…指标映射」且扩展名为 .xlsx 的文件，取第一个并读取其 [Content]（二进制内容）
 				    指标映射文件 = Table.SelectRows(源, each Text.Contains([Name], "L2-06-01 主要产品价格波动汇总表指标映射") and [Extension] = ".xlsx"){0}[Content],
-				    // 一次性解析 Excel 工作簿（true=首行为表头），后续从该工作簿对象分别取 3 张 Sheet，避免重复解析
+				    // 工作簿只解析一次，后续各 Sheet 直接取用（同一 xlsx 反复解析会拖慢刷新）
 				    指标映射工作簿 = Excel.Workbook(指标映射文件, true),
-				    产品排序映射表 = 指标映射工作簿{[Item = "产品排序", Kind = "Sheet"]}[Data],
-				    指标名称映射表 = 指标映射工作簿{[Item = "指标名称排序", Kind = "Sheet"]}[Data],
-				    指标口径映射表 = 指标映射工作簿{[Item = "指标口径排序", Kind = "Sheet"]}[Data],
-				
+				    产品排序映射表 = Table.Distinct(指标映射工作簿{[Item = "产品排序", Kind = "Sheet"]}[Data], {"产品"}),
+				    指标名称映射表 = Table.Distinct(指标映射工作簿{[Item = "指标名称排序", Kind = "Sheet"]}[Data], {"指标名称"}),
+				    指标口径映射表 = Table.Distinct(指标映射工作簿{[Item = "指标口径排序", Kind = "Sheet"]}[Data], {"指标口径"}),
 				    // ========== BW连接配置 ==========
 				    // 连接 BW QAS 环境：Implementation=2.0 用新版接口 / LanguageCode=ZH 返回中文 / EnableStructures=true 开启内置结构 / BatchSize 放大提升批量拉取性能
 				    数据源 = SapBusinessWarehouse.Cubes(QAS服务器, 系统编号, 客户端ID, [Implementation="2.0", LanguageCode="ZH", EnableStructures=true, BatchSize=500000000]),
@@ -155,32 +154,19 @@ table 'L2-06-01 主要产品价格波动汇总表'
 				                    // BW期间参数，传入当前循环年月
 				                    {Cube.ApplyParameter, "[ZMSDQNY]", {month}},
 				                    // ========== 维度字段展开 ==========
-				                    // 展开维度并输出列名「产品」
 				                    {Cube.AddAndExpandDimensionColumn, "[4ZRSD_CP001-ZCP]", {"[4ZRSD_CP001-ZCP].[LEVEL01]"}, {"产品"}},
-				                    // 展开维度并输出列名「指标名称」
 				                    {Cube.AddAndExpandDimensionColumn, "[4ZRSD_CP001-ZINDNAME]", {"[4ZRSD_CP001-ZINDNAME].[LEVEL01]"}, {"指标名称"}},
 				                    // ========== 度量值：多期对比指标 ==========
-				                    // 添加度量值「FY（Y-2）」
 				                    {Cube.AddMeasureColumn, "FY（Y-2）", "[4VGQHR12MHZ1PHK1NB6E6C649].[4VGQHR12MHZ1PJ8W4FO18FRJE]"},
-				                    // 添加度量值「FY（Y-1）」
 				                    {Cube.AddMeasureColumn, "FY（Y-1）", "[4VGQHR12MHZ1PHK1NB6E6C649].[4VGQHR12MHZ1PJ8W5EFCBP92K]"},
-				                    // 添加度量值「（当年）预算」
 				                    {Cube.AddMeasureColumn, "（当年）预算", "[4VGQHR12MHZ1PHK1NB6E6C649].[4VGQHR12MHZ1PJ8W5EFCBPFE4]"},
-				                    // 添加度量值「（Q-2）季度」
 				                    {Cube.AddMeasureColumn, "（Q-2）季度", "[4VGQHR12MHZ1PHK1NB6E6C649].[4VGQHR12MHZ1PJ8W9TN0HJ5TP]"},
-				                    // 添加度量值「（Q-1）季度」
 				                    {Cube.AddMeasureColumn, "（Q-1）季度", "[4VGQHR12MHZ1PHK1NB6E6C649].[4VGQHR12MHZ1PJ8W9TN0HK1FH]"},
-				                    // 添加度量值「季度环比%」
 				                    {Cube.AddMeasureColumn, "季度环比%", "[4VGQHR12MHZ1PHK1NB6E6C649].[4VGQHR12MHZ1PJ8WADGXTKX1B]"},
-				                    // 添加度量值「（M-3）月」
 				                    {Cube.AddMeasureColumn, "（M-3）月", "[4VGQHR12MHZ1PHK1NB6E6C649].[4VGQHR12MHZ1PLXJHO3QTX3S2]"},
-				                    // 添加度量值「（M-2）月」
 				                    {Cube.AddMeasureColumn, "（M-2）月", "[4VGQHR12MHZ1PHK1NB6E6C649].[4VGQHR12MHZ1PLXJEVKLS4IFW]"},
-				                    // 添加度量值「（M-1）月」
 				                    {Cube.AddMeasureColumn, "（M-1）月", "[4VGQHR12MHZ1PHK1NB6E6C649].[4VGQHR12MHZ1PJ8WA0MQ79932]"},
-				                    // 添加度量值「当月」
 				                    {Cube.AddMeasureColumn, "当月", "[4VGQHR12MHZ1PHK1NB6E6C649].[4VGQHR12MHZ1PJ8WA0MQ7A4OU]"},
-				                    // 添加度量值「月度环比%」
 				                    {Cube.AddMeasureColumn, "月度环比%", "[4VGQHR12MHZ1PHK1NB6E6C649].[4VGQHR12MHZ1PJ8WADGXTL3CV]"}
 				                }),
 				            // 增加【加载日期】列（当月首日），标记本条数据对应的查询期间，用于报表切片

@@ -137,15 +137,12 @@ table 'L2-01-14 物料单耗月表'
 				    源 = SharePoint.Files(财经SharePoint站点, [ApiVersion = 15]),
 				    // 从文件列表筛选名称含该表「…指标映射」且扩展名为 .xlsx 的文件，取第一个并读取其 [Content]（二进制内容）
 				    指标映射文件 = Table.SelectRows(源, each Text.Contains([Name], "L2-01-14 物料单耗月表指标映射") and [Extension] = ".xlsx"){0}[Content],
-				    // 用 Excel.Workbook 解析（true=首行为表头），取出「单位排序映射表」对应工作表作为映射表
-				    单位排序映射表 = Excel.Workbook(指标映射文件, true){[Item = "单位排序", Kind = "Sheet"]}[Data],
-				    // 用 Excel.Workbook 解析（true=首行为表头），取出「矿体排序映射表」对应工作表作为映射表
-				    矿体排序映射表 = Excel.Workbook(指标映射文件, true){[Item = "矿体排序", Kind = "Sheet"]}[Data],
-				    // 用 Excel.Workbook 解析（true=首行为表头），取出「中区东区排序映射表」对应工作表作为映射表
-				    中区东区排序映射表 = Excel.Workbook(指标映射文件, true){[Item = "中区东区排序", Kind = "Sheet"]}[Data],
-				    // 用 Excel.Workbook 解析（true=首行为表头），取出「指标名称排序映射表」对应工作表作为映射表
-				    指标名称排序映射表 = Excel.Workbook(指标映射文件, true){[Item = "指标名称排序", Kind = "Sheet"]}[Data],
-				
+				    // 工作簿只解析一次，后续各 Sheet 直接取用（同一 xlsx 反复解析会拖慢刷新）
+				    指标映射工作簿 = Excel.Workbook(指标映射文件, true),
+				    单位排序映射表 = Table.Distinct(指标映射工作簿{[Item = "单位排序", Kind = "Sheet"]}[Data], {"单位"}),
+				    矿体排序映射表 = Table.Distinct(指标映射工作簿{[Item = "矿体排序", Kind = "Sheet"]}[Data], {"矿体"}),
+				    中区东区排序映射表 = Table.Distinct(指标映射工作簿{[Item = "中区东区排序", Kind = "Sheet"]}[Data], {"中区东区"}),
+				    指标名称排序映射表 = Table.Distinct(指标映射工作簿{[Item = "指标名称排序", Kind = "Sheet"]}[Data], {"指标名称"}),
 				    // ========== 连接BW QAS环境 ==========
 				    // 连接 BW QAS 环境：Implementation=2.0 新版接口 / LanguageCode=ZH 返回中文 / EnableStructures=true 开启内置结构 / BatchSize 放大提升批量拉取性能
 				    数据源 = SapBusinessWarehouse.Cubes(QAS服务器, 系统编号, 客户端ID, [Implementation="2.0", LanguageCode="ZH", EnableStructures=true, BatchSize=500000000]),
@@ -174,41 +171,28 @@ table 'L2-01-14 物料单耗月表'
 				                {Cube.ApplyParameter, "[ZMSDQNY]", {month}},
 				                // 维度展开
 				                {Cube.AddAndExpandDimensionColumn, "[4ZRCO_CP004-ZUNIT]", {"[4ZRCO_CP004-ZUNIT].[LEVEL01]"}, {"单位"}},
-				                // 展开维度并输出列名「矿体」
 				                {Cube.AddAndExpandDimensionColumn, "[ZKT]", {"[ZKT].[LEVEL01]"}, {"矿体"}},
-				                // 展开维度并输出列名「中区东区」
 				                {Cube.AddAndExpandDimensionColumn, "[ZTDISTRCT]", {"[ZTDISTRCT].[LEVEL01]"}, {"中区东区"}},
 				                // 目标类
 				                {Cube.AddMeasureColumn, "26年目标", "[4VGQHR12MHZ1PH0QD0454F134].[4VGQHR12MHZ1PH0RGAVD1MOPL]"},
-				                // 添加度量值「比目标±%」
 				                {Cube.AddMeasureColumn, "比目标±%", "[4VGQHR12MHZ1PH0QD0454F134].[4VGQHR12MHZ1PH0RGAVD1N7O9]"},
-				                // 添加度量值「累计比目标」
 				                {Cube.AddMeasureColumn, "累计比目标", "[4VGQHR12MHZ1PH0QD0454F134].[4VGQHR12MHZ1PH0RGAVD1N1CP]"},
 				                // 当月/上月/环比类
 				                {Cube.AddMeasureColumn, "当月", "[4VGQHR12MHZ1PH0QD0454F134].[4VGQHR12MHZ1PH0RGAVD1M5QX]"},
-				                // 添加度量值「当月累计」
 				                {Cube.AddMeasureColumn, "当月累计", "[4VGQHR12MHZ1PH0QD0454F134].[4VGQHR12MHZ1PH0RGAVD1MV15]"},
-				                // 添加度量值「上月」
 				                {Cube.AddMeasureColumn, "上月", "[4VGQHR12MHZ1PH0QD0454F134].[4VGQHR12MHZ1PH0RGAVD1LZFD]"},
-				                // 添加度量值「环比」
 				                {Cube.AddMeasureColumn, "环比", "[4VGQHR12MHZ1PH0QD0454F134].[4VGQHR12MHZ1PH0RGAVD1MC2H]"},
-				                // 添加度量值「环比±%」
 				                {Cube.AddMeasureColumn, "环比±%", "[4VGQHR12MHZ1PH0QD0454F134].[4VGQHR12MHZ1PH0RGAVD1MIE1]"},
-				                // 添加度量值「环比实际量LAM」
 				                {Cube.AddMeasureColumn, "环比实际量LAM", "[4VGQHR12MHZ1PH0QD0454F134].[4VGQHR12MHZ1PH0QD0454FQDC]"},
-				                // 添加度量值「环比实际数LAM」
 				                {Cube.AddMeasureColumn, "环比实际数LAM", "[4VGQHR12MHZ1PH0QD0454F134].[4VGQHR12MHZ1PH0QD0454FK1S]"},
 				                // 实际类（AM=当月实际）
 				                {Cube.AddMeasureColumn, "实际量AM", "[4VGQHR12MHZ1PH0QD0454F134].[4VGQHR12MHZ1PH0QD0454FDQ8]"},
-				                // 添加度量值「实际数AM」
 				                {Cube.AddMeasureColumn, "实际数AM", "[4VGQHR12MHZ1PH0QD0454F134].[4VGQHR12MHZ1PH0QD0454F7EO]"},
 				                // 年累类（AY=年度累计）
 				                {Cube.AddMeasureColumn, "年累实际量AY", "[4VGQHR12MHZ1PH0QD0454F134].[4VGQHR12MHZ1PH0QD0454G30G]"},
-				                // 添加度量值「年累实际数AY」
 				                {Cube.AddMeasureColumn, "年累实际数AY", "[4VGQHR12MHZ1PH0QD0454F134].[4VGQHR12MHZ1PH0QD0454FWOW]"},
 				                // 预算类（BM=当月预算）
 				                {Cube.AddMeasureColumn, "预算量BM", "[4VGQHR12MHZ1PH0QD0454F134].[4VGQHR12MHZ1PH0QD0454GFNK]"},
-				                // 添加度量值「预算数BM」
 				                {Cube.AddMeasureColumn, "预算数BM", "[4VGQHR12MHZ1PH0QD0454F134].[4VGQHR12MHZ1PH0QD0454G9C0]"}
 				            }),
 				            // 追加「加载日期」列：把当前循环 YYYYMM 转成当月首日 date（如 202601 → 2026-01-01），标记该行数据所属期间

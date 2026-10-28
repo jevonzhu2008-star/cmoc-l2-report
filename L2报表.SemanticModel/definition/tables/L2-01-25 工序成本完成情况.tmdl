@@ -141,22 +141,19 @@ table 'L2-01-25 工序成本完成情况'
 				        5、连接参数统一：QAS服务器、系统编号、客户端ID，和项目其他BW查询保持一套参数规范
 				        6、EnableStructures=true
 				        7、末尾逆透视，统一长表结构，方便矩阵报表排序展示
-				        8、新增：读取SharePoint指标映射表，左连接带出【指标名称排序、大工序排序、矿体排序、单位排序】
+				        8、读取SharePoint指标映射表，左连接带出【指标名称排序、大工序排序、矿体排序、单位排序】
 				    */
 				    // ========== 读取SharePoint上的映射表 ==========
 				    // 连接财经 SharePoint 站点，列出全部文件（ApiVersion=15 为较新 REST API），结果为文件列表表
 				    源 = SharePoint.Files(财经SharePoint站点, [ApiVersion = 15]),
 				    // 从文件列表筛选名称含该表「…指标映射」且扩展名为 .xlsx 的文件，取第一个并读取其 [Content]（二进制内容）
 				    指标映射文件 = Table.SelectRows(源, each Text.Contains([Name], "L2-01-25 工序成本完成情况指标映射") and [Extension] = ".xlsx"){0}[Content],
-				    // 用 Excel.Workbook 解析（true=首行为表头），取出「指标名称排序映射表」对应工作表作为映射表
-				    指标名称排序映射表 = Excel.Workbook(指标映射文件, true){[Item = "指标名称排序", Kind = "Sheet"]}[Data],
-				    // 用 Excel.Workbook 解析（true=首行为表头），取出「大工序排序映射表」对应工作表作为映射表
-				    大工序排序映射表 = Excel.Workbook(指标映射文件, true){[Item = "大工序排序", Kind = "Sheet"]}[Data],
-				    // 用 Excel.Workbook 解析（true=首行为表头），取出「矿体排序映射表」对应工作表作为映射表
-				    矿体排序映射表 = Excel.Workbook(指标映射文件, true){[Item = "矿体排序", Kind = "Sheet"]}[Data],
-				    // 用 Excel.Workbook 解析（true=首行为表头），取出「单位排序映射表」对应工作表作为映射表
-				    单位排序映射表 = Excel.Workbook(指标映射文件, true){[Item = "单位排序", Kind = "Sheet"]}[Data],
-				
+				    // 工作簿只解析一次，后续各 Sheet 直接取用（同一 xlsx 反复解析会拖慢刷新）
+				    指标映射工作簿 = Excel.Workbook(指标映射文件, true),
+				    指标名称排序映射表 = Table.Distinct(指标映射工作簿{[Item = "指标名称排序", Kind = "Sheet"]}[Data], {"指标名称"}),
+				    大工序排序映射表 = Table.Distinct(指标映射工作簿{[Item = "大工序排序", Kind = "Sheet"]}[Data], {"大工序"}),
+				    矿体排序映射表 = Table.Distinct(指标映射工作簿{[Item = "矿体排序", Kind = "Sheet"]}[Data], {"矿体"}),
+				    单位排序映射表 = Table.Distinct(指标映射工作簿{[Item = "单位排序", Kind = "Sheet"]}[Data], {"单位"}),
 				    // 1、连接BW QAS环境
 				    // 连接 BW QAS 环境：Implementation=2.0 用新版接口 / LanguageCode=ZH 返回中文 / EnableStructures=true 开启内置结构 / BatchSize 放大提升批量拉取性能
 				    数据源 = SapBusinessWarehouse.Cubes(QAS服务器, 系统编号, 客户端ID, [Implementation="2.0", LanguageCode="ZH", EnableStructures=true, BatchSize=500000000]),
@@ -183,25 +180,15 @@ table 'L2-01-25 工序成本完成情况'
 				            Query = Cube.Transform(基础查询, {
 				                // 设置 BW 期间参数 [ZMSDQNY] = 当前循环月份（BW 据此返回截止该月的累计数据）
 				                {Cube.ApplyParameter, "[ZMSDQNY]", {month}},
-				                // 展开维度并输出列名「大工序」
 				                {Cube.AddAndExpandDimensionColumn, "[ZEJGX]", {"[ZEJGX].[LEVEL01]"}, {"大工序"}},
-				                // 展开维度并输出列名「单位」
 				                {Cube.AddAndExpandDimensionColumn, "[4ZRCO_CP004-ZUNIT]", {"[4ZRCO_CP004-ZUNIT].[LEVEL01]"}, {"单位"}},
-				                // 展开维度并输出列名「矿体」
 				                {Cube.AddAndExpandDimensionColumn, "[ZKT]", {"[ZKT].[LEVEL01]"}, {"矿体"}},
-				                // 添加度量值「本月计划」
 				                {Cube.AddMeasureColumn, "本月计划", "[4VGQHR12MHZ3FQYRN4M06P70U].[4VGQHR12MHZ3FQYRN4M06DYHA]"},
-				                // 添加度量值「本月完成」
 				                {Cube.AddMeasureColumn, "本月完成", "[4VGQHR12MHZ3FQYRN4M06P70U].[4VGQHR12MHZ3FQYRN4M06DS5Q]"},
-				                // 添加度量值「累计完成率」
 				                {Cube.AddMeasureColumn, "累计完成率", "[4VGQHR12MHZ3FQYRN4M06P70U].[4VGQHR12MHZ1PGM5GIE7E7KFQ]"},
-				                // 添加度量值「年累计实际数」
 				                {Cube.AddMeasureColumn, "年累计实际数", "[4VGQHR12MHZ3FQYRN4M06P70U].[4VGQHR12MHZ3FQYRN4M06GEZ2]"},
-				                // 添加度量值「年累计预算数」
 				                {Cube.AddMeasureColumn, "年累计预算数", "[4VGQHR12MHZ3FQYRN4M06P70U].[4VGQHR12MHZ3FQYRN4M06GLAM]"},
-				                // 添加度量值「上月完成」
 				                {Cube.AddMeasureColumn, "上月完成", "[4VGQHR12MHZ3FQYRN4M06P70U].[4VGQHR12MHZ1PGM53NL89XZX5]"},
-				                // 添加度量值「完成率%」
 				                {Cube.AddMeasureColumn, "完成率%", "[4VGQHR12MHZ3FQYRN4M06P70U].[4VGQHR12MHZ3FQYRN4M06E4SU]"}
 				            }),
 				            // 加载日期标记
