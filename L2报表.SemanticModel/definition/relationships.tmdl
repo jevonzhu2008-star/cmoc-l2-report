@@ -38,3 +38,7 @@ relationship a315a8fb-a33b-2200-f509-4fb9552c8762
 	fromColumn: 'L2-01-03 快报-金融投资业务专属'.加载日期
 	toColumn: 日期表.日期
 
+relationship c81bcd78-1b4a-4c87-28ed-a2898393c97a
+	fromColumn: 'L2-01-25 工序成本完成情况'.加载日期
+	toColumn: 日期表.日期
+

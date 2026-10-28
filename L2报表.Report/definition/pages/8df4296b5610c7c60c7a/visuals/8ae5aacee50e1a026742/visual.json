@@ -1002,6 +1002,76 @@
         },
         "type": "Categorical",
         "howCreated": "User"
+      },
+      {
+        "name": "3985a8e92813a6569171",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "L2-01-04 S3 C1成本变化步行图VS上月"
+              }
+            },
+            "Property": "指标名称"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "3bc91b5110a3bc3ae277",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "L2-01-04 S3 C1成本变化步行图VS上月"
+              }
+            },
+            "Property": "矿体"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "2005f6309016a958ee7e",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "L2-01-04 S3 C1成本变化步行图VS上月"
+              }
+            },
+            "Property": "产品"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "87035da63896d05b0657",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "L2-01-04 S3 C1成本变化步行图VS上月"
+              }
+            },
+            "Property": "单位"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "7e03b180bca58c0b7305",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "度量值"
+              }
+            },
+            "Property": "L2-01-04指标值"
+          }
+        },
+        "type": "Advanced"
       }
     ],
     "filterSortOrder": "Custom"

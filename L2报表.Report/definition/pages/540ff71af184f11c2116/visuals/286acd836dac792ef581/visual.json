@@ -1002,6 +1002,76 @@
         },
         "type": "Categorical",
         "howCreated": "User"
+      },
+      {
+        "name": "baa917c98db00b0c609c",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "L2-01-14 物料单耗月表"
+              }
+            },
+            "Property": "指标名称"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "cf3ad616e4312098004e",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "L2-01-14 物料单耗月表"
+              }
+            },
+            "Property": "矿体"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "14cae560bdae0b7b3942",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "L2-01-14 物料单耗月表"
+              }
+            },
+            "Property": "中区东区"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "c681a5ca4abcb11000c4",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "L2-01-14 物料单耗月表"
+              }
+            },
+            "Property": "单位"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "4b437110c39b08002020",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "度量值"
+              }
+            },
+            "Property": "L2-01-14指标值"
+          }
+        },
+        "type": "Advanced"
       }
     ],
     "filterSortOrder": "Custom"

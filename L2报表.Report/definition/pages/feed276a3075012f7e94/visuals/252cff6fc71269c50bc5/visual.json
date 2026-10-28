@@ -907,6 +907,62 @@
         },
         "type": "Advanced",
         "howCreated": "User"
+      },
+      {
+        "name": "8f03b80fea1c186ecbd0",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "L2-03-06 矿石成本分析"
+              }
+            },
+            "Property": "指标名称"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "b754e8bfaba9806dd52e",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "L2-03-06 矿石成本分析"
+              }
+            },
+            "Property": "矿体"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "a8be12245661706b74d9",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "L2-03-06 矿石成本分析"
+              }
+            },
+            "Property": "指标项"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "d54b2de60030b640b0c1",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "度量值"
+              }
+            },
+            "Property": "L2-03-06指标值"
+          }
+        },
+        "type": "Advanced"
       }
     ],
     "filterSortOrder": "Custom"

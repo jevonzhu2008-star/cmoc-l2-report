@@ -1123,6 +1123,20 @@
           }
         },
         "type": "Categorical"
+      },
+      {
+        "name": "1aafbac427edc7c7478c",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "度量值"
+              }
+            },
+            "Property": "L2-01-03指标值"
+          }
+        },
+        "type": "Advanced"
       }
     ],
     "filterSortOrder": "Custom"

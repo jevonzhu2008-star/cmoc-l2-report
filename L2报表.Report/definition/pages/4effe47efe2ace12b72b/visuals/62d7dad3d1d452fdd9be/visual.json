@@ -1036,6 +1036,48 @@
         },
         "type": "Categorical",
         "howCreated": "User"
+      },
+      {
+        "name": "f265d17242a147927065",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "L2-03-02 财务费用汇总表"
+              }
+            },
+            "Property": "结构"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "d90f7e67e7ea86b7ba7c",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "L2-03-02 财务费用汇总表"
+              }
+            },
+            "Property": "指标名称"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "a30b6144dc711d022020",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "度量值"
+              }
+            },
+            "Property": "L2-03-02指标值"
+          }
+        },
+        "type": "Advanced"
       }
     ],
     "filterSortOrder": "Custom"

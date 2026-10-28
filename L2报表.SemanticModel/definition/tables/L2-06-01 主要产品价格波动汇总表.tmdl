@@ -25,10 +25,13 @@ table 'L2-06-01 主要产品价格波动汇总表'
 
 	column 加载日期
 		dataType: dateTime
+		isHidden
 		formatString: Long Date
 		lineageTag: 44b0e6ae-82ea-4c94-9279-0c27ed47e640
 		summarizeBy: none
 		sourceColumn: 加载日期
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -57,9 +60,12 @@ table 'L2-06-01 主要产品价格波动汇总表'
 
 	column 指标口径排序
 		dataType: double
+		isHidden
 		lineageTag: ca3c085b-90b8-498b-bac1-a2ac7740831b
 		summarizeBy: sum
 		sourceColumn: 指标口径排序
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -67,9 +73,12 @@ table 'L2-06-01 主要产品价格波动汇总表'
 
 	column 指标名称排序
 		dataType: double
+		isHidden
 		lineageTag: 2051efa0-4dc5-47e5-b7de-3fc927436f61
 		summarizeBy: sum
 		sourceColumn: 指标名称排序
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -77,9 +86,12 @@ table 'L2-06-01 主要产品价格波动汇总表'
 
 	column 产品排序
 		dataType: double
+		isHidden
 		lineageTag: d67d1770-fafb-464c-892d-155535616d23
 		summarizeBy: sum
 		sourceColumn: 产品排序
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 

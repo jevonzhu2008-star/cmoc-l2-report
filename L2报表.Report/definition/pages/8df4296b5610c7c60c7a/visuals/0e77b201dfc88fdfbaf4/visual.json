@@ -20,18 +20,35 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "L2-01-04 S3 C1成本变化步行图VS上月"
+                      "Entity": "日期表"
                     }
                   },
-                  "Property": "加载日期"
+                  "Property": "年月"
                 }
               },
-              "queryRef": "L2-01-04 S3 C1成本变化步行图VS上月.加载日期",
-              "nativeQueryRef": "加载日期",
+              "queryRef": "日期表.年月",
+              "nativeQueryRef": "年月",
               "active": true
             }
           ]
         }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "日期表"
+                  }
+                },
+                "Property": "年月"
+              }
+            },
+            "direction": "Descending"
+          }
+        ]
       }
     },
     "objects": {
@@ -56,8 +73,8 @@
                 "Version": 2,
                 "From": [
                   {
-                    "Name": "l",
-                    "Entity": "L2-01-04 S3 C1成本变化步行图VS上月",
+                    "Name": "日",
+                    "Entity": "日期表",
                     "Type": 0
                   }
                 ],
@@ -70,10 +87,10 @@
                             "Column": {
                               "Expression": {
                                 "SourceRef": {
-                                  "Source": "l"
+                                  "Source": "日"
                                 }
                               },
-                              "Property": "加载日期"
+                              "Property": "年月"
                             }
                           }
                         ],
@@ -81,7 +98,7 @@
                           [
                             {
                               "Literal": {
-                                "Value": "datetime'2026-03-01T00:00:00'"
+                                "Value": "202603L"
                               }
                             }
                           ]

@@ -19,10 +19,13 @@ table 'L2-01-14 物料单耗月表'
 
 	column 加载日期
 		dataType: dateTime
+		isHidden
 		formatString: Long Date
 		lineageTag: cc9f0af8-88ef-4520-bbe4-7374cc5cda45
 		summarizeBy: none
 		sourceColumn: 加载日期
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 

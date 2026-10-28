@@ -3,10 +3,13 @@ table 'L2-03-02 财务费用汇总表'
 
 	column 加载日期
 		dataType: dateTime
+		isHidden
 		formatString: Long Date
 		lineageTag: 7284d363-4974-49b0-a0bd-ec17ea367a5d
 		summarizeBy: none
 		sourceColumn: 加载日期
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 

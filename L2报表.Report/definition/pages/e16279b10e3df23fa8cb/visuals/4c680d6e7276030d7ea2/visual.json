@@ -155,5 +155,23 @@
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "bbb7ed8a21a05c330382",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "日期表"
+              }
+            },
+            "Property": "年月"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
   }
 }

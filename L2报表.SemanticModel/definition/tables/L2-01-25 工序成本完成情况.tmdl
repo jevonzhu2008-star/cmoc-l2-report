@@ -36,10 +36,13 @@ table 'L2-01-25 工序成本完成情况'
 
 	column 加载日期
 		dataType: dateTime
+		isHidden
 		formatString: Long Date
 		lineageTag: c44d9c18-ae65-495d-90fe-6323af12fd6a
 		summarizeBy: none
 		sourceColumn: 加载日期
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 

@@ -989,6 +989,76 @@
         },
         "type": "Categorical",
         "howCreated": "User"
+      },
+      {
+        "name": "b879b18b67b781235798",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "L2-01-25 工序成本完成情况"
+              }
+            },
+            "Property": "指标名称"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "be2441b591409a8261a8",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "L2-01-25 工序成本完成情况"
+              }
+            },
+            "Property": "矿体"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "2b0206e9eb4b93e90547",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "L2-01-25 工序成本完成情况"
+              }
+            },
+            "Property": "大工序"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "24b3d0f2ee7a2a248bdc",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "L2-01-25 工序成本完成情况"
+              }
+            },
+            "Property": "单位"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "f44d0f4bee6c570426a9",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "度量值"
+              }
+            },
+            "Property": "L2-01-25指标值"
+          }
+        },
+        "type": "Advanced"
       }
     ],
     "filterSortOrder": "Custom"

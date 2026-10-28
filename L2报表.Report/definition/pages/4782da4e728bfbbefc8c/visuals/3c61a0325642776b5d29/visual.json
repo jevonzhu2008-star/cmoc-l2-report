@@ -2,8 +2,8 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "3c61a0325642776b5d29",
   "position": {
-    "x": 32,
-    "y": 64,
+    "x": 32.858055411126792,
+    "y": 62.065215776572828,
     "z": 0,
     "height": 992,
     "width": 1855.9999999999998,
@@ -940,6 +940,62 @@
         },
         "type": "Advanced",
         "howCreated": "User"
+      },
+      {
+        "name": "45454761220724c471bc",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "L2-05-01 硫磺及硫酸价格分析月报"
+              }
+            },
+            "Property": "指标名称"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "9ed1dd3502521217cb31",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "L2-05-01 硫磺及硫酸价格分析月报"
+              }
+            },
+            "Property": "指标单位"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "1240d1a0e89e015b2905",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "L2-05-01 硫磺及硫酸价格分析月报"
+              }
+            },
+            "Property": "期间名称"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "684f4deb189a6d0913c6",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "度量值"
+              }
+            },
+            "Property": "L2-05-01指标值"
+          }
+        },
+        "type": "Advanced"
       }
     ],
     "filterSortOrder": "Custom"

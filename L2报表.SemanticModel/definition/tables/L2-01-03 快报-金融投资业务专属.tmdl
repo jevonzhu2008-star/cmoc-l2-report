@@ -33,10 +33,13 @@ table 'L2-01-03 快报-金融投资业务专属'
 
 	column 加载日期
 		dataType: dateTime
+		isHidden
 		formatString: Long Date
 		lineageTag: f56d50f9-5a7f-4e9c-8e80-a5b90d3ffb31
 		summarizeBy: none
 		sourceColumn: 加载日期
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 

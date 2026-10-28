@@ -25,10 +25,13 @@ table 'L2-03-06 矿石成本分析'
 
 	column 加载日期
 		dataType: dateTime
+		isHidden
 		formatString: Long Date
 		lineageTag: dfa6e2b4-6bee-47b0-b0ec-e44e4d24142f
 		summarizeBy: none
 		sourceColumn: 加载日期
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
