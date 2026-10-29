@@ -122,7 +122,7 @@ table 'L2-01-03 快报-金融投资业务专属'
 	partition 'L2-01-03 快报-金融投资业务专属' = m
 		mode: import
 		queryGroup: 财经
-		source = ```
+		source =
 				let
 				    /*
 				    【查询名称】ZRFI_CP012 金融投资业务专属 BW 取数
@@ -237,7 +237,6 @@ table 'L2-01-03 快报-金融投资业务专属'
 				    展开公司排序 = Table.ExpandTableColumn(左连接公司排序, "公司映射临时", {"公司代码排序"}, {"公司代码排序"})
 				in
 				    展开公司排序
-				```
 
 	annotation PBI_ResultType = Table
 

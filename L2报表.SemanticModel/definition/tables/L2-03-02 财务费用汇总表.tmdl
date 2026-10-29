@@ -90,7 +90,7 @@ table 'L2-03-02 财务费用汇总表'
 	partition 'L2-03-02 财务费用汇总表' = m
 		mode: import
 		queryGroup: 财经
-		source = ```
+		source =
 				let
 				    /*
 				    【查询名称】ZRFI_CP010 财务费用汇总表 BW 取数
@@ -197,7 +197,6 @@ table 'L2-03-02 财务费用汇总表'
 				    展开结构排序 = Table.ExpandTableColumn(左连接结构排序, "结构映射临时", {"结构排序"}, {"结构排序"})
 				in
 				    展开结构排序
-				```
 
 	annotation PBI_ResultType = Table
 

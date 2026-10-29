@@ -42,3 +42,27 @@ relationship c81bcd78-1b4a-4c87-28ed-a2898393c97a
 	fromColumn: 'L2-01-25 工序成本完成情况'.加载日期
 	toColumn: 日期表.日期
 
+relationship AutoDetected_57be3ee7-455b-466d-9237-623c62145eb1
+	fromColumn: 'L2-04-01 库存汇总表'.矿体
+	toColumn: 矿体表.矿体
+
+relationship AutoDetected_2e9dc38f-db55-48d7-b959-25a2579cc914
+	fromColumn: 'L2-01-04 S3 C1成本变化步行图VS上月'.矿体
+	toColumn: 矿体表.矿体
+
+relationship AutoDetected_e942affb-9845-431c-b303-3bcaedd6e658
+	fromColumn: 'L2-01-14 物料单耗月表'.矿体
+	toColumn: 矿体表.矿体
+
+relationship AutoDetected_e3029839-9ad8-426d-b3cb-5060d62d28a8
+	fromColumn: 'L2-01-25 工序成本完成情况'.矿体
+	toColumn: 矿体表.矿体
+
+relationship AutoDetected_367aa890-e959-455c-8b39-ee5ef47cb84b
+	fromColumn: 'L2-03-06 矿石成本分析'.矿体
+	toColumn: 矿体表.矿体
+
+relationship d699370b-c959-fbe7-f5e8-3edb25851011
+	fromColumn: 'L2-03-01 销售管理费用预算执行汇总表'.业务板块
+	toColumn: 矿体表.矿体
+

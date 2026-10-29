@@ -156,12 +156,11 @@ table 度量值
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// 当前月报期间：取日期表的最大日期，格式化为「当前月报期间: yyyy年MM月」，供各内容页顶部卡片展示
-	measure 当前月报期间 = ```
-    VAR _Date = MAX('日期表'[日期])
-    VAR _YearMonth = FORMAT(_Date,"yyyy年MM月")
-    RETURN
-        "当前月报期间: " & _YearMonth
-    ```
+	measure 当前月报期间 =
+			VAR _Date = MAX('日期表'[日期])
+			VAR _YearMonth = FORMAT(_Date,"yyyy年MM月")
+			RETURN
+			    "当前月报期间: " & _YearMonth
 		displayFolder: 辅助
 		lineageTag: 3bef2f0e-ee99-49e7-ad9c-0e69ad93164d
 

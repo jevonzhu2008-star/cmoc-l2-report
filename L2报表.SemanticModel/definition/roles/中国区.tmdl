@@ -1,0 +1,7 @@
+role 中国区
+	modelPermission: read
+
+	tablePermission 矿体表 = [矿体] == "中国区"
+
+	annotation PBI_Id = 4cff0094515542ed993b2b02532ebded
+

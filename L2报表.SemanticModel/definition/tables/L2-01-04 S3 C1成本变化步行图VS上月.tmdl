@@ -111,7 +111,7 @@ table 'L2-01-04 S3 C1成本变化步行图VS上月'
 	partition 'L2-01-04 S3 C1成本变化步行图VS上月' = m
 		mode: import
 		queryGroup: 财经
-		source = ```
+		source =
 				let
 				    /*
 				    【查询名称】ZRCO_CP011 S3 C1成本变化步行图VS上月 BW 取数
@@ -206,7 +206,6 @@ table 'L2-01-04 S3 C1成本变化步行图VS上月'
 				    展开矿体排序 = Table.ExpandTableColumn(左连接矿体排序, "映射矿体", {"矿体排序"}, {"矿体排序"})
 				in
 				    展开矿体排序
-				```
 
 	annotation PBI_ResultType = Table
 
