@@ -16,6 +16,9 @@ table 矿体表
 		lineageTag: 095ed839-7bf1-49ef-b165-5a1a11dc4871
 		summarizeBy: none
 		sourceColumn: 矿体
+		sortByColumn: 矿体排序
+
+		changedProperty = SortByColumn
 
 		annotation SummarizationSetBy = Automatic
 
@@ -24,16 +27,17 @@ table 矿体表
 		queryGroup: 辅助
 		source =
 				let
-				   // ========== 1. 读取 SharePoint 上的结构排序映射表 ==========
+				    // ========== 1. 读取 SharePoint 上的维度表 ==========
 				    // 连接财经 SharePoint 站点，列出全部文件（ApiVersion=15 为较新 REST API），结果为文件列表表
 				    源 = SharePoint.Files(财经SharePoint站点, [ApiVersion = 15]),
-				    // 筛选文件名含「L2-01-02 集团合并利润汇总表指标映射」且扩展名为 .xlsx 的文件，取第一个并读取其 [Content]（二进制内容）
+				    // 筛选文件名含「维度表」且扩展名为 .xlsx 的文件，取第一个并读取其 [Content]（二进制内容）
 				    维度表文件 = Table.SelectRows(源, each Text.Contains([Name], "维度表") and [Extension] = ".xlsx"){0}[Content],
 				    // 工作簿只解析一次，后续各 Sheet 直接取用（同一 xlsx 反复解析会拖慢刷新）
 				    矿体工作簿 = Excel.Workbook(维度表文件, true),
+				    // 取「矿体」Sheet 并按矿体去重：作为维度表供各事实表按矿体筛选，也是四个 RLS 角色的过滤依据
 				    矿体表 = Table.Distinct(矿体工作簿{[Item = "矿体", Kind = "Sheet"]}[Data], {"矿体"})
 				in
-				  矿体表
+				    矿体表
 
 	annotation PBI_ResultType = Table
 
