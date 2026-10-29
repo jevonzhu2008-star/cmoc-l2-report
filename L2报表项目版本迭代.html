@@ -95,6 +95,15 @@ svg text{font-family:var(--sans)}
 <script>
 const DATA = [
   {
+    "short": "de42c49",
+    "date": "2026-10-29 15:16",
+    "msg": "L2-04-01 库存汇总表改为「指标名称/指标值」长表结构，重建该页报表",
+    "files": 10,
+    "add": 384,
+    "del": 199,
+    "ms": false
+  },
+  {
     "short": "5074400",
     "date": "2026-10-29 10:33",
     "msg": "切片器改用「年月筛选」并新增「当前月报期间」卡片，L2-01-04 切换至 ZRCO_CP011",
@@ -449,6 +458,16 @@ const DATA = [
 
 // 完整提交备注（由 update-version-html.py 维护，去 Co-Authored-By）
 const NOTES = {
+  "de42c49": [
+    "- M：BW 取数由「金额(人民币)/量(吨)」2 个宽列改为 18 个度量（人民币金额、原币金额、吨位 × 当月实际/环比/去年实际/月-1/2/3），逆透视成长表后再按空格把「指标名称」拆成「指标名称 + 结构」",
+    "- M：新增「矿体v」辅助列（矿体副本，供报表另一种展示逻辑）；Cube 只实例化一次；数值列 null 统一替换为 0，维度文本保留 null",
+    "- M：头部注释重写为业务口径说明，步骤编号 1~9",
+    "- 模型：删除 L2-04-01 的「金额(人民币)」「量(吨)」两列，新增「指标名称」「指标值」「矿体v」；「结构」补 sortByColumn = 结构排序",
+    "- DAX：金额(人民币)、量(吨) 由直接 SUM 列改为按「指标名称」过滤后 SUM(指标值)；新增「金额(原币)」",
+    "- 报表：L2-04-01 页面重建（新 UUID 72b8f9de0e30717743ca），矩阵改为 分类/结构/矿体 + 金额(人民币)/金额(原币)/量(吨) 三个度量，新增「矿体」切片器，沿用「年月筛选」切片器与「当前月报期间」卡片",
+    "- 报表：pages.json 同步替换页面 UUID，活动页改为 L2-03-02 财务费用汇总表",
+    "- 模型：辅助 queryGroup 的 PBI_QueryGroupOrder 由 5 改为 2"
+  ],
   "5074400": [
     "- 日期表：新增「年月筛选」文本列，范围内最大年月显示为「最近月份」，其余显示 yyyy-MM，并沿用「年月」排序",
     "- 报表：11 个内容页的切片器由「年月」改为「年月筛选」（默认选「最近月份」），加入同名同步组，翻页时筛选保持一致",
@@ -784,7 +803,7 @@ const NOTES = {
 const totalAdd = DATA.reduce((s,d)=>s+d.add,0);
 const totalDel = DATA.reduce((s,d)=>s+d.del,0);
 const totalFiles = DATA.reduce((s,d)=>s+d.files,0);
-const days = "8.7";
+const days = "8.9";
 
 document.getElementById('kpis').innerHTML = `
   <div class="kpi"><div class="n">${DATA.length}</div><div class="l">提交数（main）</div></div>
