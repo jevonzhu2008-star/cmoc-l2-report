@@ -1,0 +1,59 @@
+table Security_Ore_Permission
+	isHidden
+	lineageTag: 50a7eec2-7053-4e73-a345-77ff3272cebb
+
+	column UPN
+		dataType: string
+		isHidden
+		lineageTag: c5329526-87da-4306-8ccb-3c28cb20662a
+		summarizeBy: none
+		sourceColumn: UPN
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column OreName
+		dataType: string
+		isHidden
+		lineageTag: 1860532b-a60a-4abb-88c3-ebc68276dd80
+		summarizeBy: none
+		sourceColumn: OreName
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsActive
+		dataType: boolean
+		isHidden
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: f4e15a1c-3047-4729-aaed-21bb4c91bb2a
+		summarizeBy: none
+		sourceColumn: IsActive
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Security_Ore_Permission = m
+		mode: import
+		queryGroup: 辅助
+		source =
+				let
+				    // ========== 1. 读取 SharePoint 上的维度表 ==========
+				    // 连接财经 SharePoint 站点，列出全部文件（ApiVersion=15 为较新 REST API），结果为文件列表表
+				    源 = SharePoint.Files(财经SharePoint站点, [ApiVersion = 15]),
+				
+				    权限文件 = Table.SelectRows(源, each Text.Contains([Name], "Security_Ore_Permission") and [Extension] = ".xlsx"){0}[Content],
+				
+				    权限工作簿 = Excel.Workbook(权限文件, true),
+				
+				    矿体表 = Table.Distinct(权限工作簿{[Item = "Security_Ore_Permission", Kind = "Sheet"]}[Data], {"UPN"})
+				in
+				    矿体表
+
+	changedProperty = IsHidden
+
+	annotation PBI_ResultType = Table
+

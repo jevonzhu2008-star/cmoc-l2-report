@@ -22,7 +22,7 @@ queryGroup 辅助
 
 annotation __PBI_TimeIntelligenceEnabled = 0
 
-annotation PBI_QueryOrder = ["QAS服务器","系统编号","客户端ID","p_月报起始日期","p_月报终止日期","L2-01-02 集团合并利润汇总表","L2-01-03 快报-金融投资业务专属","L2-01-04 S3 C1成本变化步行图VS上月","L2-01-14 物料单耗月表","L2-01-25 工序成本完成情况","L2-03-01 销售管理费用预算执行汇总表","L2-03-02 财务费用汇总表","L2-03-06 矿石成本分析","L2-04-01 库存汇总表","L2-05-01 硫磺及硫酸价格分析月报","L2-06-01 主要产品价格波动汇总表","财经SharePoint站点","动态年月偏移","度量值","矿体表","日期表"]
+annotation PBI_QueryOrder = ["QAS服务器","系统编号","客户端ID","p_月报起始日期","p_月报终止日期","L2-01-02 集团合并利润汇总表","L2-01-03 快报-金融投资业务专属","L2-01-04 S3 C1成本变化步行图VS上月","L2-01-14 物料单耗月表","L2-01-25 工序成本完成情况","L2-03-01 销售管理费用预算执行汇总表","L2-03-02 财务费用汇总表","L2-03-06 矿石成本分析","L2-04-01 库存汇总表","L2-05-01 硫磺及硫酸价格分析月报","L2-06-01 主要产品价格波动汇总表","财经SharePoint站点","动态年月偏移","度量值","矿体表","日期表","Security_Ore_Permission"]
 
 annotation PBI_ProTooling = ["MCP-PBIModeling","DevMode"]
 
@@ -40,11 +40,9 @@ ref table 'L2-03-06 矿石成本分析'
 ref table 'L2-06-01 主要产品价格波动汇总表'
 ref table 日期表
 ref table 矿体表
+ref table Security_Ore_Permission
 
-ref role 集团
-ref role KFM
-ref role TFM
-ref role 中国区
+ref role Role_Dynamic_OreFilter
 
 ref cultureInfo zh-CN
 

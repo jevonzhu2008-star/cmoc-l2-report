@@ -1,7 +1,0 @@
-role TFM
-	modelPermission: read
-
-	tablePermission 矿体表 = [矿体] == "TFM"
-
-	annotation PBI_Id = 5100326f99904d5eb10c5cdca9d531c9
-

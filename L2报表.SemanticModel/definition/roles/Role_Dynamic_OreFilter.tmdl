@@ -1,0 +1,20 @@
+role Role_Dynamic_OreFilter
+	modelPermission: read
+
+	tablePermission 矿体表 =
+			VAR CurrentUPN = USERPRINCIPALNAME()
+			// 获取当前用户所有生效矿体权限
+			VAR UserOrePermissions =
+			    CALCULATETABLE(
+			        'Security_Ore_Permission',
+			        'Security_Ore_Permission'[UPN] = CurrentUPN,
+			        'Security_Ore_Permission'[IsActive] = TRUE
+			    )
+			VAR CurrentOre = '矿体表'[矿体]
+			VAR HasAllOreAccess = "*" IN SELECTCOLUMNS(UserOrePermissions,"Ore",[OreName])
+			VAR HasSingleOreAccess = CurrentOre IN SELECTCOLUMNS(UserOrePermissions,"Ore",[OreName])
+			RETURN
+			HasAllOreAccess || HasSingleOreAccess
+
+	annotation PBI_Id = f413cb0f2da84114a51ec1ccac75c923
+

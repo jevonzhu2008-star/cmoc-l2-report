@@ -1,5 +1,0 @@
-role 集团
-	modelPermission: read
-
-	annotation PBI_Id = f82932b8eb244c658b122370005684c7
-

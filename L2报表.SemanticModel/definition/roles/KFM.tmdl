@@ -1,7 +1,0 @@
-role KFM
-	modelPermission: read
-
-	tablePermission 矿体表 = [矿体] == "KFM"
-
-	annotation PBI_Id = d8eb2841beb046ff841f33767ed1be9d
-
