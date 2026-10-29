@@ -95,6 +95,15 @@ svg text{font-family:var(--sans)}
 <script>
 const DATA = [
   {
+    "short": "1c56b49",
+    "date": "2026-10-29 17:34",
+    "msg": "RLS 改为动态矿体权限，L2-04-01 页设为可见",
+    "files": 9,
+    "add": 84,
+    "del": 34,
+    "ms": false
+  },
+  {
     "short": "522e5f8",
     "date": "2026-10-29 16:17",
     "msg": "矿体表补排序依据并修正 M 注释与缩进",
@@ -494,6 +503,12 @@ const DATA = [
 
 // 完整提交备注（由 update-version-html.py 维护，去 Co-Authored-By）
 const NOTES = {
+  "1c56b49": [
+    "- 模型：删除 集团 / KFM / TFM / 中国区 四个静态角色，改为单个动态角色 Role_Dynamic_OreFilter；按 USERPRINCIPALNAME() 关联新表 Security_Ore_Permission（UPN / OreName / IsActive），矿体表中 OreName 命中或含「*」（全部权限）的行可见",
+    "- 模型：新增隐藏表 Security_Ore_Permission，从 SharePoint 上「Security_Ore_Permission」xlsx 的同名 Sheet 读取，queryGroup 辅助；model.tmdl 补 ref table、ref role 与 PBI_QueryOrder",
+    "- 报表：L2-04-01 页面去掉 HiddenInViewMode（改为可见页），pages.json 的 activePageName 指向该页；landingPageName 仍是首页",
+    "- 校验：MCP 重新连接正常载入（15 张表 / 24 个度量值 / 17 条关系）"
+  ],
   "522e5f8": [
     "- 模型：「矿体」补 sortByColumn = 矿体排序，切片器与矩阵按映射表的业务顺序排列，而不是按拼音 —— 经 MCP 连接确认该列 sortByColumn 已生效、状态 Ready",
     "- M 注释：第 1 步标题「读取 SharePoint 上的结构排序映射表」改为「读取 SharePoint 上的维度表」；筛选条件改写成「维度表」（原注释照抄了 L2-01-02 指标映射的文件名，与代码不符）；为「矿体」Sheet 去重一行补说明（供事实表筛选与四个 RLS 角色过滤）",
@@ -869,7 +884,7 @@ const NOTES = {
 const totalAdd = DATA.reduce((s,d)=>s+d.add,0);
 const totalDel = DATA.reduce((s,d)=>s+d.del,0);
 const totalFiles = DATA.reduce((s,d)=>s+d.files,0);
-const days = "8.9";
+const days = "9.0";
 
 document.getElementById('kpis').innerHTML = `
   <div class="kpi"><div class="n">${DATA.length}</div><div class="l">提交数（main）</div></div>
