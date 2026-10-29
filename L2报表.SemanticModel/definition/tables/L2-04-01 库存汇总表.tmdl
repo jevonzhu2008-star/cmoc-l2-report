@@ -110,6 +110,7 @@ table 'L2-04-01 库存汇总表'
 		lineageTag: 374cb4f0-adcf-4a28-9457-47291b12ab54
 		summarizeBy: none
 		sourceColumn: 矿体v
+		sortByColumn: 矿体排序
 
 		changedProperty = SortByColumn
 

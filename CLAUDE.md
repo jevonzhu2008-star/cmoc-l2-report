@@ -34,17 +34,20 @@ git add -A && git commit -m "…"    # 唯一的日常工作流入口
 `L2报表.SemanticModel/definition/` 下：
 
 - `database.tmdl` —— `compatibilityLevel: 1702`
-- `model.tmdl` —— culture `zh-CN`、queryGroup（**参数 / 财经 / 辅助**）、全部 `ref table`、`PBI_QueryOrder`。**模型没有任何 relationship**，筛选靠各表独立（`valueFilterBehavior: independent`）与报表内切片器
+- `model.tmdl` —— culture `zh-CN`、queryGroup（**参数 / 财经 / 辅助**）、全部 `ref table`、`PBI_QueryOrder`；`valueFilterBehavior: independent`
+- `relationships.tmdl` —— **11 条关系**，一律「事实表.加载日期 → 日期表.日期」的多对一单列关系；报表里的「年月筛选」切片器就是靠它同时筛所有内容页
 - `expressions.tmdl` —— 全部取数参数（`IsParameterQuery`），共 7 个：`QAS服务器`、`系统编号`、`客户端ID`、`p_月报起始日期`、`p_月报终止日期`、`财经SharePoint站点`、`动态年月偏移`
 - `functions.tmdl` —— DAX 用户函数，只有两个：`FormatAmount`（`"#,0;(#,0);0"`）与 `FormatRatio`（`"+0.00%;-0.00%;0.00%"`），无参数、直接返回格式字符串，度量值通过 `formatStringDefinition` 引用
-- `tables/` —— 每个表一个 `.tmdl`（10 张事实表 + `度量值` 表）
+- `tables/` —— 每个表一个 `.tmdl`（11 张事实表 + `度量值` 表 + `日期表`）
 - `cultures/zh-CN.tmdl` —— Q&A 语言架构（`linguisticMetadata`，约 2000 行自动生成）。改列名/表名后不必手改，里面有历史遗留的孤儿条目（如 `_has_…`）属正常现象
 
 ### 表的业务组织
 
-10 张事实表，全部是 L2 编号的集团财经表，命名格式 `L2-编号 业务名称`：
+11 张事实表，全部是 L2 编号的集团财经表，命名格式 `L2-编号 业务名称`：
 
-`L2-01-02 集团合并利润汇总表`、`L2-01-03 快报-金融投资业务专属`、`L2-01-04 S3 C1成本变化步行图VS上月`、`L2-01-14 物料单耗月表`、`L2-01-25 工序成本完成情况`、`L2-03-01 销售管理费用预算执行汇总表`、`L2-03-02 财务费用汇总表`、`L2-03-06 矿石成本分析`、`L2-04-01 库存汇总表`、`L2-05-01 硫磺及硫酸价格分析月报`。
+`L2-01-02 集团合并利润汇总表`、`L2-01-03 快报-金融投资业务专属`、`L2-01-04 S3 C1成本变化步行图VS上月`、`L2-01-14 物料单耗月表`、`L2-01-25 工序成本完成情况`、`L2-03-01 销售管理费用预算执行汇总表`、`L2-03-02 财务费用汇总表`、`L2-03-06 矿石成本分析`、`L2-04-01 库存汇总表`、`L2-05-01 硫磺及硫酸价格分析月报`、`L2-06-01 主要产品价格波动汇总表`。
+
+另有一张 `日期表`：由 `p_月报起始日期` ~ `p_月报终止日期` 在 M 里生成连续日期，派生 `年 / 月 / 年月 / 年排序 / 月排序 / 年月筛选`（`年月筛选` 把范围内最大年月显示为「最近月份」，其余为 `yyyy-MM`，供切片器用）。它是模型里唯一被所有事实表指向的维度表。
 
 映射/排序数据**不进模型表**，而是在各自的 M 查询里读 SharePoint 上的「<表名>指标映射.xlsx」并 `NestedJoin` 物化进事实表（带出 `结构排序`、`指标名称排序` 等隐藏排序列，供 `sortByColumn` 使用）。
 
@@ -53,49 +56,53 @@ git add -A && git commit -m "…"    # 唯一的日常工作流入口
 每张事实表的 M 查询骨架一致，读一张就能推断其余：
 
 1. `SharePoint.Files(财经SharePoint站点, [ApiVersion=15])` 筛出该表的指标映射 xlsx，`Excel.Workbook` 取排序工作表
-2. `SapBusinessWarehouse.Cubes(QAS服务器, 系统编号, 客户端ID, [Implementation="2.0", LanguageCode="ZH", …])` → `{[Name=Cube]}` → `{[Id="Cube/Query"]}`
+2. `SapBusinessWarehouse.Cubes(QAS服务器, 系统编号, 客户端ID, [Implementation="2.0", LanguageCode="ZH", …])` → `{[Name=Cube]}` → `{[Id="Cube/Query"]}`；**Cube 只在循环外实例化一次**，循环里只做 `Cube.Transform`
 3. `List.Generate(() => p_月报起始日期, each _ <= p_月报终止日期, each Date.AddMonths(_, 1))` 生成月份序列，再转成 **YYYYMM 文本**
 4. 每月 `Cube.Transform`：`Cube.ApplyParameter "[ZMSDQNY]"` → 展开维度 → `AddMeasureColumn`
 5. 追加 `加载日期` = 该月 1 日（**date 类型**，格式 `yyyy-M-d`）
-6. null → 0，`Table.UnpivotOtherColumns` 逆透视成「指标名称 / 指标值」长表（L2-01-02 例外：逆透视成「月份 / 实际值」，再派生 `月份排序`、`季度`）
+6. null → 0，`Table.UnpivotOtherColumns` 逆透视成「指标名称 / 指标值」长表（L2-01-02 例外：逆透视成「月份 / 实际值」，再派生 `月份排序`、`季度`；L2-04-01 例外：BW 度量名本身写成「金额(人民币) 当月实际」这类「指标 + 结构」格式，逆透视后再 `Table.SplitColumn` 按空格拆出 `结构` 列）
 7. 左连接排序映射表，展开排序字段
 
 **关键约束**：循环里的 `month` 变量是 **YYYYMM 文本**（BW 参数 `[ZMSDQNY]` 的要求），而 `加载日期` 列是 **date**。两者不能混用——直接把 `month` 赋给日期列会抛类型错误，必须 `#date(Number.From(Text.Start(month,4)), Number.From(Text.End(month,2)), 1)`。
 
 ### 度量值集中管理
 
-22 个度量值全部在 `tables/度量值.tmdl` 的「度量值」表里，**不散落到事实表**。`displayFolder` 用**源表名**分组（如 `L2-01-02 集团合并利润汇总表`），新增度量值沿用。
+24 个度量值全部在 `tables/度量值.tmdl` 的「度量值」表里，**不散落到事实表**。`displayFolder` 用**源表名**分组（如 `L2-01-02 集团合并利润汇总表`），新增度量值沿用；跨页共用的辅助度量（`当前月报期间`）放 `辅助`。
 
-格式约定：金额类 + `formatStringDefinition = FormatAmount()`；比率类 + `FormatRatio()`；混合口径的长表指标值（`L2-01-04指标值`、`L2-01-14指标值`、`L2-01-25指标值`、`L2-03-06指标值`）不用 UDF，改打 `annotation PBI_FormatHint = {"isGeneralNumber":true}`。
+长表（指标名称 / 指标值）的表，度量值一律 `CALCULATE(SUM(<表>[指标值]), <表>[指标名称] = "…")`，不要直接 SUM 某个物理列——`L2-04-01` 的 `金额(人民币)`、`金额(原币)`、`量(吨)` 就是这种写法，报表里再用「结构」列区分当月/环比/去年同期/月-1~3。
+
+格式约定：金额类 + `formatStringDefinition = FormatAmount()`；比率类 + `FormatRatio()`；混合口径的长表指标值（`L2-01-04指标值`、`L2-01-14指标值`、`L2-01-25指标值`、`L2-03-06指标值`、`L2-06-01指标值`）不用 UDF，改打 `annotation PBI_FormatHint = {"isGeneralNumber":true}`。
 
 ## 报告（PBIR）
 
 `L2报表.Report/definition/pages/` 下每个页面是一个 **UUID 命名目录**（`page.json` + `visuals/<uuid>/visual.json`）。顺序、活动页、落地页都在 `pages/pages.json` 的 `pageOrder` / `activePageName` / `landingPageName` 里，值是页面目录的 UUID。
 
-当前 **11 个页面，1 个可见 + 10 个隐藏**。按 `pageOrder`：
+当前 **12 个页面，1 个可见 + 11 个隐藏**。按 `pageOrder`：
 
 | UUID | displayName | 说明 |
 |---|---|---|
 | `e6f9a94ed6eff9e91d95` | L2报表 | **首页 / 落地页**，仅一个圆角矩形标题形状 |
-| `50df5dd79c9c19213b42` | L2-01-02 集团合并利润汇总表 | 2 个矩阵 + 切片器 |
+| `50df5dd79c9c19213b42` | L2-01-02 集团合并利润汇总表 | 2 个矩阵 |
 | `020a059bfd06b6347883` | L2-01-03 快报-金融投资业务专属 | |
-| `8df4296b5610c7c60c7a` | L2-01-04 S3 C1成本变化步行图VS上月 | 多一个瀑布图 `waterfallChart` |
+| `8df4296b5610c7c60c7a` | L2-01-04 S3 C1成本变化步行图VS上月 | |
 | `540ff71af184f11c2116` | L2-01-14 物料单耗月表 | |
 | `98de86891699048a660e` | L2-01-25 工序成本完成情况 | |
 | `e16279b10e3df23fa8cb` | L2-03-01 销售管理费用预算执行汇总表 | |
 | `4effe47efe2ace12b72b` | L2-03-02 财务费用汇总表 | |
 | `feed276a3075012f7e94` | L2-03-06 矿石成本分析 | |
-| `4dd8b19487bd640b4b60` | L2-04-01库存汇总表 | |
+| `72b8f9de0e30717743ca` | L2-04-01库存汇总表 | 多一个「矿体」切片器 |
 | `4782da4e728bfbbefc8c` | L2-05-01 硫磺及硫酸价格分析月报 | |
+| `e3b3b9f3eab1c72826c8` | L2-06-01 主要产品价格波动汇总表 | |
 
-- 除首页外，10 个内容页都在 `page.json` 里带 `"visibility": "HiddenInViewMode"`，画布统一 1920 × 1080。
-- **每个内容页的标准构成 = 1 个矩阵（`pivotTable`）+ 1 个「加载日期」切片器**。切片器选 `加载日期` 列并按日期区间筛选，是各页唯一的交互入口。
+- 除首页外，11 个内容页都在 `page.json` 里带 `"visibility": "HiddenInViewMode"`，画布统一 1920 × 1080。
+- **每个内容页的标准构成 = 1 个矩阵（`pivotTable`）+ 1 个「年月筛选」切片器 + 1 个「当前月报期间」卡片**。切片器取 `日期表.年月筛选`，默认选「最近月份」，并挂同名 `syncGroup`（`fieldChanges` / `filterChanges` 均开），翻页时筛选保持一致；卡片显示 `度量值.当前月报期间`（`当前月报期间: yyyy年MM月`）。
+- 切片器能筛所有表，是因为每个事实表的 `加载日期` 都与 `日期表[日期]` 建了关系（见 `relationships.tmdl`）。新增事实表时别忘了补这条关系，否则新页的切片器对它无效。
 - 首页导航按钮**尚未添加**——当前 view 模式只能看到首页那一个标题形状，这是预期状态，不要当成 bug。
 - 主题在 `definition/report.json`：基础主题 `Fluent2-CY26SU09` + 自定义主题 `StaticResources/RegisteredResources/dba7299791721089146.json`。
 
 ## 数据源
 
-- **SAP BW**：只保留了 QAS 环境 `10.43.15.32`（参数 `QAS服务器`，10 张表全部引用它）。切生产就是改这一个参数值，不存在单独的「生产服务器」参数。
+- **SAP BW**：只保留了 QAS 环境 `10.43.15.32`（参数 `QAS服务器`，11 张表全部引用它）。切生产就是改这一个参数值，不存在单独的「生产服务器」参数。
 - **SharePoint**：财经站点 `https://xsyzz.sharepoint.com/sites/CMOCGroup/`（参数 `财经SharePoint站点`），用于读指标映射 xlsx。
 - 连接凭据在 `.pbi/localSettings.json`（已 gitignore）。
 
