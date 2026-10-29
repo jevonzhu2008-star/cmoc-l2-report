@@ -125,117 +125,114 @@ table 'L2-04-01 库存汇总表'
 				    【查询名称】ZRMM_CP002 库存汇总表 BW 取数
 				    【对应报表】L2-04-01 库存汇总表
 				    【BW对象】Cube:ZRMM_CP002，Query:ZRMM_CP002_Q0001
-				    【业务说明】
-				        1、按月循环拉取BW数据，区间由参数 p_月报起始日期、p_月报终止日期控制
-				        2、BW参数 ZMSDQNY 传入 YYYYMM，拉取对应期间指标
-				        3、维度：分类、矿体；指标包含人民币金额、原币金额、产量（吨），配套当月/环比/去年同期/近3个月历史值
-				        4、拉取后转为长表结构，拆分指标维度，关联外部排序映射表，用于报表内自定义排序
-				        5、BW Cube仅初始化一次，避免循环内重复建立BW会话，提升刷新性能
+				    【说明】
+				        1、按月循环拉取 BW 数据，区间由参数 p_月报起始日期、p_月报终止日期控制
+				        2、BW 参数 [ZMSDQNY] 传入 YYYYMM，拉取对应期间指标
+				        3、维度：分类、矿体；「结构」不是 BW 维度，而是逆透视后按空格拆分指标名称得到的一列，另加「矿体v」作为矿体副本辅助列
+				        4、指标共 18 个，分三组：金额(人民币)、金额(原币)、量(吨)，每组含当月实际、环比、去年实际、月-1/2/3 实际
+				        5、拉取后转为长表结构，再依次左连接分类、结构、矿体 3 个排序映射 Sheet，用于报表内自定义排序
+				        6、BW Cube 仅初始化一次，避免循环内重复建立 BW 会话，提升刷新性能
 				    */
-				
-				    // ========== 1. 初始化BW数据源，Cube实例化一次 ==========
+				    // ========== 1. 连接 BW QAS 环境（Cube 只实例化一次） ==========
 				    源 = SapBusinessWarehouse.Cubes(QAS服务器, 系统编号, 客户端ID , [Implementation="2.0"]),
 				    ZRMM_CP002 = 源{[Name="ZRMM_CP002"]}[Data],
 				    Cube = ZRMM_CP002{[Id="ZRMM_CP002/ZRMM_CP002_Q0001"]}[Data],
-				
-				    // ========== 2. 读取SharePoint排序映射表（用于报表维度排序） ==========
-				    // 访问SharePoint文档库，筛选指标映射Excel文件
+				    // ========== 2. 读取 SharePoint 排序映射表（用于报表维度排序） ==========
+				    // 连接财经 SharePoint 站点，列出全部文件（ApiVersion=15 为较新 REST API），结果为文件列表表
 				    源2 = SharePoint.Files(财经SharePoint站点, [ApiVersion = 15]),
+				    // 筛选文件名含「L2-04-01库存汇总表指标映射」且扩展名为 .xlsx 的文件，取第一个并读取其 [Content]（二进制内容）
 				    指标映射文件 = Table.SelectRows(源2, each Text.Contains([Name], "L2-04-01库存汇总表指标映射") and [Extension] = ".xlsx"){0}[Content],
-				    // 读取Excel工作簿，一次性加载所有Sheet
+				    // 工作簿只解析一次，后续各 Sheet 直接取用（同一 xlsx 反复解析会拖慢刷新）
 				    指标映射工作簿 = Excel.Workbook(指标映射文件, true),
-				    // 分类排序表：去重+清洗文本空格，保证关联匹配稳定
+				    // 分类排序表：去重 + 清洗文本空格，保证关联匹配稳定
 				    分类排序表 = Table.Distinct(Table.TransformColumns(指标映射工作簿{[Item = "分类排序", Kind = "Sheet"]}[Data], {{"分类", each try Text.Trim(Text.From(_)) otherwise _, type text}}), {"分类"}),
-				    // 结构排序表：去重+清洗文本空格
+				    // 结构排序表：去重 + 清洗文本空格，保证关联匹配稳定
 				    结构排序表 = Table.Distinct(Table.TransformColumns(指标映射工作簿{[Item = "结构排序", Kind = "Sheet"]}[Data], {{"结构", each try Text.Trim(Text.From(_)) otherwise _, type text}}), {"结构"}),
-				    // 矿体排序表：去重+清洗文本空格
+				    // 矿体排序表：去重 + 清洗文本空格，保证关联匹配稳定
 				    矿体排序表 = Table.Distinct(Table.TransformColumns(指标映射工作簿{[Item = "矿体排序", Kind = "Sheet"]}[Data], {{"矿体", each try Text.Trim(Text.From(_)) otherwise _, type text}}), {"矿体"}),
-				
-				    // ========== 3. 循环月份参数配置 ==========
-				    // 起始月份，PowerBI参数（Date类型）
+				    // ========== 3. 月份循环配置 ==========
+				    // 循环起始月份，取自 Power BI 参数 p_月报起始日期（date 类型）
 				    起始月份 = p_月报起始日期,
-				    // 结束月份，PowerBI参数（Date类型）
+				    // 循环结束月份，取自 Power BI 参数 p_月报终止日期（date 类型）
 				    结束月份 = p_月报终止日期,
-				    // 生成连续月份日期列表
+				    // 生成连续月份序列：从起始月份起每月 +1，直到不超过结束月份（结果为 date 列表）
 				    月份序列 = List.Generate(() => 起始月份, each _ <= 结束月份, each Date.AddMonths(_, 1)),
-				    // 转换为BW要求 YYYYMM 文本格式，用于参数传入
+				    // 把每个日期转成 BW 要求的 YYYYMM 文本：年×100 + 月（如 2026 年 1 月 → "202601"）
 				    月份文本列表 = List.Transform(月份序列, each Text.From(Date.Year(_) * 100 + Date.Month(_))),
-				
-				    // ========== 4. 自定义函数：单月BW取数（可折叠查询下发BW） ==========
-				    // 入参：month(YYYYMM文本)；返回：当月原始宽表
+				    // ========== 4. 单月取数函数 ==========
+				    // 单月取数函数：输入 YYYYMM 文本，输出当月已替换空值的宽表
 				    取单月 = (month as text) as table =>
-				    let
-				        // BW查询变换：设置期间参数、展开维度、加载全部度量值
-				        添加的项 = Cube.Transform(Cube,
-				            {
-				                // 传入BW期间参数ZMSDQNY
-				                {Cube.ApplyParameter, "[ZMSDQNY]", {month}},
-				                // 展开维度：分类
-				                {Cube.AddAndExpandDimensionColumn, "[4ZRMM_CP002-ZKL]", {"[4ZRMM_CP002-ZKL].[LEVEL01]"}, {"分类"}},
-				                // 展开维度：矿体
-				                {Cube.AddAndExpandDimensionColumn, "[ZKT]", {"[ZKT].[LEVEL01]"}, {"矿体"}},
-				                // 人民币金额指标组：当月、环比、去年同期、前1/2/3月
-				                {Cube.AddMeasureColumn, "金额(人民币) 当月实际", "[Measures].[4VGQHR12MHZ3FWDMUA1T7TGC04VGQHR12MHZ3FVOJ91YJ560S5]"},
-				                {Cube.AddMeasureColumn, "金额(人民币) 环比", "[Measures].[4VGQHR12MHZ3FWDMUA1T7TGC04VGQHR12MHZ1PLARX5QW4YR6E]"},
-				                {Cube.AddMeasureColumn, "金额(人民币) 去年实际", "[Measures].[4VGQHR12MHZ3FWDMUA1T7TGC04VGQHR12MHZ3FWDMUA1T7TA0G]"},
-				                {Cube.AddMeasureColumn, "金额(人民币) 月-1实际", "[Measures].[4VGQHR12MHZ3FWDMUA1T7TGC04VGQHR12MHZ1PLYB03BDBK19L]"},
-				                {Cube.AddMeasureColumn, "金额(人民币) 月-2实际", "[Measures].[4VGQHR12MHZ3FWDMUA1T7TGC04VGQHR12MHZ1PLYB03BDBJUY1]"},
-				                {Cube.AddMeasureColumn, "金额(人民币) 月-3实际", "[Measures].[4VGQHR12MHZ3FWDMUA1T7TGC04VGQHR12MHZ1PLYB03BDBJOMH]"},
-				                // 原币金额指标组：当月、环比、去年同期、前1/2/3月
-				                {Cube.AddMeasureColumn, "金额(原币) 当月实际", "[Measures].[4VGQHR12MHZ3FWDSL9T0KCND84VGQHR12MHZ3FVOJ91YJ560S5]"},
-				                {Cube.AddMeasureColumn, "金额(原币) 环比", "[Measures].[4VGQHR12MHZ3FWDSL9T0KCND84VGQHR12MHZ1PLARX5QW4YR6E]"},
-				                {Cube.AddMeasureColumn, "金额(原币) 去年实际", "[Measures].[4VGQHR12MHZ3FWDSL9T0KCND84VGQHR12MHZ3FWDMUA1T7TA0G]"},
-				                {Cube.AddMeasureColumn, "金额(原币) 月-1实际", "[Measures].[4VGQHR12MHZ3FWDSL9T0KCND84VGQHR12MHZ1PLYB03BDBK19L]"},
-				                {Cube.AddMeasureColumn, "金额(原币) 月-2实际", "[Measures].[4VGQHR12MHZ3FWDSL9T0KCND84VGQHR12MHZ1PLYB03BDBJUY1]"},
-				                {Cube.AddMeasureColumn, "金额(原币) 月-3实际", "[Measures].[4VGQHR12MHZ3FWDSL9T0KCND84VGQHR12MHZ1PLYB03BDBJOMH]"},
-				                // 产量(吨)指标组：当月、环比、去年同期、前1/2/3月
-				                {Cube.AddMeasureColumn, "量(吨) 当月实际", "[Measures].[4VGQHR12MHZ1PLG0H34K5L1JG4VGQHR12MHZ3FVOJ91YJ560S5]"},
-				                {Cube.AddMeasureColumn, "量(吨) 环比", "[Measures].[4VGQHR12MHZ1PLG0H34K5L1JG4VGQHR12MHZ1PLARX5QW4YR6E]"},
-				                {Cube.AddMeasureColumn, "量(吨) 去年实际", "[Measures].[4VGQHR12MHZ1PLG0H34K5L1JG4VGQHR12MHZ3FWDMUA1T7TA0G]"},
-				                {Cube.AddMeasureColumn, "量(吨) 月-1实际", "[Measures].[4VGQHR12MHZ1PLG0H34K5L1JG4VGQHR12MHZ1PLYB03BDBK19L]"},
-				                {Cube.AddMeasureColumn, "量(吨) 月-2实际", "[Measures].[4VGQHR12MHZ1PLG0H34K5L1JG4VGQHR12MHZ1PLYB03BDBJUY1]"},
-				                {Cube.AddMeasureColumn, "量(吨) 月-3实际", "[Measures].[4VGQHR12MHZ1PLG0H34K5L1JG4VGQHR12MHZ1PLYB03BDBJOMH]"}
-				            }
-				        ),
-				        // 新增加载日期列，统一为每月1号日期格式，用于报表时间筛选
-				        附加月份 = Table.AddColumn(添加的项, "加载日期", each #date(Number.From(Text.Start(month, 4)), Number.From(Text.End(month, 2)), 1), type date),
-				        // 数值指标空值替换为0；维度文本字段保留Null，不覆盖
-				        已替换值 = Table.ReplaceValue(附加月份, null, 0, Replacer.ReplaceValue,
-				            {
-				                "金额(人民币) 当月实际", "金额(人民币) 环比", "金额(人民币) 去年实际",
-				                "金额(人民币) 月-1实际", "金额(人民币) 月-2实际", "金额(人民币) 月-3实际",
-				                "金额(原币) 当月实际", "金额(原币) 环比", "金额(原币) 去年实际",
-				                "金额(原币) 月-1实际", "金额(原币) 月-2实际", "金额(原币) 月-3实际",
-				                "量(吨) 当月实际", "量(吨) 环比", "量(吨) 去年实际",
-				                "量(吨) 月-1实际", "量(吨) 月-2实际", "量(吨) 月-3实际"
-				            }
-				        )
-				    in
-				        已替换值,
-				
-				    // ========== 5. 批量循环取数 + 合并宽表 ==========
-				    所有月份表 = Table.Combine(List.Transform(月份文本列表, 取单月 )),
-				
-				    // ========== 6. 宽表转长表（逆透视），适配指标下拉、切片器 ==========
-				    // 保留维度和时间字段，其余全部转为【指标名称、指标值】
+				        let
+				            // 对 Cube 应用一组 BW 变换：设置期间参数、展开维度、添加度量值
+				            添加的项 = Cube.Transform(Cube,
+				                {
+				                    // 传入 BW 期间参数 [ZMSDQNY] = 当前循环月份
+				                    {Cube.ApplyParameter, "[ZMSDQNY]", {month}},
+				                    // 展开维度：分类
+				                    {Cube.AddAndExpandDimensionColumn, "[4ZRMM_CP002-ZKL]", {"[4ZRMM_CP002-ZKL].[LEVEL01]"}, {"分类"}},
+				                    // 展开维度：矿体
+				                    {Cube.AddAndExpandDimensionColumn, "[ZKT]", {"[ZKT].[LEVEL01]"}, {"矿体"}},
+				                    // ========== 人民币金额指标组 ==========
+				                    {Cube.AddMeasureColumn, "金额(人民币) 当月实际", "[Measures].[4VGQHR12MHZ3FWDMUA1T7TGC04VGQHR12MHZ3FVOJ91YJ560S5]"},
+				                    {Cube.AddMeasureColumn, "金额(人民币) 环比", "[Measures].[4VGQHR12MHZ3FWDMUA1T7TGC04VGQHR12MHZ1PLARX5QW4YR6E]"},
+				                    {Cube.AddMeasureColumn, "金额(人民币) 去年实际", "[Measures].[4VGQHR12MHZ3FWDMUA1T7TGC04VGQHR12MHZ3FWDMUA1T7TA0G]"},
+				                    {Cube.AddMeasureColumn, "金额(人民币) 月-1实际", "[Measures].[4VGQHR12MHZ3FWDMUA1T7TGC04VGQHR12MHZ1PLYB03BDBK19L]"},
+				                    {Cube.AddMeasureColumn, "金额(人民币) 月-2实际", "[Measures].[4VGQHR12MHZ3FWDMUA1T7TGC04VGQHR12MHZ1PLYB03BDBJUY1]"},
+				                    {Cube.AddMeasureColumn, "金额(人民币) 月-3实际", "[Measures].[4VGQHR12MHZ3FWDMUA1T7TGC04VGQHR12MHZ1PLYB03BDBJOMH]"},
+				                    // ========== 原币金额指标组 ==========
+				                    {Cube.AddMeasureColumn, "金额(原币) 当月实际", "[Measures].[4VGQHR12MHZ3FWDSL9T0KCND84VGQHR12MHZ3FVOJ91YJ560S5]"},
+				                    {Cube.AddMeasureColumn, "金额(原币) 环比", "[Measures].[4VGQHR12MHZ3FWDSL9T0KCND84VGQHR12MHZ1PLARX5QW4YR6E]"},
+				                    {Cube.AddMeasureColumn, "金额(原币) 去年实际", "[Measures].[4VGQHR12MHZ3FWDSL9T0KCND84VGQHR12MHZ3FWDMUA1T7TA0G]"},
+				                    {Cube.AddMeasureColumn, "金额(原币) 月-1实际", "[Measures].[4VGQHR12MHZ3FWDSL9T0KCND84VGQHR12MHZ1PLYB03BDBK19L]"},
+				                    {Cube.AddMeasureColumn, "金额(原币) 月-2实际", "[Measures].[4VGQHR12MHZ3FWDSL9T0KCND84VGQHR12MHZ1PLYB03BDBJUY1]"},
+				                    {Cube.AddMeasureColumn, "金额(原币) 月-3实际", "[Measures].[4VGQHR12MHZ3FWDSL9T0KCND84VGQHR12MHZ1PLYB03BDBJOMH]"},
+				                    // ========== 产量(吨)指标组 ==========
+				                    {Cube.AddMeasureColumn, "量(吨) 当月实际", "[Measures].[4VGQHR12MHZ1PLG0H34K5L1JG4VGQHR12MHZ3FVOJ91YJ560S5]"},
+				                    {Cube.AddMeasureColumn, "量(吨) 环比", "[Measures].[4VGQHR12MHZ1PLG0H34K5L1JG4VGQHR12MHZ1PLARX5QW4YR6E]"},
+				                    {Cube.AddMeasureColumn, "量(吨) 去年实际", "[Measures].[4VGQHR12MHZ1PLG0H34K5L1JG4VGQHR12MHZ3FWDMUA1T7TA0G]"},
+				                    {Cube.AddMeasureColumn, "量(吨) 月-1实际", "[Measures].[4VGQHR12MHZ1PLG0H34K5L1JG4VGQHR12MHZ1PLYB03BDBK19L]"},
+				                    {Cube.AddMeasureColumn, "量(吨) 月-2实际", "[Measures].[4VGQHR12MHZ1PLG0H34K5L1JG4VGQHR12MHZ1PLYB03BDBJUY1]"},
+				                    {Cube.AddMeasureColumn, "量(吨) 月-3实际", "[Measures].[4VGQHR12MHZ1PLG0H34K5L1JG4VGQHR12MHZ1PLYB03BDBJOMH]"}
+				                }
+				            ),
+				            // 追加「加载日期」列：把当前循环 YYYYMM 转成当月首日 date（如 202601 → 2026-01-01），标记该行数据所属期间
+				            附加月份 = Table.AddColumn(添加的项, "加载日期", each #date(Number.From(Text.Start(month, 4)), Number.From(Text.End(month, 2)), 1), type date),
+				            // 把数值指标列的 null 统一替换为 0；维度文本列保留 null，不覆盖
+				            已替换值 = Table.ReplaceValue(附加月份, null, 0, Replacer.ReplaceValue,
+				                {
+				                    "金额(人民币) 当月实际", "金额(人民币) 环比", "金额(人民币) 去年实际",
+				                    "金额(人民币) 月-1实际", "金额(人民币) 月-2实际", "金额(人民币) 月-3实际",
+				                    "金额(原币) 当月实际", "金额(原币) 环比", "金额(原币) 去年实际",
+				                    "金额(原币) 月-1实际", "金额(原币) 月-2实际", "金额(原币) 月-3实际",
+				                    "量(吨) 当月实际", "量(吨) 环比", "量(吨) 去年实际",
+				                    "量(吨) 月-1实际", "量(吨) 月-2实际", "量(吨) 月-3实际"
+				                }
+				            )
+				        in
+				            已替换值,
+				    // ========== 5. 循环遍历月份并合并宽表 ==========
+				    // 遍历月份文本列表，对每个 YYYYMM 调用取单月，再把 N 个月的结果表上下合并成一张宽表
+				    所有月份表 = Table.Combine(List.Transform(月份文本列表, 取单月)),
+				    // ========== 6. 逆透视（宽表转长表） ==========
+				    // 保留维度和时间字段，其余全部转为两列【指标名称、指标值】
 				    已逆透视其他列 = Table.UnpivotOtherColumns(所有月份表, {"分类", "矿体", "加载日期"}, "指标名称", "指标值"),
-				
 				    // ========== 7. 拆分指标名称：按空格切分为【指标名称、结构】 ==========
 				    // 示例："金额(人民币) 当月实际" → 指标名称：金额(人民币)，结构：当月实际
 				    按分隔符拆分列 = Table.SplitColumn(已逆透视其他列, "指标名称", Splitter.SplitTextByDelimiter(" "), {"指标名称", "结构"}),
-				
 				    // ========== 8. 增加矿体副本辅助列，用于报表不同展示逻辑 ==========
 				    已添加自定义 = Table.AddColumn(按分隔符拆分列, "矿体v", each [矿体]),
-				
-				    // ========== 9. 左关联排序映射表，带出排序序号（左连接，保留所有BW原始数据） ==========
-				    // 关联分类排序
+				    // ========== 9. 依次左连接 3 张排序映射表 ==========
+				    // 左连接「分类排序」映射表（按分类匹配；JoinKind.LeftOuter，未匹配行保留）
 				    左连接分类排序 = Table.NestedJoin(已添加自定义, {"分类"}, 分类排序表, {"分类"}, "分类映射临时", JoinKind.LeftOuter),
+				    // 展开临时映射列，仅保留「分类排序」字段
 				    展开分类排序 = Table.ExpandTableColumn(左连接分类排序, "分类映射临时", {"分类排序"}, {"分类排序"}),
-				    // 关联结构排序
+				    // 左连接「结构排序」映射表（按结构匹配；JoinKind.LeftOuter，未匹配行保留）
 				    左连接结构排序 = Table.NestedJoin(展开分类排序, {"结构"}, 结构排序表, {"结构"}, "结构映射临时", JoinKind.LeftOuter),
+				    // 展开临时映射列，仅保留「结构排序」字段
 				    展开结构排序 = Table.ExpandTableColumn(左连接结构排序, "结构映射临时", {"结构排序"}, {"结构排序"}),
-				    // 关联矿体排序
+				    // 左连接「矿体排序」映射表（按矿体匹配；JoinKind.LeftOuter，未匹配行保留）
 				    左连接矿体排序 = Table.NestedJoin(展开结构排序, {"矿体"}, 矿体排序表, {"矿体"}, "矿体映射临时", JoinKind.LeftOuter),
+				    // 展开临时映射列，仅保留「矿体排序」字段
 				    展开矿体排序 = Table.ExpandTableColumn(左连接矿体排序, "矿体映射临时", {"矿体排序"}, {"矿体排序"})
 				in
 				    展开矿体排序

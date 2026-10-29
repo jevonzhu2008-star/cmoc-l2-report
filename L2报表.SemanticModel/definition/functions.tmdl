@@ -1,8 +1,8 @@
-/// 金额格式字符串：千分位整数、负数带括号、零显示 0；供金额类度量值 formatStringDefinition 引用
+/// FormatAmount：金额格式字符串，千分位整数、负数带括号、零显示 0；供金额类度量值 formatStringDefinition 引用
 function FormatAmount = () => "#,0;(#,0);0"
 	lineageTag: 15da78dd-fbd0-4602-96c6-32c1edbef155
 
-/// 百分比格式字符串：带正负号、2 位小数、零显示 0.00%；供百分比类度量值 formatStringDefinition 引用
+/// FormatRatio：百分比格式字符串，带正负号、2 位小数、零显示 0.00%；供百分比类度量值 formatStringDefinition 引用
 function FormatRatio = () => "+0.00%;-0.00%;0.00%"
 	lineageTag: 218991ec-c130-43e5-a106-45cd669d18b4
 

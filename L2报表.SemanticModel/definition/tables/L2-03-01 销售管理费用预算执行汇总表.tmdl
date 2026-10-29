@@ -157,29 +157,31 @@ table 'L2-03-01 销售管理费用预算执行汇总表'
 		source =
 				let
 				    /*
-				    【查询名称】ZRFI_CP005 销管费用BW取数
-				    【对应报表】L2销管费用月报
-				    【BW对象】Cube:ZRFI_CP005   Query:ZRFI_CP005_Q0002
+				    【查询名称】ZRFI_CP005 销管费用 BW 取数
+				    【对应报表】L2-03-01 销售管理费用预算执行汇总表
+				    【BW对象】Cube:ZRFI_CP005，Query:ZRFI_CP005_Q0002
 				    【说明】
-				        1、循环取数：从参数 p_月报起始日期 开始，取到 p_月报终止日期，逐月查询BW后合并成长表
-				        2、BW参数[ZMSDQNY]：YYYYMM格式年月，返回截止当月YTD累计指标
-				        3、维度：公司名称(显示名称)、销管费分类、管理口径利润中心
-				        4、【公司代码】：存放纯编码；【利润中心代码】：利润中心编码
-				        5、业务板块：3级分步匹配，优先级：双键(利润中心代码+公司代码) > 仅利润中心代码 > 仅公司代码，三级全落空填「待定」
-				        6、外部映射Sheet【业务板块映射】表头：利润中心代码,公司代码,业务板块,业务板块排序
-				        7、业务板块排序随【业务板块映射】按业务板块去重生成（同一板块只保留首条）
+				        1、循环取数：从 p_月报起始日期 到 p_月报终止日期，逐月查询 BW 后合并成长表
+				        2、BW 参数 [ZMSDQNY]：YYYYMM 格式年月，返回截止当月的 YTD 累计指标
+				        3、维度：公司名称（显示名称）、销管费分类、管理口径利润中心
+				        4、公司代码列存放纯编码，利润中心代码列存放利润中心编码
+				        5、业务板块：三级分步匹配，优先级为双键（利润中心代码 + 公司代码）> 仅利润中心代码 > 仅公司代码，三级全落空填「待定」
+				        6、外部映射 Sheet「业务板块映射」表头：利润中心代码、公司代码、业务板块、业务板块排序
+				        7、业务板块排序随「业务板块映射」按业务板块去重生成（同一板块只保留首条）
 				        8、映射表匹配键先转文本再去重：避免 Excel 数值推断导致匹配不上、以及一键多映射导致事实行翻倍
-				    */
-				    // ========== 读取SharePoint上的指标映射工作簿 ==========
+				        */
+				    // ========== 1. 读取 SharePoint 上的指标映射工作簿 ==========
+				    // 连接财经 SharePoint 站点，列出全部文件（ApiVersion=15 为较新 REST API），结果为文件列表表
 				    源 = SharePoint.Files(财经SharePoint站点, [ApiVersion = 15]),
+				    // 筛选文件名含「L2-03-01 销售管理费用预算执行汇总表指标映射」且扩展名为 .xlsx 的文件，取第一个并读取其 [Content]（二进制内容）
 				    指标映射文件 = Table.SelectRows(源, each Text.Contains([Name], "L2-03-01 销售管理费用预算执行汇总表指标映射") and [Extension] = ".xlsx"){0}[Content],
 				    // 工作簿只解析一次，后续各 Sheet 直接取用（同一 xlsx 反复解析会拖慢刷新）
 				    指标映射工作簿 = Excel.Workbook(指标映射文件, true),
 				    // 销管费分类排序（公司代码、管理口径利润中心已不做排序，对应 Sheet 不再读取）
 				    销管费分类排序表 = Table.Distinct(指标映射工作簿{[Item = "销管费分类排序", Kind = "Sheet"]}[Data], {"销管费分类"}),
-				    // 业务板块排序（业务板块,业务板块排序），按业务板块去重保证一对一
+				    // 业务板块排序（业务板块、业务板块排序），按业务板块去重保证一对一
 				    业务板块排序表 = Table.Distinct(Table.SelectRows(指标映射工作簿{[Item = "业务板块映射", Kind = "Sheet"]}[Data], each [业务板块] <> null), {"业务板块"}),
-				    // 业务板块映射（利润中心代码,公司代码,业务板块）
+				    // 业务板块映射（利润中心代码、公司代码、业务板块）
 				    业务板块映射表 = 指标映射工作簿{[Item = "业务板块映射", Kind = "Sheet"]}[Data],
 				    // 匹配键统一转文本：Excel 会把纯数字代码推断成数值，与 BW 取回的文本编码对不上
 				    映射_规范化 = Table.TransformColumnTypes(业务板块映射表, {{"利润中心代码", type text}, {"公司代码", type text}, {"业务板块", type text}}),
@@ -187,25 +189,34 @@ table 'L2-03-01 销售管理费用预算执行汇总表'
 				    映射_双键 = Table.Distinct(Table.SelectRows(映射_规范化, each [利润中心代码] <> null and [公司代码] <> null), {"利润中心代码", "公司代码"}),
 				    映射_仅利润中心代码 = Table.Distinct(Table.SelectRows(映射_规范化, each [利润中心代码] <> null and [公司代码] = null), {"利润中心代码"}),
 				    映射_仅公司代码 = Table.Distinct(Table.SelectRows(映射_规范化, each [利润中心代码] = null and [公司代码] <> null), {"公司代码"}),
-				    // 1、连接BW QAS环境
+				    // ========== 2. 连接 BW QAS 环境 ==========
+				    // 连接 BW QAS 环境：Implementation=2.0 用新版接口 / LanguageCode=ZH 返回中文 / BatchSize 放大提升批量拉取性能
 				    数据源 = SapBusinessWarehouse.Cubes(QAS服务器, 系统编号, 客户端ID, [LanguageCode="ZH", Implementation="2.0", BatchSize=500000000]),
-				    // 2、定位Cube与目标BW查询
+				    // 按 Cube 名称定位 ZRFI_CP005
 				    立方体 = 数据源{[Name="ZRFI_CP005"]}[Data],
+				    // 按 Query ID 定位 ZRFI_CP005/ZRFI_CP005_Q0002
 				    基础查询 = 立方体{[Id="ZRFI_CP005/ZRFI_CP005_Q0002"]}[Data],
-				    // ========== 月份循环配置 ==========
+				    // ========== 3. 月份循环配置 ==========
+				    // 循环起始月份，取自 Power BI 参数 p_月报起始日期（date 类型）
 				    起始月份 = p_月报起始日期,
+				    // 循环结束月份，取自 Power BI 参数 p_月报终止日期（date 类型）
 				    结束月份 = p_月报终止日期,
+				    // 生成连续月份序列：从起始月份起每月 +1，直到不超过结束月份（结果为 date 列表）
 				    月份序列 = List.Generate(() => 起始月份, each _ <= 结束月份, each Date.AddMonths(_, 1)),
+				    // 把每个日期转成 BW 要求的 YYYYMM 文本：年×100 + 月（如 2026 年 1 月 → "202601"）
 				    月份文本列表 = List.Transform(月份序列, each Text.From(Date.Year(_) * 100 + Date.Month(_))),
-				    // 单月取数函数
+				    // ========== 4. 单月取数函数 ==========
+				    // 单月取数函数：输入 YYYYMM 文本，输出该月 BW 查询结果表
 				    查询单月 = (month as text) =>
 				        let
 				            Query = Cube.Transform(基础查询, {
 				                {Cube.ApplyParameter, "[ZMSDQNY]", {month}},
-				                // 度量值：YTD 累计实际、累计预算（累计执行% 改由 DAX DIVIDE 计算，不再从 BW 取）
+				                // ========== 度量值 ==========
+				                // YTD 累计实际、累计预算（累计执行% 改由 DAX DIVIDE 计算，不从 BW 取）
 				                {Cube.AddMeasureColumn, "累计实际", "[Measures].[4VGQHR12MHZ3FT2S9KPZM93SH]"},
 				                {Cube.AddMeasureColumn, "累计预算", "[Measures].[4VGQHR12MHZ3FT2S9KPZM9GFL]"},
-				                // 维度：公司名称（显示名）、销管费分类、管理口径利润中心
+				                // ========== 维度 ==========
+				                // 公司名称（显示名称）、销管费分类、管理口径利润中心
 				                {Cube.AddAndExpandDimensionColumn, "[ZBUKRS]", {"[ZBUKRS].[LEVEL01]"}, {"公司名称"}},
 				                {Cube.AddAndExpandDimensionColumn, "[ZXGFFL]", {"[ZXGFFL].[LEVEL01]"}, {"销管费分类"}},
 				                {Cube.AddAndExpandDimensionColumn, "[ZPRCTR_GL]", {"[ZPRCTR_GL].[LEVEL01]"}, {"管理口径利润中心"}}
@@ -214,23 +225,26 @@ table 'L2-03-01 销售管理费用预算执行汇总表'
 				            添加公司代码 = Table.AddColumn(Query, "公司代码", each Cube.AttributeMemberProperty([公司名称], "[2ZBUKRS]")),
 				            添加销管费分类代码 = Table.AddColumn(添加公司代码, "销管费分类代码", each Cube.AttributeMemberProperty([销管费分类], "[2ZXGFFL]")),
 				            添加利润中心代码 = Table.AddColumn(添加销管费分类代码, "利润中心代码", each Cube.AttributeMemberProperty([管理口径利润中心], "[2ZPRCTR_GL]")),
+				            // 追加「加载日期」列：把当前循环 YYYYMM 转成当月首日 date（如 202601 → 2026-01-01），标记该行数据所属期间
 				            附加月份 = Table.AddColumn(添加利润中心代码, "加载日期", each #date(Number.From(Text.Start(month, 4)), Number.From(Text.End(month, 2)), 1), type date)
 				        in
 				            附加月份,
+				    // 遍历月份文本列表，对每个 YYYYMM 调用查询单月，得到 N 个月的结果表
 				    各月结果 = List.Transform(月份文本列表, 查询单月),
+				    // 把 N 个月的结果表上下合并成一张长表
 				    合并结果 = Table.Combine(各月结果),
-				    // ========== 销管费分类排序 ==========
+				    // ========== 5. 左连接「销管费分类排序」映射表 ==========
 				    关联分类排序 = Table.NestedJoin(合并结果, {"销管费分类"}, 销管费分类排序表, {"销管费分类"}, "分类映射临时", JoinKind.LeftOuter),
 				    展开分类排序 = Table.ExpandTableColumn(关联分类排序, "分类映射临时", {"销管费分类排序"}, {"销管费分类排序"}),
-				    // ========== 业务板块三级匹配（优先级：双键 > 仅利润中心代码 > 仅公司代码） ==========
+				    // ========== 6. 业务板块三级匹配（优先级：双键 > 仅利润中心代码 > 仅公司代码） ==========
 				    // 三级各展开成一列，未命中的行为 null，最后按优先级取第一个非空值
-				    // 第1级：利润中心代码 + 公司代码 双键匹配（最高优先级）
+				    // 第 1 级：利润中心代码 + 公司代码 双键匹配（最高优先级）
 				    阶段1_关联 = Table.NestedJoin(展开分类排序, {"利润中心代码", "公司代码"}, 映射_双键, {"利润中心代码", "公司代码"}, "tmp1", JoinKind.LeftOuter),
 				    阶段1_展开 = Table.ExpandTableColumn(阶段1_关联, "tmp1", {"业务板块"}, {"业务板块_双键"}),
-				    // 第2级：双键未命中的，只用利润中心代码匹配
+				    // 第 2 级：双键未命中的，只用利润中心代码匹配
 				    阶段2_关联 = Table.NestedJoin(阶段1_展开, {"利润中心代码"}, 映射_仅利润中心代码, {"利润中心代码"}, "tmp2", JoinKind.LeftOuter),
 				    阶段2_展开 = Table.ExpandTableColumn(阶段2_关联, "tmp2", {"业务板块"}, {"业务板块_利润中心"}),
-				    // 第3级：仍未命中的，只用公司代码匹配
+				    // 第 3 级：仍未命中的，只用公司代码匹配
 				    阶段3_关联 = Table.NestedJoin(阶段2_展开, {"公司代码"}, 映射_仅公司代码, {"公司代码"}, "tmp3", JoinKind.LeftOuter),
 				    阶段3_展开 = Table.ExpandTableColumn(阶段3_关联, "tmp3", {"业务板块"}, {"业务板块_公司"}),
 				    // 按优先级取值；三级全部落空的填「待定」

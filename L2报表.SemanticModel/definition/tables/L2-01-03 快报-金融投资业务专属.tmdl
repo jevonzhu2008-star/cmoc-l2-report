@@ -125,133 +125,115 @@ table 'L2-01-03 快报-金融投资业务专属'
 		source = ```
 				let
 				    /*
-				    【查询名称】ZRFI_CP012 金融投资业务专属 BW取数
-				    【对应报表】L2‑01‑03 快报-金融投资业务专属
-				    【BW对象】Cube:ZRFI_CP012   Query:ZRFI_CP012_Q0001
+				    【查询名称】ZRFI_CP012 金融投资业务专属 BW 取数
+				    【对应报表】L2-01-03 快报-金融投资业务专属
+				    【BW对象】Cube:ZRFI_CP012，Query:ZRFI_CP012_Q0001
 				    【说明】
-				        1、循环取数：从参数 p_月报起始日期 到 p_月报终止日期，逐月查询BW后合并
-				        2、BW参数[ZMSDQNY]：YYYYMM格式，BW根据该参数返回截止该月的YTD数据
+				        1、循环取数：从参数 p_月报起始日期 到 p_月报终止日期，逐月查询 BW 后合并成长表
+				        2、BW 参数 [ZMSDQNY]：YYYYMM 格式年月，BW 根据该参数自动返回截止该月的 YTD 数据
 				        3、维度：公司代码、金融投资产品、公司代码货币
-				        4、指标：年净值、投资变动、本年利润累计、上月累计、当月数、期末净值、汇率变动共17个Measure
-				        5、末尾逆透视：把17个指标列转成「指标名称+指标值」的长表结构，方便报表按指标筛选展示
+				        4、指标：年净值、投资变动、本年利润累计、上月累计、当月数、期末净值、汇率变动，共 17 个 Measure
+				        5、末尾逆透视：把 17 个指标列转成「指标名称」「指标值」的长表结构，方便报表按指标筛选展示
+				        6、末尾左连接指标排序、金融投资产品排序、公司代码排序三张映射表，带出【指标排序】【金融投资产品排序】【公司代码排序】
 				    */
-				    
-				    // ========== 读取SharePoint上的排序映射表 ==========
+				    // ========== 1. 读取 SharePoint 上的排序映射表 ==========
 				    // 连接财经 SharePoint 站点，列出全部文件（ApiVersion=15 为较新 REST API），结果为文件列表表
 				    源 = SharePoint.Files(财经SharePoint站点, [ApiVersion = 15]),
-				    // 从文件列表筛选名称含该表「…指标映射」且扩展名为 .xlsx 的文件，取第一个并读取其 [Content]（二进制内容）
+				    // 筛选文件名含「L2-01-03 快报-金融投资业务专属指标映射」且扩展名为 .xlsx 的文件，取第一个并读取其 [Content]（二进制内容）
 				    指标映射文件 = Table.SelectRows(源, each Text.Contains([Name], "L2-01-03 快报-金融投资业务专属指标映射") and [Extension] = ".xlsx"){0}[Content],
 				    // 工作簿只解析一次，后续各 Sheet 直接取用（同一 xlsx 反复解析会拖慢刷新）
 				    指标映射工作簿 = Excel.Workbook(指标映射文件, true),
 				    指标排序表 = Table.Distinct(指标映射工作簿{[Item = "指标排序", Kind = "Sheet"]}[Data], {"指标名称"}),
 				    金融投资产品排序表 = Table.Distinct(指标映射工作簿{[Item = "金融投资产品排序", Kind = "Sheet"]}[Data], {"金融投资产品"}),
 				    公司代码排序表 = Table.Distinct(指标映射工作簿{[Item = "公司代码排序", Kind = "Sheet"]}[Data], {"公司代码"}),
-				    // ========== 第一步：连接BW QAS环境 ==========
-				    // 连接 BW QAS 环境：Implementation=2.0 新版接口 / LanguageCode=ZH 返回中文
+				    // ========== 2. 连接 BW QAS 环境 ==========
+				    // 连接 BW QAS 环境：Implementation=2.0 用新版接口 / LanguageCode=ZH 返回中文
 				    数据源 = SapBusinessWarehouse.Cubes(QAS服务器, 系统编号, 客户端ID, [Implementation="2.0", LanguageCode="ZH"]),
-				    
-				    // ========== 第二步：定位Cube与目标BW查询 ==========
 				    // 按 Cube 名称定位 ZRFI_CP012
 				    立方体 = 数据源{[Name="ZRFI_CP012"]}[Data],
-				    // 按 Query ID 定位该 Cube 内的目标查询 ZRFI_CP012/ZRFI_CP012_Q0001
+				    // 按 Query ID 定位 ZRFI_CP012/ZRFI_CP012_Q0001
 				    基础查询 = 立方体{[Id="ZRFI_CP012/ZRFI_CP012_Q0001"]}[Data],
-				    
-				    // ========== 第三步：月份循环配置 ==========
-				    // 月报起始月份，取自PowerBI参数 p_月报起始日期
+				    // ========== 3. 月份循环配置 ==========
+				    // 月报起始月份，取自 Power BI 参数 p_月报起始日期
 				    起始月份 = p_月报起始日期,
-				    // 月报结束月份，取自PowerBI参数 p_月报终止日期
+				    // 月报结束月份，取自 Power BI 参数 p_月报终止日期
 				    结束月份 = p_月报终止日期,
-				    // 生成连续月份序列（从起始到结束，逐月+1）
+				    // 生成连续月份序列：从起始月份起每月 +1，直到不超过结束月份（结果为 date 列表）
 				    月份序列 = List.Generate(() => 起始月份, each _ <= 结束月份, each Date.AddMonths(_, 1)),
-				    // 转换为BW要求的 YYYYMM 文本格式（如202601）
+				    // 把每个日期转成 BW 要求的 YYYYMM 文本：年×100 + 月（如 2026 年 1 月 → "202601"）
 				    月份文本列表 = List.Transform(月份序列, each Text.From(Date.Year(_) * 100 + Date.Month(_))),
-				    
-				    // ========== 第四步：单月取数函数 ==========
-				    // 输入：年月文本（如"202603"），输出：该月的BW查询结果表
+				    // ========== 4. 单月取数函数 ==========
+				    // 输入：年月文本（如 "202603"），输出：该月的 BW 查询结果表
 				    查询单月 = (month as text) =>
 				        let
-				            // Measure公共前缀，避免重复写
+				            // Measure 公共前缀，避免重复写
 				            MeasurePrefix = "[Measures].[4VGQHR12MHZ3FUPQLKJ2",
-				            
-				            // 执行BW查询，添加所有指标列和维度展开
+				            // 执行 BW 查询，添加所有指标列和维度展开
 				            Query = Cube.Transform(基础查询, {
 				                // 设置期间参数：当前循环到的月份
 				                {Cube.ApplyParameter, "[ZMSDQNY]", {month}},
-				                
-				                // ===== 年净值类指标（期初/年累计） =====
+				                // ========== 年净值类指标（期初/年累计） ==========
 				                {Cube.AddMeasureColumn, "年净值-成本", MeasurePrefix & "R9KUV]"},
 				                {Cube.AddMeasureColumn, "年净值-公允价值变动", MeasurePrefix & "R9R6F]"},
 				                {Cube.AddMeasureColumn, "年净值-合计", MeasurePrefix & "R9XHZ]"},
-				                
-				                // ===== 投资变动类指标 =====
+				                // ========== 投资变动类指标 ==========
 				                {Cube.AddMeasureColumn, "本年-新增投资", MeasurePrefix & "RA3TJ]"},
-				                
-				                // ===== 本年利润类指标（累计发生数） =====
+				                // ========== 本年利润类指标（累计发生数） ==========
 				                {Cube.AddMeasureColumn, "本年利润-累计公允价值变动", MeasurePrefix & "RAA53]"},
 				                {Cube.AddMeasureColumn, "本年利润-累计投资收益", MeasurePrefix & "RAGGN]"},
 				                {Cube.AddMeasureColumn, "本年利润-累计所得税费用影响", MeasurePrefix & "RAMS7]"},
 				                {Cube.AddMeasureColumn, "本年利润-退出成本", MeasurePrefix & "RAT3R]"},
 				                {Cube.AddMeasureColumn, "本年利润-退出持有收益", MeasurePrefix & "RAZFB]"},
-				                
-				                // ===== 上月累计数（用于环比计算） =====
+				                // ========== 上月累计数（用于环比计算） ==========
 				                {Cube.AddMeasureColumn, "本年利润-累计公允价值变动(上月累计)", MeasurePrefix & "RB5QV]"},
 				                {Cube.AddMeasureColumn, "本年利润-累计投资收益(上月累计)", MeasurePrefix & "RBC2F]"},
 				                {Cube.AddMeasureColumn, "本年利润-累计所得税费用影响(上月累计)", MeasurePrefix & "RBIDZ]"},
-				                
-				                // ===== 当月发生数 =====
+				                // ========== 当月发生数 ==========
 				                {Cube.AddMeasureColumn, "本年利润-当月数", MeasurePrefix & "RBOPJ]"},
-				                
-				                // ===== 期末净值类指标 =====
+				                // ========== 期末净值类指标 ==========
 				                {Cube.AddMeasureColumn, "期末净值-成本", MeasurePrefix & "RBV13]"},
 				                {Cube.AddMeasureColumn, "期末净值-公允价值变动", MeasurePrefix & "RC1CN]"},
 				                {Cube.AddMeasureColumn, "期末净值-合计", MeasurePrefix & "RC7O7]"},
-				                
-				                // ===== 汇率影响类指标 =====
+				                // ========== 汇率影响类指标 ==========
 				                {Cube.AddMeasureColumn, "当月汇率变动影响-币种（CNY)", MeasurePrefix & "RCDZR]"},
-				                
-				                // ===== 维度展开（取Level 01层级） =====
+				                // ========== 维度展开（取 Level 01 层级） ==========
 				                {Cube.AddAndExpandDimensionColumn, "[ZBUKRS]", {"[ZBUKRS].[LEVEL01]"}, {"公司代码"}},
 				                {Cube.AddAndExpandDimensionColumn, "[0LOC_CURRCY]", {"[0LOC_CURRCY].[LEVEL01]"}, {"公司代码货币 级别 01"}},
 				                {Table.AddColumn, "公司代码货币", each Cube.AttributeMemberProperty([公司代码货币 级别 01], "[20LOC_CURRCY]")},
 				                {Cube.AddAndExpandDimensionColumn, "[4ZRFI_CP012-CC_A_JRTZCP]", {"[4ZRFI_CP012-CC_A_JRTZCP].[LEVEL01]"}, {"金融投资产品"}}
 				            }),
-				            
-				            // 附加「加载日期」字段，标记本条数据对应的查询期间
+				            // 追加「加载日期」列：把当前循环 YYYYMM 转成当月首日 date（如 202601 → 2026-01-01），标记该行数据所属期间
 				            附加加载日期 = Table.AddColumn(Query, "加载日期", each #date(Number.From(Text.Start(month, 4)), Number.From(Text.End(month, 2)), 1), type date)
 				        in
 				            附加加载日期,
-				    
-				    // ========== 第五步：循环遍历月份，逐个执行取数 ==========
+				    // ========== 5. 循环遍历月份，逐个取数 ==========
 				    // 得到一个列表，每个元素是一个月份的表
 				    各月结果 = List.Transform(月份文本列表, 查询单月),
-				    
-				    // ========== 第六步：合并所有月份的表 ==========
-				    // 把N个月的表上下合并成一张大表
+				    // ========== 6. 合并所有月份的结果 ==========
+				    // 把 N 个月的表上下合并成一张大表
 				    合并结果 = Table.Combine(各月结果),
-				    
-				    // ========== 第七步：逆透视（宽表转长表） ==========
-				    // 原来17个指标是17列（宽表），逆透视后变成2列：「指标名称」+「指标值」
+				    // ========== 7. 逆透视（宽表转长表） ==========
+				    // 原来 17 个指标是 17 列（宽表），逆透视后变成 2 列：「指标名称」「指标值」
 				    // 保留不动的列：维度字段 + 加载日期
-				    // 被逆透视的列：所有17个Measure列
+				    // 被逆透视的列：所有 17 个 Measure 列
 				    逆透视长表 = Table.UnpivotOtherColumns(
-				        合并结果, 
-				        {"公司代码", "公司代码货币", "公司代码货币 级别 01", "金融投资产品", "加载日期"},  // 保留的列，新增了中间层级列
-				        "指标名称",   // 新列名：存指标名称（如"年净值-成本"）
-				        "指标值"     // 新列名：存指标数值
+				        合并结果,
+				        {"公司代码", "公司代码货币", "公司代码货币 级别 01", "金融投资产品", "加载日期"}, // 保留的列，新增了中间层级列
+				        "指标名称", // 新列名：存指标名称（如"年净值-成本"）
+				        "指标值" // 新列名：存指标数值
 				    ),
-				    
-				    // ========== 第八步：左连接映射表，带出三个排序 ==========
-				    // 左连接指标排序表（按指标名称）
+				    // ========== 8. 依次左连接 3 张排序映射表 ==========
+				    // 左连接「指标排序」映射表（按指标名称匹配；JoinKind.LeftOuter，未匹配行保留）
 				    左连接指标排序 = Table.NestedJoin(逆透视长表, {"指标名称"}, 指标排序表, {"指标名称"}, "指标映射临时", JoinKind.LeftOuter),
-				    // 展开临时映射列，带出「指标排序」相关排序字段
+				    // 展开临时映射列，仅保留「指标排序」字段
 				    展开指标排序 = Table.ExpandTableColumn(左连接指标排序, "指标映射临时", {"指标排序"}, {"指标排序"}),
-				    // 左连接金融投资产品排序表（按金融投资产品）
+				    // 左连接「金融投资产品排序」映射表（按金融投资产品匹配；JoinKind.LeftOuter，未匹配行保留）
 				    左连接产品排序 = Table.NestedJoin(展开指标排序, {"金融投资产品"}, 金融投资产品排序表, {"金融投资产品"}, "产品映射临时", JoinKind.LeftOuter),
-				    // 展开临时映射列，带出「产品排序」相关排序字段
+				    // 展开临时映射列，仅保留「金融投资产品排序」字段
 				    展开产品排序 = Table.ExpandTableColumn(左连接产品排序, "产品映射临时", {"金融投资产品排序"}, {"金融投资产品排序"}),
-				    // 左连接公司代码排序表（按公司代码）
+				    // 左连接「公司代码排序」映射表（按公司代码匹配；JoinKind.LeftOuter，未匹配行保留）
 				    左连接公司排序 = Table.NestedJoin(展开产品排序, {"公司代码"}, 公司代码排序表, {"公司代码"}, "公司映射临时", JoinKind.LeftOuter),
-				    // 展开临时映射列，带出「公司排序」相关排序字段
+				    // 展开临时映射列，仅保留「公司代码排序」字段
 				    展开公司排序 = Table.ExpandTableColumn(左连接公司排序, "公司映射临时", {"公司代码排序"}, {"公司代码排序"})
 				in
 				    展开公司排序

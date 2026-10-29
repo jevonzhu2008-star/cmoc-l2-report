@@ -14,26 +14,26 @@ expression p_月报终止日期 = #date(2026, 3, 1) meta [IsParameterQuery = tru
 
 	annotation PBI_ResultType = Date
 
-/// 系统编号：SAP BW 系统编号（参数，连接 BW 用）
+/// 系统编号： SAP BW 系统编号（参数，连接 BW 用）
 expression 系统编号 = "00" meta [IsParameterQuery = true, IsParameterQueryRequired = false, Type = type text]
 	lineageTag: ccc630c4-3332-4432-9740-ec4ea8a87f4e
 	queryGroup: 参数
 
 	annotation PBI_ResultType = Text
 
-/// 客户端ID：SAP BW 客户端 ID（参数，连接 BW 用）
+/// 客户端ID： SAP BW 客户端 ID（参数，连接 BW 用）
 expression 客户端ID = "100" meta [IsParameterQuery = true, IsParameterQueryRequired = false, Type = type text]
 	lineageTag: 7c1720ff-1ca5-4ea0-bc78-056db0769523
 	queryGroup: 参数
 
 	annotation PBI_ResultType = Text
 
-/// QAS服务器：SAP BW QAS 环境服务器地址（参数，连接 BW 用）
+/// QAS服务器： SAP BW QAS 环境服务器地址（参数，连接 BW 用）
 expression QAS服务器 =
 		let
-		    源 = "10.43.15.32" meta [IsParameterQuery = true, IsParameterQueryRequired = false, Type = type text]
+			源 = "10.43.15.32" meta [IsParameterQuery = true, IsParameterQueryRequired = false, Type = type text]
 		in
-		    源
+			源
 	lineageTag: 6041bff7-364e-41e9-a6ec-8b223c1a189a
 	queryGroup: 参数
 

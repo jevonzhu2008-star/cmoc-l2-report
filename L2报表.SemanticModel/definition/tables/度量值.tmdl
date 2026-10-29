@@ -8,7 +8,7 @@ table 度量值
 
 		formatStringDefinition = FormatAmount()
 
-	/// 去年同期YTD：上一年同期 YTD 实际（平均值：逆透视后同一数值按月份重复多行，取平均避免重复累加）
+	/// 去年同期YTD：去年同期 YTD 实际（平均值：逆透视后同一数值按月份重复多行，取平均避免重复累加）
 	measure 去年同期YTD = AVERAGE('L2-01-02 集团合并利润汇总表'[去年同期YTD])
 		displayFolder: L2-01-02 集团合并利润汇总表
 		lineageTag: a027d72c-8a9b-4a49-b35c-7eefdb7d3199
@@ -85,106 +85,87 @@ table 度量值
 
 		formatStringDefinition = FormatRatio()
 
-	/// L2-03-02指标值：财务费用分项金额求和，报表中配合「指标名称」筛选展示各分项
+	/// L2-03-02指标值：按财务费用分项对指标值求和，报表中配合「指标名称」筛选展示各分项
 	measure L2-03-02指标值 = SUM('L2-03-02 财务费用汇总表'[指标值])
 		displayFolder: L2-03-02 财务费用汇总表
 		lineageTag: fb0f769c-a919-47cc-a43e-bb2e3aa98866
 
 		formatStringDefinition = FormatAmount()
 
-	/// L2-01-03指标值：快报-金融投资业务专属长表（指标名称+指标值）的指标值求和，报表中配合「指标名称」筛选展示各指标
+	/// L2-01-03指标值：按快报-金融投资业务专属长表（指标名称+指标值）对指标值求和，报表中配合「指标名称」筛选展示各指标
 	measure L2-01-03指标值 = SUM('L2-01-03 快报-金融投资业务专属'[指标值])
 		displayFolder: L2-01-03 快报-金融投资业务专属
 		lineageTag: e0315754-a628-482f-abb8-94fd9476e555
 
 		formatStringDefinition = FormatAmount()
 
-	/// 金额(人民币)：库存汇总表金额求和（单位：人民币）
-	measure 金额(人民币) = ```
-			
-			    CALCULATE(
-			        SUM('L2-04-01 库存汇总表'[指标值]),
-			        'L2-04-01 库存汇总表'[指标名称] = "金额(人民币)"
-			    )
-			```
+	/// 金额(人民币)：按「金额(人民币)」筛选，对库存汇总表指标值求和（单位：人民币）
+	measure 金额(人民币) = CALCULATE(SUM('L2-04-01 库存汇总表'[指标值]), 'L2-04-01 库存汇总表'[指标名称] = "金额(人民币)")
 		displayFolder: L2-04-01 库存汇总表
 		lineageTag: db3d5d29-b50b-4a23-857b-20503c3ec9d8
 
 		formatStringDefinition = FormatAmount()
 
-	/// 量(吨)：库存汇总表数量求和（单位：吨）
-	measure 量(吨) = ```
-			
-			    CALCULATE(
-			        SUM('L2-04-01 库存汇总表'[指标值]),
-			        'L2-04-01 库存汇总表'[指标名称] = "量(吨)"
-			    )
-			```
+	/// 量(吨)：按「量(吨)」筛选，对库存汇总表指标值求和（单位：吨）
+	measure 量(吨) = CALCULATE(SUM('L2-04-01 库存汇总表'[指标值]), 'L2-04-01 库存汇总表'[指标名称] = "量(吨)")
 		displayFolder: L2-04-01 库存汇总表
 		lineageTag: d0d7509a-718e-4f98-ad1f-15492ec8c281
 
 		formatStringDefinition = FormatAmount()
 
-	/// L2-05-01指标值：硫磺及硫酸价格分析月报长表（指标名称+指标值）的指标值求和，报表中配合「指标名称」筛选展示各指标
+	/// L2-05-01指标值：按硫磺及硫酸价格分析月报长表（指标名称+指标值）对指标值求和，报表中配合「指标名称」筛选展示各指标
 	measure L2-05-01指标值 = SUM('L2-05-01 硫磺及硫酸价格分析月报'[指标值])
 		displayFolder: L2-05-01 硫磺及硫酸价格分析月报
 		lineageTag: 1b84b574-ee08-4c40-9052-d6c81de6ab8e
 
 		formatStringDefinition = FormatAmount()
 
-	/// L2-01-04指标值：S3 C1成本变化步行图长表（指标名称+指标值）的指标值求和；指标值含成本金额/数量等混合类型，故用通用数字格式
+	/// L2-01-04指标值：按 S3 C1成本变化步行图长表（指标名称+指标值）对指标值求和；指标值含成本金额/数量等混合类型，故用通用数字格式
 	measure L2-01-04指标值 = SUM('L2-01-04 S3 C1成本变化步行图VS上月'[指标值])
 		displayFolder: L2-01-04 S3 C1成本变化步行图VS上月
 		lineageTag: 6a619460-8596-4c1a-9cbe-cf6bfde8a11b
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// L2-01-14指标值：物料单耗月表长表（指标名称+指标值）的指标值求和；指标值含单耗比率/数量等混合类型，故用通用数字格式
+	/// L2-01-14指标值：按物料单耗月表长表（指标名称+指标值）对指标值求和；指标值含单耗比率/数量等混合类型，故用通用数字格式
 	measure L2-01-14指标值 = SUM('L2-01-14 物料单耗月表'[指标值])
 		displayFolder: L2-01-14 物料单耗月表
 		lineageTag: d2407060-2d2a-448f-957a-c69114e65d9e
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// L2-01-25指标值：工序成本完成情况长表（指标名称+指标值）的指标值求和
+	/// L2-01-25指标值：按工序成本完成情况长表（指标名称+指标值）对指标值求和
 	measure L2-01-25指标值 = SUM('L2-01-25 工序成本完成情况'[指标值])
 		displayFolder: L2-01-25 工序成本完成情况
 		lineageTag: c043b380-a857-4f96-bd06-709e56a0c038
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// L2-03-06指标值：矿石成本分析长表（指标名称+指标值）的指标值求和
+	/// L2-03-06指标值：按矿石成本分析长表（指标名称+指标值）对指标值求和
 	measure L2-03-06指标值 = SUM('L2-03-06 矿石成本分析'[指标值])
 		displayFolder: L2-03-06 矿石成本分析
 		lineageTag: 5414a2e4-66df-4721-9803-d18cdfe0cf18
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// L2-06-01指标值：主要产品价格波动汇总表长表（产品/指标名称/指标口径+指标值）的指标值求和；含单价、涨跌幅等混合口径，故用通用数字格式
+	/// L2-06-01指标值：按主要产品价格波动汇总表长表（产品/指标名称/指标口径+指标值）对指标值求和；含单价、涨跌幅等混合口径，故用通用数字格式
 	measure L2-06-01指标值 = SUM('L2-06-01 主要产品价格波动汇总表'[指标值])
 		displayFolder: L2-06-01 主要产品价格波动汇总表
 		lineageTag: d8cd5fe4-4ddc-4b1e-ad63-6f11f929e323
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// 当前月报期间：取日期表的最大日期，格式化为「当前月报期间: yyyy年MM月」，供各内容页顶部卡片展示
 	measure 当前月报期间 = ```
-			
-			VAR _Date = MAX('日期表'[日期])
-			VAR _YearMonth = FORMAT(_Date,"yyyy年MM月")
-			RETURN
-			 "当前月报期间: " & _YearMonth    
-			
-			```
+    VAR _Date = MAX('日期表'[日期])
+    VAR _YearMonth = FORMAT(_Date,"yyyy年MM月")
+    RETURN
+        "当前月报期间: " & _YearMonth
+    ```
 		displayFolder: 辅助
 		lineageTag: 3bef2f0e-ee99-49e7-ad9c-0e69ad93164d
 
-	measure 金额(原币) = ```
-			
-			    CALCULATE(
-			        SUM('L2-04-01 库存汇总表'[指标值]),
-			        'L2-04-01 库存汇总表'[指标名称] = "金额(原币)"
-			    )
-			```
+	measure 金额(原币) = CALCULATE(SUM('L2-04-01 库存汇总表'[指标值]), 'L2-04-01 库存汇总表'[指标名称] = "金额(原币)")
 		displayFolder: L2-04-01 库存汇总表
 		lineageTag: 8cbb0e7f-9b5a-494d-b304-cce2e5577cdf
 
