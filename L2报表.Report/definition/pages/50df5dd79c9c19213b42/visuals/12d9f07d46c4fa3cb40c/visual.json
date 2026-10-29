@@ -23,11 +23,11 @@
                       "Entity": "日期表"
                     }
                   },
-                  "Property": "年月"
+                  "Property": "年月筛选"
                 }
               },
-              "queryRef": "日期表.年月",
-              "nativeQueryRef": "年月",
+              "queryRef": "日期表.年月筛选",
+              "nativeQueryRef": "年月筛选",
               "active": true
             }
           ]
@@ -43,7 +43,7 @@
                     "Entity": "日期表"
                   }
                 },
-                "Property": "年月"
+                "Property": "年月筛选"
               }
             },
             "direction": "Descending"
@@ -90,7 +90,7 @@
                                   "Source": "日"
                                 }
                               },
-                              "Property": "年月"
+                              "Property": "年月筛选"
                             }
                           }
                         ],
@@ -98,7 +98,7 @@
                           [
                             {
                               "Literal": {
-                                "Value": "202603L"
+                                "Value": "'最近月份'"
                               }
                             }
                           ]
@@ -153,6 +153,11 @@
           }
         }
       ]
+    },
+    "syncGroup": {
+      "groupName": "年月筛选",
+      "fieldChanges": true,
+      "filterChanges": true
     },
     "drillFilterOtherVisuals": true
   }

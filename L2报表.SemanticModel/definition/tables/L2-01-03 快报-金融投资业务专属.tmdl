@@ -108,6 +108,17 @@ table 'L2-01-03 快报-金融投资业务专属'
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	column '公司代码货币 级别 01'
+		dataType: string
+		isHidden
+		lineageTag: 98e02fd4-a5ec-4e28-9469-71fc97c9a6f5
+		summarizeBy: none
+		sourceColumn: 公司代码货币 级别 01
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
 	partition 'L2-01-03 快报-金融投资业务专属' = m
 		mode: import
 		queryGroup: 财经
@@ -200,7 +211,8 @@ table 'L2-01-03 快报-金融投资业务专属'
 				                
 				                // ===== 维度展开（取Level 01层级） =====
 				                {Cube.AddAndExpandDimensionColumn, "[ZBUKRS]", {"[ZBUKRS].[LEVEL01]"}, {"公司代码"}},
-				                {Cube.AddAndExpandDimensionColumn, "[0LOC_CURRCY]", {"[0LOC_CURRCY].[LEVEL01]"}, {"公司代码货币"}},
+				                {Cube.AddAndExpandDimensionColumn, "[0LOC_CURRCY]", {"[0LOC_CURRCY].[LEVEL01]"}, {"公司代码货币 级别 01"}},
+				                {Table.AddColumn, "公司代码货币", each Cube.AttributeMemberProperty([公司代码货币 级别 01], "[20LOC_CURRCY]")},
 				                {Cube.AddAndExpandDimensionColumn, "[4ZRFI_CP012-CC_A_JRTZCP]", {"[4ZRFI_CP012-CC_A_JRTZCP].[LEVEL01]"}, {"金融投资产品"}}
 				            }),
 				            
@@ -223,9 +235,9 @@ table 'L2-01-03 快报-金融投资业务专属'
 				    // 被逆透视的列：所有17个Measure列
 				    逆透视长表 = Table.UnpivotOtherColumns(
 				        合并结果, 
-				        {"公司代码", "公司代码货币", "金融投资产品", "加载日期"},  // 保留的列
+				        {"公司代码", "公司代码货币", "公司代码货币 级别 01", "金融投资产品", "加载日期"},  // 保留的列，新增了中间层级列
 				        "指标名称",   // 新列名：存指标名称（如"年净值-成本"）
-				        "指标值"      // 新列名：存指标数值
+				        "指标值"     // 新列名：存指标数值
 				    ),
 				    
 				    // ========== 第八步：左连接映射表，带出三个排序 ==========

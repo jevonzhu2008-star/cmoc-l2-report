@@ -139,9 +139,9 @@ table 'L2-01-04 S3 C1成本变化步行图VS上月'
 				    // 连接 BW QAS 环境：Implementation=2.0 新版接口 / LanguageCode=ZH 返回中文 / EnableStructures=true 开启内置结构 / BatchSize 放大提升批量拉取性能
 				    数据源 = SapBusinessWarehouse.Cubes(QAS服务器, 系统编号, 客户端ID, [Implementation="2.0", LanguageCode="ZH", EnableStructures=true, BatchSize=500000000]),
 				    // 按 Cube 名称定位 ZRCO_CP004
-				    立方体 = 数据源{[Name="ZRCO_CP004"]}[Data],
+				    立方体 = 数据源{[Name="ZRCO_CP011"]}[Data],
 				    // 按 Query ID 定位该 Cube 内的目标查询 ZRCO_CP004/ZRCO_CP004_Q0012
-				    基础查询 = 立方体{[Id="ZRCO_CP004/ZRCO_CP004_Q0012"]}[Data],
+				    基础查询 = 立方体{[Id="ZRCO_CP011/ZRCO_CP011_Q0012"]}[Data],
 				
 				    // ========== 月份循环配置 ==========
 				    // 循环起始月份，取自 Power BI 参数 p_月报起始日期（date 类型）
@@ -161,57 +161,32 @@ table 'L2-01-04 S3 C1成本变化步行图VS上月'
 				            Query = Cube.Transform(基础查询, {
 				                // 设置 BW 期间参数 [ZMSDQNY] = 当前循环月份（BW 据此返回截止该月的累计数据）
 				                {Cube.ApplyParameter, "[ZMSDQNY]", {month}},
+				               
+				                // 维度展开
 				                {Cube.AddAndExpandDimensionColumn, "[ZCP]", {"[ZCP].[LEVEL01]"}, {"产品"}},
-				                {Cube.AddAndExpandDimensionColumn, "[4ZRCO_CP004-ZUNIT]", {"[4ZRCO_CP004-ZUNIT].[LEVEL01]"}, {"单位"}},
 				                {Cube.AddAndExpandDimensionColumn, "[ZKT]", {"[ZKT].[LEVEL01]"}, {"矿体"}},
-				                
-				                // M0（去年同期月）及成本要素分解
-				                // {Cube.AddMeasureColumn, "M0", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA1SEV]"},
-				                // {Cube.AddMeasureColumn, "M0_E01", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA2HP3]"},
-				                // {Cube.AddMeasureColumn, "M0_E02", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA2UC7]"},
-				                // {Cube.AddMeasureColumn, "M0_E03", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA36ZB]"},
-				                // {Cube.AddMeasureColumn, "M0_E04", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA3JMF]"},
-				                // {Cube.AddMeasureColumn, "M0_E05", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA3W9J]"},
-				                // {Cube.AddMeasureColumn, "M0_E14", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA48WN]"},
-				                // {Cube.AddMeasureColumn, "M0_E15", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA4LJR]"},
-				                // M1（上月）及成本要素分解
-				                // {Cube.AddMeasureColumn, "M1", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA1YQF]"},
-				                // {Cube.AddMeasureColumn, "M1_E01", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA2O0N]"},
-				                // {Cube.AddMeasureColumn, "M1_E02", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA30NR]"},
-				                // {Cube.AddMeasureColumn, "M1_E03", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA3DAV]"},
-				                // {Cube.AddMeasureColumn, "M1_E04", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA3PXZ]"},
-				                // {Cube.AddMeasureColumn, "M1_E05", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA42L3]"},
-				                // {Cube.AddMeasureColumn, "M1_E14", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA4F87]"},
-				                // {Cube.AddMeasureColumn, "M1_E15", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA4RVB]"},
-				                // Q0/Q1（季度指标）
-				                // {Cube.AddMeasureColumn, "Q0", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA251Z]"},
-				                // {Cube.AddMeasureColumn, "Q1", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA2BDJ]"},
+				                {Cube.AddAndExpandDimensionColumn, "[4ZRCO_CP011-ZUNIT]", {"[4ZRCO_CP011-ZUNIT].[LEVEL01]"}, {"单位"}},
 				
-				                // C1成本及要素分解
-				                // {Cube.AddMeasureColumn, "备件", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA6047]"},
-				                {Cube.AddMeasureColumn, "本月C1", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA6PEF]"},
-				                {Cube.AddMeasureColumn, "产量", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA54IF]"},
-				                {Cube.AddMeasureColumn, "递延剥离", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA66FR]"},
-				                {Cube.AddMeasureColumn, "勾稽差", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA6VPZ]"},
-				                {Cube.AddMeasureColumn, "耗材", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA5H5J]"},
-				                {Cube.AddMeasureColumn, "能源", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA5NH3]"},
-				                {Cube.AddMeasureColumn, "其他及未归类", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA6J2V]"},
-				                {Cube.AddMeasureColumn, "人工", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA5ATZ]"},
-				                {Cube.AddMeasureColumn, "上月C1", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA4Y6V]"},
-				                {Cube.AddMeasureColumn, "外包", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA5TSN]"},
-				                {Cube.AddMeasureColumn, "在产品变动", "[4VGQHR12MHZ3FSJMVHGE9X82F].[4VGQHR12MHZ3FSJMVHGEA6CRB]"}
+				                // 指标度量
+				                {Cube.AddMeasureColumn, "C1成本上个月", "[4VGQHR12MHZ3FWE24L2I3JAZ5].[4VGQHR12MHZ3FWE24L2I38Y1D]"},
+				                {Cube.AddMeasureColumn, "人工", "[4VGQHR12MHZ3FWE24L2I3JAZ5].[4VGQHR12MHZ3FWE24L2I39AOH]"},
+				                {Cube.AddMeasureColumn, "维修费用", "[4VGQHR12MHZ3FWE24L2I3JAZ5].[4VGQHR12MHZ3FWE24L2I39NBL]"},
+				                {Cube.AddMeasureColumn, "外部服务", "[4VGQHR12MHZ3FWE24L2I3JAZ5].[4VGQHR12MHZ3FWE24L2I39TN5]"},
+				                {Cube.AddMeasureColumn, "材料成本", "[4VGQHR12MHZ3FWE24L2I3JAZ5].[4VGQHR12MHZ3FWE24L2I39ZYP]"},
+				                {Cube.AddMeasureColumn, "能源费", "[4VGQHR12MHZ3FWE24L2I3JAZ5].[4VGQHR12MHZ3FWE24L2I3A6A9]"},
+				                {Cube.AddMeasureColumn, "运费", "[4VGQHR12MHZ3FWE24L2I3JAZ5].[4VGQHR12MHZ3FWE24L2I3ACLT]"},
+				                {Cube.AddMeasureColumn, "递延剥离", "[4VGQHR12MHZ3FWE24L2I3JAZ5].[4VGQHR12MHZ3FWE24L2I3AIXD]"},
+				                {Cube.AddMeasureColumn, "在产品变动", "[4VGQHR12MHZ3FWE24L2I3JAZ5].[4VGQHR12MHZ3FWE24L2I3AP8X]"},
+				                {Cube.AddMeasureColumn, "外购矿石", "[4VGQHR12MHZ3FWE24L2I3JAZ5].[4VGQHR12MHZ3FWE24L2I3AVKH]"},
+				                {Cube.AddMeasureColumn, "其他", "[4VGQHR12MHZ3FWE24L2I3JAZ5].[4VGQHR12MHZ3FWE24L2I3B1W1]"},
+				                {Cube.AddMeasureColumn, "C1成本本月实际", "[4VGQHR12MHZ3FWE24L2I3JAZ5].[4VGQHR12MHZ3FWE24L2I3B87L]"},
+				                {Cube.AddMeasureColumn, "勾稽差", "[4VGQHR12MHZ3FWE24L2I3JAZ5].[4VGQHR12MHZ3FWE24L2I3BEJ5]"},
+				                {Cube.AddMeasureColumn, "产量(品位回收率)", "[4VGQHR12MHZ3FWE24L2I3JAZ5].[4VGQHR12MHZ3FWE5SVNOORXM9]"}
 				            }),
 				            // 追加「加载日期」列：把当前循环 YYYYMM 转成当月首日 date（如 202601 → 2026-01-01），标记该行数据所属期间
 				            附加月份 = Table.AddColumn(Query, "加载日期", each #date(Number.From(Text.Start(month, 4)), Number.From(Text.End(month, 2)), 1), type date),
-				            // 把各指标列的 null 统一替换为 0（避免空值干扰报表）
-				            空值替换 = Table.ReplaceValue(附加月份, null, 0, Replacer.ReplaceValue,
-				                {/*"M0", "M0_E01", "M0_E02", "M0_E03", "M0_E04", "M0_E05", "M0_E14", "M0_E15",
-				                 "M1", "M1_E01", "M1_E02", "M1_E03", "M1_E04", "M1_E05", "M1_E14", "M1_E15",
-				                 "Q0", "Q1", "备件",*/ "本月C1", "产量", "递延剥离", "勾稽差",
-				                 "耗材", "能源", "其他及未归类", "人工", "上月C1", "外包", "在产品变动"}
-				            ),
 				            // 逆透视：把宽表的指标列转为两列「指标名称」「指标值」，形成长表
-				            逆透视 = Table.UnpivotOtherColumns(空值替换, {"产品", "矿体", "单位", "加载日期"}, "指标名称", "指标值")
+				            逆透视 = Table.UnpivotOtherColumns(附加月份, {"产品", "矿体", "单位", "加载日期"}, "指标名称", "指标值")
 				        in
 				            逆透视,
 				

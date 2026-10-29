@@ -67,6 +67,17 @@ table 日期表
 
 		annotation SummarizationSetBy = Automatic
 
+	column 年月筛选
+		dataType: string
+		lineageTag: 2d75113b-3235-4798-953f-c4887b9460fa
+		summarizeBy: none
+		sourceColumn: 年月筛选
+		sortByColumn: 年月
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
 	partition 日期表 = m
 		mode: import
 		queryGroup: 辅助
@@ -75,32 +86,33 @@ table 日期表
 				    // ① 起止日期
 				    起始日期 = p_月报起始日期,
 				    结束日期 = p_月报终止日期,
-				
-				    // ② 生成连续日期列表（含首尾，共 731 天）
+				    // ② 生成连续日期列表（含首尾）
 				    天数 = Duration.Days(结束日期 - 起始日期) + 1,
 				    日期列表 = List.Dates(起始日期, 天数, #duration(1, 0, 0, 0)),
-				
 				    // ③ 列表转表并设日期类型
 				    日期表 = Table.FromList(日期列表, Splitter.SplitByNothing(), {"日期"}, null, ExtraValues.Error),
 				    日期类型 = Table.TransformColumnTypes(日期表, {{"日期", type date}}),
-				
 				    // ④ 年：文本格式（2025年 / 2026年）
 				    加年 = Table.AddColumn(日期类型, "年", each Text.From(Date.Year([日期])) & "年", type text),
-				
 				    // ⑤ 月：文本格式（1月–12月）
 				    加月 = Table.AddColumn(加年, "月", each Text.From(Date.Month([日期])) & "月", type text),
-				
 				    // ⑥ 年月：数值键，如 202501、202612（= 年×100 + 月）
 				    加年月 = Table.AddColumn(加月, "年月", each Date.Year([日期]) * 100 + Date.Month([日期]), Int64.Type),
-				
 				    // ⑦ 年排序：按年份数值排序的键
 				    加年排序 = Table.AddColumn(加年月, "年排序", each Date.Year([日期]), Int64.Type),
-				
 				    // ⑧ 月排序：按月份数值排序的键
 				    加月排序 = Table.AddColumn(加年排序, "月排序", each Date.Month([日期]), Int64.Type),
-				
-				    // ⑨ 按日期升序排列
-				    结果 = Table.Sort(加月排序, {{"日期", Order.Ascending}})
+				    // ⑨ 本日期表范围内的最大年月（= p_月报终止日期 所在月）
+				    最大年月 = List.Max(加月排序[年月]),
+				    // ⑩ 新增【年月筛选】：最大年月显示"最近月份"，其他显示为"2026-01"格式
+				    加年月筛选 = Table.AddColumn(加月排序, "年月筛选", each
+				        if [年月] = 最大年月
+				            then "最近月份"
+				            else Text.From(Date.Year([日期])) & "-" & Text.PadStart(Text.From(Date.Month([日期])), 2, "0"),
+				        type text
+				    ),
+				    // ⑪ 按日期升序排列
+				    结果 = Table.Sort(加年月筛选, {{"日期", Order.Ascending}})
 				in
 				    结果
 
