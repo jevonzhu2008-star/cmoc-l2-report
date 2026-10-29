@@ -95,6 +95,15 @@ svg text{font-family:var(--sans)}
 <script>
 const DATA = [
   {
+    "short": "5074400",
+    "date": "2026-10-29 10:33",
+    "msg": "切片器改用「年月筛选」并新增「当前月报期间」卡片，L2-01-04 切换至 ZRCO_CP011",
+    "files": 42,
+    "add": 2196,
+    "del": 1115,
+    "ms": true
+  },
+  {
     "short": "24b3025",
     "date": "2026-10-28 14:51",
     "msg": "优化全模型 M 与 DAX：工作簿单次解析、映射表去重、注释清理",
@@ -440,6 +449,15 @@ const DATA = [
 
 // 完整提交备注（由 update-version-html.py 维护，去 Co-Authored-By）
 const NOTES = {
+  "5074400": [
+    "- 日期表：新增「年月筛选」文本列，范围内最大年月显示为「最近月份」，其余显示 yyyy-MM，并沿用「年月」排序",
+    "- 报表：11 个内容页的切片器由「年月」改为「年月筛选」（默认选「最近月份」），加入同名同步组，翻页时筛选保持一致",
+    "- 报表：各内容页右上角新增卡片，显示「当前月报期间: yyyy年MM月」；pages.json 活动页改为 L2-01-02 集团合并利润汇总表",
+    "- 度量值：新增「当前月报期间」，按日期表最大日期格式化输出",
+    "- M：L2-01-03 保留「公司代码货币 级别 01」层级列（经 AttributeMemberProperty 取货币 Member），逆透视时保留该列",
+    "- M：L2-01-04 数据源由 ZRCO_CP004 切换为 ZRCO_CP011，指标集改为「C1成本本月实际 / C1成本上个月 / 产量(品位回收率)」+ 11 项成本要素；删除 30 余行注释掉的历史度量值，取消 null→0 替换，改由逆透视直接产出长表",
+    "- 其他：diagramLayout 仅视图滚动位置变化"
+  ],
   "24b3025": [
     "- M：9 张事实表的 Excel.Workbook 改为「工作簿只解析一次」，24 处重复解析收敛为每表 1 次",
     "- M：27 张排序映射表在 join 前按匹配键 Table.Distinct，避免一键多映射导致事实行翻倍且不报错",
@@ -766,7 +784,7 @@ const NOTES = {
 const totalAdd = DATA.reduce((s,d)=>s+d.add,0);
 const totalDel = DATA.reduce((s,d)=>s+d.del,0);
 const totalFiles = DATA.reduce((s,d)=>s+d.files,0);
-const days = "7.9";
+const days = "8.7";
 
 document.getElementById('kpis').innerHTML = `
   <div class="kpi"><div class="n">${DATA.length}</div><div class="l">提交数（main）</div></div>
