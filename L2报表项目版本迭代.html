@@ -95,6 +95,15 @@ svg text{font-family:var(--sans)}
 <script>
 const DATA = [
   {
+    "short": "522e5f8",
+    "date": "2026-10-29 16:17",
+    "msg": "矿体表补排序依据并修正 M 注释与缩进",
+    "files": 1,
+    "add": 7,
+    "del": 3,
+    "ms": false
+  },
+  {
     "short": "e7cbc55",
     "date": "2026-10-29 16:10",
     "msg": "新增矿体维度表与四个 RLS 角色，报表活动页改回首页",
@@ -485,6 +494,11 @@ const DATA = [
 
 // 完整提交备注（由 update-version-html.py 维护，去 Co-Authored-By）
 const NOTES = {
+  "522e5f8": [
+    "- 模型：「矿体」补 sortByColumn = 矿体排序，切片器与矩阵按映射表的业务顺序排列，而不是按拼音 —— 经 MCP 连接确认该列 sortByColumn 已生效、状态 Ready",
+    "- M 注释：第 1 步标题「读取 SharePoint 上的结构排序映射表」改为「读取 SharePoint 上的维度表」；筛选条件改写成「维度表」（原注释照抄了 L2-01-02 指标映射的文件名，与代码不符）；为「矿体」Sheet 去重一行补说明（供事实表筛选与四个 RLS 角色过滤）",
+    "- M 排版：首行 3 空格、in 之后 2 空格的缩进统一为 4 空格倍数，与全模型其它表一致"
+  ],
   "e7cbc55": [
     "- 模型：新增「矿体表」——从 SharePoint「维度表」xlsx 的「矿体」Sheet 读取并去重，含「矿体」「矿体排序」两列，queryGroup 辅助；model.tmdl 补 ref table 与 PBI_QueryOrder",
     "- 模型：新增 6 条关系——L2-01-04 / L2-01-14 / L2-01-25 / L2-03-06 / L2-04-01 的「矿体」→ 矿体表.矿体（Desktop 自动识别），以及 L2-03-01「业务板块」→ 矿体表.矿体，供行级权限按矿体/板块过滤",
