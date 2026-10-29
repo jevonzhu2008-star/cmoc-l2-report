@@ -100,14 +100,26 @@ table 度量值
 		formatStringDefinition = FormatAmount()
 
 	/// 金额(人民币)：库存汇总表金额求和（单位：人民币）
-	measure 金额(人民币) = SUM('L2-04-01 库存汇总表'[金额(人民币)])
+	measure 金额(人民币) = ```
+			
+			    CALCULATE(
+			        SUM('L2-04-01 库存汇总表'[指标值]),
+			        'L2-04-01 库存汇总表'[指标名称] = "金额(人民币)"
+			    )
+			```
 		displayFolder: L2-04-01 库存汇总表
 		lineageTag: db3d5d29-b50b-4a23-857b-20503c3ec9d8
 
 		formatStringDefinition = FormatAmount()
 
 	/// 量(吨)：库存汇总表数量求和（单位：吨）
-	measure 量(吨) = SUM('L2-04-01 库存汇总表'[量(吨)])
+	measure 量(吨) = ```
+			
+			    CALCULATE(
+			        SUM('L2-04-01 库存汇总表'[指标值]),
+			        'L2-04-01 库存汇总表'[指标名称] = "量(吨)"
+			    )
+			```
 		displayFolder: L2-04-01 库存汇总表
 		lineageTag: d0d7509a-718e-4f98-ad1f-15492ec8c281
 
@@ -165,6 +177,18 @@ table 度量值
 			```
 		displayFolder: 辅助
 		lineageTag: 3bef2f0e-ee99-49e7-ad9c-0e69ad93164d
+
+	measure 金额(原币) = ```
+			
+			    CALCULATE(
+			        SUM('L2-04-01 库存汇总表'[指标值]),
+			        'L2-04-01 库存汇总表'[指标名称] = "金额(原币)"
+			    )
+			```
+		displayFolder: L2-04-01 库存汇总表
+		lineageTag: 8cbb0e7f-9b5a-494d-b304-cce2e5577cdf
+
+		formatStringDefinition = FormatAmount()
 
 	partition 度量值 = m
 		mode: import

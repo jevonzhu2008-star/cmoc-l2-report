@@ -1,6 +1,6 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
-  "name": "c72c9ee560ff7a26263b",
+  "name": "1359b9339ddd3590a938",
   "position": {
     "x": 16.286948553475586,
     "y": 94.10236942008116,
@@ -23,10 +23,25 @@
                       "Entity": "L2-04-01 库存汇总表"
                     }
                   },
+                  "Property": "矿体"
+                }
+              },
+              "queryRef": "L2-04-01 库存汇总表.矿体",
+              "nativeQueryRef": "矿体",
+              "active": true
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "L2-04-01 库存汇总表"
+                    }
+                  },
                   "Property": "结构"
                 }
               },
-              "queryRef": "L2-04-01库存汇总表.结构",
+              "queryRef": "L2-04-01 库存汇总表.结构",
               "nativeQueryRef": "结构",
               "active": true
             }
@@ -45,23 +60,8 @@
                   "Property": "分类"
                 }
               },
-              "queryRef": "L2-04-01库存汇总表.分类",
+              "queryRef": "L2-04-01 库存汇总表.分类",
               "nativeQueryRef": "分类",
-              "active": true
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "L2-04-01 库存汇总表"
-                    }
-                  },
-                  "Property": "矿体"
-                }
-              },
-              "queryRef": "L2-04-01库存汇总表.矿体",
-              "nativeQueryRef": "矿体",
               "active": true
             }
           ]
@@ -90,6 +90,20 @@
                       "Entity": "度量值"
                     }
                   },
+                  "Property": "金额(原币)"
+                }
+              },
+              "queryRef": "度量值.金额(原币)",
+              "nativeQueryRef": "金额(原币)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "度量值"
+                    }
+                  },
                   "Property": "金额(人民币)"
                 }
               },
@@ -98,6 +112,23 @@
             }
           ]
         }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "L2-04-01 库存汇总表"
+                  }
+                },
+                "Property": "分类"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ]
       }
     },
     "objects": {
@@ -140,7 +171,7 @@
             "columnAdjustment": {
               "expr": {
                 "Literal": {
-                  "Value": "'growToFit'"
+                  "Value": "'fitToContent'"
                 }
               }
             },
@@ -154,7 +185,7 @@
             "wordWrap": {
               "expr": {
                 "Literal": {
-                  "Value": "true"
+                  "Value": "false"
                 }
               }
             },
@@ -210,6 +241,13 @@
               "expr": {
                 "Literal": {
                   "Value": "false"
+                }
+              }
+            },
+            "rowSubtotalsPosition": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Bottom'"
                 }
               }
             }
@@ -284,6 +322,20 @@
           "selector": {
             "metadata": "指标列表.地域"
           }
+        },
+        {
+          "properties": {
+            "levelSubtotalEnabled": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "L2-04-01 库存汇总表.分类"
+          }
         }
       ],
       "rowHeaders": [
@@ -340,6 +392,20 @@
                   "Value": "0D"
                 }
               }
+            },
+            "repeatRowHeaders": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "wordWrap": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
             }
           }
         }
@@ -394,6 +460,20 @@
               "expr": {
                 "Literal": {
                   "Value": "0D"
+                }
+              }
+            },
+            "valuesOnRow": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "wordWrap": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
                 }
               }
             }
@@ -527,6 +607,19 @@
               }
             },
             "showBorder": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "rowTotal": [
+        {
+          "properties": {
+            "applyToHeaders": {
               "expr": {
                 "Literal": {
                   "Value": "false"
@@ -972,76 +1065,6 @@
         },
         "type": "Categorical",
         "howCreated": "User"
-      },
-      {
-        "name": "367fdacb22bc86eeb0d0",
-        "field": {
-          "Column": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "L2-04-01 库存汇总表"
-              }
-            },
-            "Property": "结构"
-          }
-        },
-        "type": "Categorical"
-      },
-      {
-        "name": "816b213279e98b430360",
-        "field": {
-          "Column": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "L2-04-01 库存汇总表"
-              }
-            },
-            "Property": "分类"
-          }
-        },
-        "type": "Categorical"
-      },
-      {
-        "name": "9379e7fa71bc904b23ce",
-        "field": {
-          "Column": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "L2-04-01 库存汇总表"
-              }
-            },
-            "Property": "矿体"
-          }
-        },
-        "type": "Categorical"
-      },
-      {
-        "name": "1f3372cfc00686654604",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "度量值"
-              }
-            },
-            "Property": "量(吨)"
-          }
-        },
-        "type": "Advanced"
-      },
-      {
-        "name": "537bbf5f8004d2208308",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "度量值"
-              }
-            },
-            "Property": "金额(人民币)"
-          }
-        },
-        "type": "Advanced"
       }
     ],
     "filterSortOrder": "Custom"

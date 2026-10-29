@@ -18,7 +18,7 @@ queryGroup 财经
 
 queryGroup 辅助
 
-	annotation PBI_QueryGroupOrder = 5
+	annotation PBI_QueryGroupOrder = 2
 
 annotation __PBI_TimeIntelligenceEnabled = 0
 
