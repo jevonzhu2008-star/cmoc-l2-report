@@ -95,6 +95,15 @@ svg text{font-family:var(--sans)}
 <script>
 const DATA = [
   {
+    "short": "e7cbc55",
+    "date": "2026-10-29 16:10",
+    "msg": "新增矿体维度表与四个 RLS 角色，报表活动页改回首页",
+    "files": 14,
+    "add": 401,
+    "del": 19,
+    "ms": false
+  },
+  {
     "short": "6c4c380",
     "date": "2026-10-29 15:40",
     "msg": "统一全模型 M 与 DAX 的注释与排版（不改逻辑）",
@@ -476,6 +485,14 @@ const DATA = [
 
 // 完整提交备注（由 update-version-html.py 维护，去 Co-Authored-By）
 const NOTES = {
+  "e7cbc55": [
+    "- 模型：新增「矿体表」——从 SharePoint「维度表」xlsx 的「矿体」Sheet 读取并去重，含「矿体」「矿体排序」两列，queryGroup 辅助；model.tmdl 补 ref table 与 PBI_QueryOrder",
+    "- 模型：新增 6 条关系——L2-01-04 / L2-01-14 / L2-01-25 / L2-03-06 / L2-04-01 的「矿体」→ 矿体表.矿体（Desktop 自动识别），以及 L2-03-01「业务板块」→ 矿体表.矿体，供行级权限按矿体/板块过滤",
+    "- 安全：新增 4 个 RLS 角色——集团（不设过滤）、KFM、TFM、中国区（分别按 [矿体] == \"KFM\" / \"TFM\" / \"中国区\" 过滤矿体表），均只有 read 权限",
+    "- 报表：pages.json 的 activePageName 改回首页 e6f9a94ed6eff9e91d95；report.json 新增 filterPaneHiddenInEditMode = true（编辑模式隐藏筛选器窗格）",
+    "- Desktop 重写：L2-01-03 / L2-01-04 / L2-03-02 三个分区的 source 围栏、以及「当前月报期间」的表达式围栏被去掉，属等价写法，无逻辑变化；diagramLayout.json 为模型视图布局",
+    "- 校验：MCP 重新连接正常载入（14 张表 / 24 个度量值 / 17 条关系）"
+  ],
   "6c4c380": [
     "- M 头部：12 个事实表统一为【查询名称】/【对应报表】/【BW对象】/【说明】四段式；【BW对象】统一「Cube:<Cube>，Query:<Query>」，值与代码 {} 定位一致",
     "- M 头部按代码改正过期信息：L2-01-04 由 ZRCO_CP004 改为 ZRCO_CP011 并重写指标口径说明；L2-01-25「工序产量月报 / L2-XX-XX」改为「工序成本完成情况 / L2-01-25」；L2-03-06「L2-01-26 矿体指标月报」改为「L2-03-06 矿石成本分析」；L2-03-01「L2销管费用月报」改为「L2-03-01 销售管理费用预算执行汇总表」；L2-05-01「L2原材料采购月报」改为「L2-05-01 硫磺及硫酸价格分析月报」；L2-01-02 的 U+2011 连字符改为普通连字符",
