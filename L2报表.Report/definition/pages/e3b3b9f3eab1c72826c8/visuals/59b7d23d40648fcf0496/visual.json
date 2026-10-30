@@ -70,22 +70,17 @@
           "projections": [
             {
               "field": {
-                "Aggregation": {
+                "Measure": {
                   "Expression": {
-                    "Column": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "L2-06-01 主要产品价格波动汇总表"
-                        }
-                      },
-                      "Property": "指标值"
+                    "SourceRef": {
+                      "Entity": "度量值"
                     }
                   },
-                  "Function": 0
+                  "Property": "L2-06-01指标值"
                 }
               },
-              "queryRef": "Sum(L2-06-01 主要产品价格波动汇总表.指标值)",
-              "nativeQueryRef": "指标值 的总和"
+              "queryRef": "度量值.L2-06-01指标值",
+              "nativeQueryRef": "L2-06-01指标值"
             }
           ]
         }
@@ -388,6 +383,83 @@
                 }
               }
             }
+          }
+        },
+        {
+          "properties": {
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Conditional": {
+                      "Cases": [
+                        {
+                          "Condition": {
+                            "And": {
+                              "Left": {
+                                "Comparison": {
+                                  "ComparisonKind": 2,
+                                  "Left": {
+                                    "Measure": {
+                                      "Expression": {
+                                        "SourceRef": {
+                                          "Entity": "度量值"
+                                        }
+                                      },
+                                      "Property": "L2-06-01指标值"
+                                    }
+                                  },
+                                  "Right": {
+                                    "Literal": {
+                                      "Value": "-99999999D"
+                                    }
+                                  }
+                                }
+                              },
+                              "Right": {
+                                "Comparison": {
+                                  "ComparisonKind": 3,
+                                  "Left": {
+                                    "Measure": {
+                                      "Expression": {
+                                        "SourceRef": {
+                                          "Entity": "度量值"
+                                        }
+                                      },
+                                      "Property": "L2-06-01指标值"
+                                    }
+                                  },
+                                  "Right": {
+                                    "Literal": {
+                                      "Value": "0D"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "Value": {
+                            "Literal": {
+                              "Value": "'#B91C1C'"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "dataViewWildcard": {
+                  "matchingOption": 1
+                }
+              }
+            ],
+            "metadata": "度量值.L2-06-01指标值"
           }
         }
       ],
@@ -954,25 +1026,6 @@
           }
         },
         "type": "Categorical"
-      },
-      {
-        "name": "9c654f4175806c7c2655",
-        "field": {
-          "Aggregation": {
-            "Expression": {
-              "Column": {
-                "Expression": {
-                  "SourceRef": {
-                    "Entity": "L2-06-01 主要产品价格波动汇总表"
-                  }
-                },
-                "Property": "指标值"
-              }
-            },
-            "Function": 0
-          }
-        },
-        "type": "Advanced"
       }
     ],
     "filterSortOrder": "Custom"

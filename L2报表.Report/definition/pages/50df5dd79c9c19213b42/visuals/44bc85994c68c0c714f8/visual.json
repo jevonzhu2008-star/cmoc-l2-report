@@ -548,7 +548,7 @@
                             "And": {
                               "Left": {
                                 "Comparison": {
-                                  "ComparisonKind": 2,
+                                  "ComparisonKind": 1,
                                   "Left": {
                                     "Measure": {
                                       "Expression": {
@@ -715,7 +715,7 @@
                                   },
                                   "Right": {
                                     "Literal": {
-                                      "Value": "0D"
+                                      "Value": "1D"
                                     }
                                   }
                                 }
@@ -745,57 +745,6 @@
                           "Value": {
                             "Literal": {
                               "Value": "'#059669'"
-                            }
-                          }
-                        },
-                        {
-                          "Condition": {
-                            "And": {
-                              "Left": {
-                                "Comparison": {
-                                  "ComparisonKind": 2,
-                                  "Left": {
-                                    "Measure": {
-                                      "Expression": {
-                                        "SourceRef": {
-                                          "Entity": "度量值"
-                                        }
-                                      },
-                                      "Property": "预算达成率"
-                                    }
-                                  },
-                                  "Right": {
-                                    "Literal": {
-                                      "Value": "-99999999D"
-                                    }
-                                  }
-                                }
-                              },
-                              "Right": {
-                                "Comparison": {
-                                  "ComparisonKind": 3,
-                                  "Left": {
-                                    "Measure": {
-                                      "Expression": {
-                                        "SourceRef": {
-                                          "Entity": "度量值"
-                                        }
-                                      },
-                                      "Property": "预算达成率"
-                                    }
-                                  },
-                                  "Right": {
-                                    "Literal": {
-                                      "Value": "0D"
-                                    }
-                                  }
-                                }
-                              }
-                            }
-                          },
-                          "Value": {
-                            "Literal": {
-                              "Value": "'#B91C1C'"
                             }
                           }
                         }
@@ -830,7 +779,7 @@
                             "And": {
                               "Left": {
                                 "Comparison": {
-                                  "ComparisonKind": 2,
+                                  "ComparisonKind": 1,
                                   "Left": {
                                     "Measure": {
                                       "Expression": {
