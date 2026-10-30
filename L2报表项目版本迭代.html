@@ -95,6 +95,15 @@ svg text{font-family:var(--sans)}
 <script>
 const DATA = [
   {
+    "short": "3c003ac",
+    "date": "2026-10-30 13:33",
+    "msg": "L2-01-02 分月列空值不再替换为 0；活动页切到物料单耗月表",
+    "files": 2,
+    "add": 2,
+    "del": 2,
+    "ms": false
+  },
+  {
     "short": "2a2e590",
     "date": "2026-10-30 10:52",
     "msg": "金额格式改为两位小数，各页矩阵补负数红色条件格式",
@@ -512,6 +521,11 @@ const DATA = [
 
 // 完整提交备注（由 update-version-html.py 维护，去 Co-Authored-By）
 const NOTES = {
+  "3c003ac": [
+    "- 「空值替换为0」步骤中注释掉 1月~12月 共 12 个分月列，分月无数据时保留空值，不再填 0；",
+    "YTD / 预算 / MTD 类指标仍按原逻辑补 0。",
+    "- pages.json 的 activePageName 由首页改为 L2-01-14 物料单耗月表（Desktop 保存附带，landingPageName 仍为首页）。"
+  ],
   "2a2e590": [
     "- 模型：FormatAmount 由 \"#,0;(#,0);0\" 改为 \"#,0.00;(#,0.00);0.00\"，所有引用该函数的金额类度量值改为显示两位小数",
     "- 模型：累计实际 增加 /1000（单位由元改为千元）",
@@ -904,7 +918,7 @@ const NOTES = {
 const totalAdd = DATA.reduce((s,d)=>s+d.add,0);
 const totalDel = DATA.reduce((s,d)=>s+d.del,0);
 const totalFiles = DATA.reduce((s,d)=>s+d.files,0);
-const days = "9.7";
+const days = "9.8";
 
 document.getElementById('kpis').innerHTML = `
   <div class="kpi"><div class="n">${DATA.length}</div><div class="l">提交数（main）</div></div>
