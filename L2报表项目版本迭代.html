@@ -95,6 +95,15 @@ svg text{font-family:var(--sans)}
 <script>
 const DATA = [
   {
+    "short": "2a2e590",
+    "date": "2026-10-30 10:52",
+    "msg": "金额格式改为两位小数，各页矩阵补负数红色条件格式",
+    "files": 14,
+    "add": 876,
+    "del": 104,
+    "ms": false
+  },
+  {
     "short": "1c56b49",
     "date": "2026-10-29 17:34",
     "msg": "RLS 改为动态矿体权限，L2-04-01 页设为可见",
@@ -503,6 +512,17 @@ const DATA = [
 
 // 完整提交备注（由 update-version-html.py 维护，去 Co-Authored-By）
 const NOTES = {
+  "2a2e590": [
+    "- 模型：FormatAmount 由 \"#,0;(#,0);0\" 改为 \"#,0.00;(#,0.00);0.00\"，所有引用该函数的金额类度量值改为显示两位小数",
+    "- 模型：累计实际 增加 /1000（单位由元改为千元）",
+    "- 模型：L2-01-04 的 BW 度量组更换 measure ID，成本要素为 人工/维修费用/外部服务/材料成本/能源费/运费/递延剥离/在产品变动/外购矿石/其他 共 10 项，加 C1成本本月实际、C1成本上个月、产量(品位回收率)，去掉「勾稽差」",
+    "- 模型：L2-01-04 / L2-01-14 / L2-01-25 / L2-03-06 / L2-06-01 五个指标值度量值由通用数字格式改为 FormatAmount()",
+    "- 报表：9 个内容页的矩阵指标值新增条件格式——小于 0 的单元格字体显示为 #B91C1C",
+    "- 报表：L2-01-02 的预算达成率条件格式阈值由「> 0」改为「> 1」（达成率超过 100% 才显绿），并删掉负数红色分支",
+    "- 报表：L2-06-01 矩阵的字段时间由隐式聚合 Sum(指标值) 改为度量值 L2-06-01指标值",
+    "- 报表：L2-04-01 页恢复 HiddenInViewMode，pages.json 的 activePageName 回落到首页",
+    "- 校验：MCP 重新连接正常载入（15 张表 / 24 个度量值 / 17 条关系）"
+  ],
   "1c56b49": [
     "- 模型：删除 集团 / KFM / TFM / 中国区 四个静态角色，改为单个动态角色 Role_Dynamic_OreFilter；按 USERPRINCIPALNAME() 关联新表 Security_Ore_Permission（UPN / OreName / IsActive），矿体表中 OreName 命中或含「*」（全部权限）的行可见",
     "- 模型：新增隐藏表 Security_Ore_Permission，从 SharePoint 上「Security_Ore_Permission」xlsx 的同名 Sheet 读取，queryGroup 辅助；model.tmdl 补 ref table、ref role 与 PBI_QueryOrder",
@@ -884,7 +904,7 @@ const NOTES = {
 const totalAdd = DATA.reduce((s,d)=>s+d.add,0);
 const totalDel = DATA.reduce((s,d)=>s+d.del,0);
 const totalFiles = DATA.reduce((s,d)=>s+d.files,0);
-const days = "9.0";
+const days = "9.7";
 
 document.getElementById('kpis').innerHTML = `
   <div class="kpi"><div class="n">${DATA.length}</div><div class="l">提交数（main）</div></div>
