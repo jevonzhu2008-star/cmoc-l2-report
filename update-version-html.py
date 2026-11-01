@@ -258,6 +258,45 @@ svg text{{font-family:var(--sans)}}
 .tl-notes summary:hover{{color:var(--accent-strong)}}
 .tl-notes ul{{margin:6px 0 0 18px; padding:0}}
 .tl-notes li{{margin:3px 0; line-height:1.5}}
+
+/* ============ 日历视图 ============ */
+.lv-0{{--o:0}} .lv-1{{--o:.10}} .lv-2{{--o:.20}} .lv-3{{--o:.32}} .lv-4{{--o:.45}}
+.cal-legend{{display:flex; align-items:center; gap:6px; flex-wrap:wrap; font-size:12px; color:var(--ink-muted); margin:-4px 0 18px}}
+.cal-swatch{{position:relative; width:12px; height:12px; border:1px solid var(--border); border-radius:3px}}
+.cal-swatch::before{{content:""; position:absolute; inset:0; border-radius:2px; background:var(--accent); opacity:var(--o,0)}}
+.cal-legend .ms-dot{{width:7px; height:7px; border-radius:50%; background:var(--down); margin-left:10px}}
+.cal-wrap{{display:flex; flex-wrap:wrap; gap:24px; align-items:flex-start}}
+.cal-month{{flex:1 1 260px; max-width:340px}}
+.cal-month-title{{font-size:13px; font-weight:600; margin-bottom:10px; display:flex; align-items:baseline; gap:8px}}
+.cal-month-title .cnt{{font-size:11.5px; font-weight:400; color:var(--ink-muted)}}
+.cal-weekdays,.cal-days{{display:grid; grid-template-columns:repeat(7,1fr); gap:5px}}
+.cal-weekdays div{{font-size:11px; color:var(--ink-muted); text-align:center}}
+.cal-cell{{position:relative; aspect-ratio:1/1; border:1px solid var(--border); border-radius:6px; display:flex; align-items:center; justify-content:center; font-family:var(--mono); font-size:13px; color:var(--ink-2)}}
+.cal-cell::before{{content:""; position:absolute; inset:0; border-radius:5px; background:var(--accent); opacity:var(--o,0); transition:opacity .15s}}
+.cal-cell.empty{{border-color:transparent}}
+.cal-cell.empty::before{{content:none}}
+.cal-cell.has-data{{color:var(--ink-1); cursor:pointer}}
+.cal-cell.has-data:hover::before{{opacity:calc(var(--o,0) + .12)}}
+.cal-cell.has-data:focus-visible{{outline:2px solid var(--accent-strong); outline-offset:1px}}
+.cal-cell.selected{{box-shadow:0 0 0 2px var(--accent-strong)}}
+.cal-num{{position:absolute; top:2px; left:5px; font-size:9.5px; opacity:.65; z-index:1}}
+.cal-cnt{{position:relative; z-index:1; font-weight:700}}
+.cal-cell.ms::after{{content:""; position:absolute; z-index:2; bottom:3px; left:50%; transform:translateX(-50%); width:4px; height:4px; border-radius:50%; background:var(--down)}}
+.cal-detail{{margin-top:20px; border-top:1px solid var(--border); padding-top:14px}}
+.cd-head{{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:8px}}
+.cd-date{{font-weight:600; font-size:13.5px}}
+.cd-meta{{font-family:var(--mono); font-size:12px; color:var(--ink-muted)}}
+.cd-meta .add{{color:var(--up)}}
+.cd-meta .del{{color:var(--down)}}
+.cd-list{{list-style:none; margin:0; padding:0}}
+.cd-list>li{{padding:8px 0; border-top:1px dashed var(--border)}}
+.cd-list>li:first-child{{border-top:none}}
+.cd-row{{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap}}
+.cd-time{{font-family:var(--mono); font-size:12px; color:var(--ink-muted); white-space:nowrap}}
+.cd-msg{{font-size:13px}}
+@media(max-width:560px){{
+  .cal-month{{max-width:none}}
+}}
 </style>
 </head>
 <body>
@@ -268,6 +307,18 @@ svg text{{font-family:var(--sans)}}
   </header>
 
   <div class="kpis" id="kpis"></div>
+
+  <div class="card">
+    <h2>提交日历</h2>
+    <div class="cal-legend">
+      <span>提交密度</span>
+      <i class="cal-swatch lv-0"></i><i class="cal-swatch lv-1"></i><i class="cal-swatch lv-2"></i><i class="cal-swatch lv-3"></i><i class="cal-swatch lv-4"></i>
+      <span>少 → 多</span>
+      <i class="ms-dot"></i><span>里程碑提交</span>
+    </div>
+    <div class="cal-wrap" id="calendar"></div>
+    <div class="cal-detail" id="calDetail"></div>
+  </div>
 
   <div class="card">
     <h2>版本迭代时间线</h2>
@@ -315,8 +366,113 @@ document.getElementById('timeline').innerHTML = DATA.map(d=>`
   </div>
 `).join('');
 
+// ============ 日历视图 ============
+(function(){{
+  const host = document.getElementById('calendar');
+  const detail = document.getElementById('calDetail');
+  if(!host || !detail) return;
 
+  // 按自然日归并提交
+  const byDate = new Map();
+  DATA.forEach(d=>{{
+    const day = (d.date||'').slice(0,10);
+    if(!day) return;
+    if(!byDate.has(day)) byDate.set(day, []);
+    byDate.get(day).push(d);
+  }});
+  const dayKeys = [...byDate.keys()].sort();
+  if(!dayKeys.length){{ host.innerHTML = '<p class="note">暂无提交记录。</p>'; return; }}
+  const maxCount = Math.max(...dayKeys.map(k=>byDate.get(k).length));
 
+  // 提交数 → 密度等级 1~4
+  function level(n){{
+    if(maxCount <= 1) return 4;
+    const r = n / maxCount;
+    if(r <= .25) return 1;
+    if(r <= .50) return 2;
+    if(r <= .75) return 3;
+    return 4;
+  }}
+
+  const pad = n => String(n).padStart(2, '0');
+  const WEEK = ['日','一','二','三','四','五','六'];
+  const HEAD = ['一','二','三','四','五','六','日'];
+
+  // 首末提交之间覆盖到的所有月份
+  const [fy, fm] = dayKeys[0].split('-').map(Number);
+  const [ly, lm] = dayKeys[dayKeys.length-1].split('-').map(Number);
+  const months = [];
+  for(let y = fy, m = fm; y < ly || (y === ly && m <= lm); m++){{
+    months.push([y, m]);
+    if(m === 12){{ m = 0; y++; }}
+  }}
+
+  let html = '';
+  months.forEach(([y, m])=>{{
+    const lead = (new Date(y, m-1, 1).getDay() + 6) % 7;   // 周一为第一列
+    const total = new Date(y, m, 0).getDate();
+    let hits = 0, busyDays = 0, cells = '';
+    for(let i = 0; i < lead; i++) cells += '<div class="cal-cell empty"></div>';
+    for(let d = 1; d <= total; d++){{
+      const key = `${{y}}-${{pad(m)}}-${{pad(d)}}`;
+      const list = byDate.get(key);
+      if(!list){{
+        cells += `<div class="cal-cell"><span class="cal-num">${{d}}</span></div>`;
+        continue;
+      }}
+      hits += list.length; busyDays += 1;
+      const ms = list.some(x=>x.ms) ? ' ms' : '';
+      cells += `<div class="cal-cell has-data lv-${{level(list.length)}}${{ms}}" data-date="${{key}}" tabindex="0" role="button"`
+             + ` title="${{key}} · ${{list.length}} 次提交" aria-label="${{key}}，${{list.length}} 次提交">`
+             + `<span class="cal-num">${{d}}</span><span class="cal-cnt">${{list.length}}</span></div>`;
+    }}
+    html += `<div class="cal-month">`
+          + `<div class="cal-month-title">${{y}} 年 ${{m}} 月<span class="cnt">${{hits}} 次提交 · ${{busyDays}} 天</span></div>`
+          + `<div class="cal-weekdays">${{HEAD.map(w=>`<div>${{w}}</div>`).join('')}}</div>`
+          + `<div class="cal-days">${{cells}}</div>`
+          + `</div>`;
+  }});
+  host.innerHTML = html;
+
+  // 选中某天 → 展开当天明细
+  function renderDetail(key){{
+    host.querySelectorAll('.cal-cell.selected').forEach(el=>el.classList.remove('selected'));
+    const cell = host.querySelector(`.cal-cell[data-date="${{key}}"]`);
+    if(cell) cell.classList.add('selected');
+    const list = byDate.get(key) || [];
+    if(!list.length){{ detail.innerHTML = ''; return; }}
+    const add = list.reduce((s,d)=>s+d.add, 0);
+    const del = list.reduce((s,d)=>s+d.del, 0);
+    const files = list.reduce((s,d)=>s+d.files, 0);
+    const wd = WEEK[new Date(key + 'T00:00:00').getDay()];
+    detail.innerHTML = `<div class="cd-head">`
+        + `<span class="cd-date">${{key}} 周${{wd}}</span>`
+        + `<span class="cd-meta">${{list.length}} 次提交 · ${{files}} 文件 · `
+        + `<span class="add">+${{add.toLocaleString()}}</span> / <span class="del">−${{del.toLocaleString()}}</span></span>`
+      + `</div><ul class="cd-list">`
+      + list.map(d=>`<li>`
+          + `<div class="cd-row"><span class="cd-time">${{(d.date||'').slice(11)}}</span>`
+          + `<span class="tl-hash">${{d.short}}</span><span class="cd-msg">${{d.msg}}</span></div>`
+          + `<div class="tl-delta"><span class="add">+${{d.add.toLocaleString()}}</span> / `
+          + `<span class="del">−${{d.del.toLocaleString()}}</span><span class="files"> · ${{d.files}} 文件</span></div>`
+          + `${{(NOTES[d.short]||[]).length ? `<details class="tl-notes"><summary>完整备注</summary><ul>${{NOTES[d.short].map(x=>`<li>${{x}}</li>`).join('')}}</ul></details>` : ''}}`
+          + `</li>`).join('')
+      + `</ul>`;
+  }}
+
+  host.addEventListener('click', e=>{{
+    const cell = e.target.closest('.cal-cell.has-data');
+    if(cell) renderDetail(cell.dataset.date);
+  }});
+  host.addEventListener('keydown', e=>{{
+    if(e.key !== 'Enter' && e.key !== ' ') return;
+    const cell = e.target.closest('.cal-cell.has-data');
+    if(cell){{ e.preventDefault(); renderDetail(cell.dataset.date); }}
+  }});
+
+  // 默认选中最近一个有提交的日子
+  renderDetail(dayKeys[dayKeys.length-1]);
+}})();
 
 </script>
 </body>
