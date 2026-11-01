@@ -38,7 +38,7 @@ table 日期表
 		dataType: int64
 		formatString: 0
 		lineageTag: a08d4dd2-ba49-444e-9c6b-965937a4f432
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: 年月
 
 		annotation SummarizationSetBy = Automatic
@@ -48,7 +48,7 @@ table 日期表
 		isHidden
 		formatString: 0
 		lineageTag: 2de7929c-7dc3-4502-9075-c51472faab07
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: 年排序
 
 		changedProperty = IsHidden
@@ -60,7 +60,7 @@ table 日期表
 		isHidden
 		formatString: 0
 		lineageTag: 0f39ddae-02df-4a34-803d-eeec19d686e1
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: 月排序
 
 		changedProperty = IsHidden
