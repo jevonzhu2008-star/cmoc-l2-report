@@ -146,6 +146,15 @@ svg text{font-family:var(--sans)}
 <script>
 const DATA = [
   {
+    "short": "0fc075a",
+    "date": "2026-11-01 19:46",
+    "msg": "版本迭代页新增提交日历视图",
+    "files": 2,
+    "add": 312,
+    "del": 0,
+    "ms": false
+  },
+  {
     "short": "6b953f7",
     "date": "2026-11-01 18:40",
     "msg": "L2-04-01 指标数值列改 0 填充为 null；活动页切回首页",
@@ -590,6 +599,13 @@ const DATA = [
 
 // 完整提交备注（由 update-version-html.py 维护，去 Co-Authored-By）
 const NOTES = {
+  "0fc075a": [
+    "- update-version-html.py 模板新增「提交日历」卡片：按自然日归并 DATA，按月绘制日历网格（周一为首列），覆盖首末提交之间的所有月份",
+    "- 格子底色按当天提交数分 4 级密度、格内显示提交次数；含里程碑提交的日子底部标红点，并附图例",
+    "- 点击（或 Tab 聚焦后回车/空格）选中某天，卡片下方展开当天明细：时间、短 hash、提交标题、增删行与「完整备注」；默认选中最近一个有提交的日子",
+    "- 新增配套 CSS，沿用页面既有配色 token（--accent / --border / --mono），浅色与深色主题均已验证可读",
+    "- 日历卡片置于 KPI 与时间线之间，时间线保持原样"
+  ],
   "6b953f7": [
     "- L2-04-01 库存汇总表：单月函数内原「指标数值列 null 填充为 0」改为「指标数值列 0 填充为 null」，",
     "维度文本列仍旧不替换；避免 BW 未返回数据的月份被当成真实 0 值",
@@ -1008,7 +1024,7 @@ const NOTES = {
 const totalAdd = DATA.reduce((s,d)=>s+d.add,0);
 const totalDel = DATA.reduce((s,d)=>s+d.del,0);
 const totalFiles = DATA.reduce((s,d)=>s+d.files,0);
-const days = "12.0";
+const days = "12.1";
 
 document.getElementById('kpis').innerHTML = `
   <div class="kpi"><div class="n">${DATA.length}</div><div class="l">提交数（main）</div></div>
