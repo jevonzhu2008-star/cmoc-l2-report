@@ -95,6 +95,15 @@ svg text{font-family:var(--sans)}
 <script>
 const DATA = [
   {
+    "short": "6b953f7",
+    "date": "2026-11-01 18:40",
+    "msg": "L2-04-01 指标数值列改 0 填充为 null；活动页切回首页",
+    "files": 2,
+    "add": 3,
+    "del": 3,
+    "ms": false
+  },
+  {
     "short": "bab7597",
     "date": "2026-11-01 17:07",
     "msg": "L2-04-01 取数重构：逆透视移入单月函数，月报终止日期延至 2026-06",
@@ -530,6 +539,11 @@ const DATA = [
 
 // 完整提交备注（由 update-version-html.py 维护，去 Co-Authored-By）
 const NOTES = {
+  "6b953f7": [
+    "- L2-04-01 库存汇总表：单月函数内原「指标数值列 null 填充为 0」改为「指标数值列 0 填充为 null」，",
+    "维度文本列仍旧不替换；避免 BW 未返回数据的月份被当成真实 0 值",
+    "- pages.json：activePageName 由 L2-04-01 页 (72b8f9de) 改为首页 (e6f9a94e)，landingPageName 不变"
+  ],
   "bab7597": [
     "一、语义模型",
     "1. L2-04-01 库存汇总表 M 查询重构：",
