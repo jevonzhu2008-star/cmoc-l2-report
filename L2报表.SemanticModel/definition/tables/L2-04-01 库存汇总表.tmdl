@@ -204,8 +204,8 @@ table 'L2-04-01 库存汇总表'
 				            ),
 				            // 增加加载日期列：YYYYMM转为当月第一天Date类型，用于标记本条数据归属期间
 				            附加月份 = Table.AddColumn(添加的项, "加载日期", each #date(Number.From(Text.Start(month, 4)), Number.From(Text.End(month, 2)), 1), type date),
-				            // 指标数值列null填充为0；维度文本列保留null不替换，避免维度信息被覆盖
-				            已替换值 = Table.ReplaceValue(附加月份, null, 0, Replacer.ReplaceValue,
+				            // 指标数值列0填充为null；维度文本列保留不替换，避免维度信息被覆盖
+				            已替换值 = Table.ReplaceValue(附加月份, 0, null, Replacer.ReplaceValue,
 				                {
 				                    "金额(人民币) 当月实际", "金额(人民币) 环比", "金额(人民币) 去年实际",
 				                    "金额(人民币) 月-1实际", "金额(人民币) 月-2实际", "金额(人民币) 月-3实际",
