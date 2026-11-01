@@ -95,6 +95,15 @@ svg text{font-family:var(--sans)}
 <script>
 const DATA = [
   {
+    "short": "bab7597",
+    "date": "2026-11-01 17:07",
+    "msg": "L2-04-01 取数重构：逆透视移入单月函数，月报终止日期延至 2026-06",
+    "files": 6,
+    "add": 95,
+    "del": 61,
+    "ms": false
+  },
+  {
     "short": "3c003ac",
     "date": "2026-10-30 13:33",
     "msg": "L2-01-02 分月列空值不再替换为 0；活动页切到物料单耗月表",
@@ -521,6 +530,22 @@ const DATA = [
 
 // 完整提交备注（由 update-version-html.py 维护，去 Co-Authored-By）
 const NOTES = {
+  "bab7597": [
+    "一、语义模型",
+    "1. L2-04-01 库存汇总表 M 查询重构：",
+    "- 逆透视（UnpivotOtherColumns）从外层移入「取单月」函数内部，每个月先转长表再合并；",
+    "- 新增合计行计算链：剔除矿体=「未分配」后按 分类/加载日期/指标名称 分组求和，打上矿体=「合计」标识，再与明细行合并（已追加明细合计）。",
+    "注意：函数 in 中当前仍返回「已逆透视其他列」（明细），合计行那一步被注释、尚未启用；",
+    "- 拆分【指标名称/结构】、矿体v 副本列、3 张排序映射左连接改为在合并后统一处理；",
+    "- 补全各步注释，说明维度别名与 BW 技术名的对应关系。",
+    "2. p_月报终止日期：2026-03-01 → 2026-06-01，取到 2026 年 6 月数据。",
+    "二、报表",
+    "- 活动页从「L2-01-14 物料单耗月表」切到「L2-04-01 库存汇总表」。",
+    "三、Desktop 自动重写（非手工改动）",
+    "- 日期表「年月/年排序/月排序」summarizeBy 由 none 改为 sum；",
+    "- L2-04-01 矩阵条件格式负值边界重新生成；",
+    "- 指标值列 lineageTag 变更、diagramLayout 布局更新。"
+  ],
   "3c003ac": [
     "- 「空值替换为0」步骤中注释掉 1月~12月 共 12 个分月列，分月无数据时保留空值，不再填 0；",
     "YTD / 预算 / MTD 类指标仍按原逻辑补 0。",
@@ -918,7 +943,7 @@ const NOTES = {
 const totalAdd = DATA.reduce((s,d)=>s+d.add,0);
 const totalDel = DATA.reduce((s,d)=>s+d.del,0);
 const totalFiles = DATA.reduce((s,d)=>s+d.files,0);
-const days = "9.8";
+const days = "12.0";
 
 document.getElementById('kpis').innerHTML = `
   <div class="kpi"><div class="n">${DATA.length}</div><div class="l">提交数（main）</div></div>
