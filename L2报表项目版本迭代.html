@@ -146,6 +146,15 @@ svg text{font-family:var(--sans)}
 <script>
 const DATA = [
   {
+    "short": "27ff8d5",
+    "date": "2026-11-02 10:09",
+    "msg": "L2-03-01/L2-04-01 增加集团合计行并精简模型列",
+    "files": 4,
+    "add": 70,
+    "del": 158,
+    "ms": false
+  },
+  {
     "short": "0fc075a",
     "date": "2026-11-01 19:46",
     "msg": "版本迭代页新增提交日历视图",
@@ -599,6 +608,11 @@ const DATA = [
 
 // 完整提交备注（由 update-version-html.py 维护，去 Co-Authored-By）
 const NOTES = {
+  "27ff8d5": [
+    "- L2-03-01：M 查询内部完成业务板块三级匹配后仅保留核心字段，删去公司代码、管理口径利润中心、销管费分类代码、利润中心代码、公司名称 5 个隐藏编码列；按「销管费分类排序 + 加载日期 + 销管费分类」汇总生成「业务板块 = 集团合计」行并追加回明细；同步清理 zh-CN 语言架构中对应的 5 个孤儿条目。",
+    "- L2-04-01：指标值数据类型 double → decimal；恢复「明细 + 合计」合并（此前切到仅明细），汇总行的矿体标识由「合计」改为「集团合计」，与 L2-03-01 口径统一。",
+    "- pages.json：活动页切到 L2-04-01库存汇总表，打开即定位到该页。"
+  ],
   "0fc075a": [
     "- update-version-html.py 模板新增「提交日历」卡片：按自然日归并 DATA，按月绘制日历网格（周一为首列），覆盖首末提交之间的所有月份",
     "- 格子底色按当天提交数分 4 级密度、格内显示提交次数；含里程碑提交的日子底部标红点，并附图例",
@@ -1024,7 +1038,7 @@ const NOTES = {
 const totalAdd = DATA.reduce((s,d)=>s+d.add,0);
 const totalDel = DATA.reduce((s,d)=>s+d.del,0);
 const totalFiles = DATA.reduce((s,d)=>s+d.files,0);
-const days = "12.1";
+const days = "12.7";
 
 document.getElementById('kpis').innerHTML = `
   <div class="kpi"><div class="n">${DATA.length}</div><div class="l">提交数（main）</div></div>
