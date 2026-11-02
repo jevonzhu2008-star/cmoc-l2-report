@@ -72,6 +72,21 @@
                       "Entity": "L2-01-25 工序成本完成情况"
                     }
                   },
+                  "Property": "成本指标"
+                }
+              },
+              "queryRef": "L2-01-25 工序成本完成情况.成本指标",
+              "nativeQueryRef": "成本指标",
+              "active": true
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "L2-01-25 工序成本完成情况"
+                    }
+                  },
                   "Property": "单位"
                 }
               },

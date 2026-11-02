@@ -57,11 +57,41 @@
                       "Entity": "L2-01-14 物料单耗月表"
                     }
                   },
-                  "Property": "中区东区"
+                  "Property": "区域"
                 }
               },
-              "queryRef": "L2-01-14 物料单耗月表.中区东区",
-              "nativeQueryRef": "中区东区",
+              "queryRef": "L2-01-14 物料单耗月表.区域",
+              "nativeQueryRef": "区域",
+              "active": true
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "L2-01-14 物料单耗月表"
+                    }
+                  },
+                  "Property": "一级工序"
+                }
+              },
+              "queryRef": "L2-01-14 物料单耗月表.一级工序",
+              "nativeQueryRef": "一级工序",
+              "active": true
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "L2-01-14 物料单耗月表"
+                    }
+                  },
+                  "Property": "主要耗材用量"
+                }
+              },
+              "queryRef": "L2-01-14 物料单耗月表.主要耗材用量",
+              "nativeQueryRef": "主要耗材用量",
               "active": true
             },
             {
@@ -115,7 +145,19 @@
           },
           {
             "queryRefs": [
-              "L2-01-14 物料单耗月表.中区东区"
+              "L2-01-14 物料单耗月表.区域"
+            ],
+            "isPinned": true
+          },
+          {
+            "queryRefs": [
+              "L2-01-14 物料单耗月表.一级工序"
+            ],
+            "isPinned": true
+          },
+          {
+            "queryRefs": [
+              "L2-01-14 物料单耗月表.主要耗材用量"
             ],
             "isPinned": true
           },
@@ -1104,20 +1146,6 @@
               }
             },
             "Property": "矿体"
-          }
-        },
-        "type": "Categorical"
-      },
-      {
-        "name": "14cae560bdae0b7b3942",
-        "field": {
-          "Column": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "L2-01-14 物料单耗月表"
-              }
-            },
-            "Property": "中区东区"
           }
         },
         "type": "Categorical"

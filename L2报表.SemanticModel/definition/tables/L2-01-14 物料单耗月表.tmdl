@@ -55,14 +55,6 @@ table 'L2-01-14 物料单耗月表'
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	column 中区东区
-		dataType: string
-		lineageTag: 3d9c2b17-a417-4b81-bff8-9bc686bc63fe
-		summarizeBy: none
-		sourceColumn: 中区东区
-
-		annotation SummarizationSetBy = Automatic
-
 	column 指标名称排序
 		dataType: double
 		isHidden
@@ -102,14 +94,35 @@ table 'L2-01-14 物料单耗月表'
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	column 中区东区排序
-		dataType: double
-		isHidden
-		lineageTag: a59cbde5-4177-4284-bfc2-108784dd32c3
-		summarizeBy: sum
-		sourceColumn: 中区东区排序
+	column 区域
+		dataType: string
+		lineageTag: 134d67af-dd6a-43bd-8647-4cf67a0839f9
+		summarizeBy: none
+		sourceColumn: 区域
 
-		changedProperty = IsHidden
+		annotation SummarizationSetBy = Automatic
+
+	column 一级工序
+		dataType: string
+		lineageTag: cbcdf1d7-2ec1-48c7-a01e-85bd6204b436
+		summarizeBy: none
+		sourceColumn: 一级工序
+
+		annotation SummarizationSetBy = Automatic
+
+	column 主要耗材用量
+		dataType: string
+		lineageTag: 87bdaae7-ff87-40fe-8dc5-aac2b93bb903
+		summarizeBy: none
+		sourceColumn: 主要耗材用量
+
+		annotation SummarizationSetBy = Automatic
+
+	column 区域排序
+		dataType: double
+		lineageTag: af5a90b8-516f-4799-b9b4-845dcf6b8142
+		summarizeBy: sum
+		sourceColumn: 区域排序
 
 		annotation SummarizationSetBy = Automatic
 
@@ -141,7 +154,7 @@ table 'L2-01-14 物料单耗月表'
 				    指标映射工作簿 = Excel.Workbook(指标映射文件, true),
 				    单位排序映射表 = Table.Distinct(指标映射工作簿{[Item = "单位排序", Kind = "Sheet"]}[Data], {"单位"}),
 				    矿体排序映射表 = Table.Distinct(指标映射工作簿{[Item = "矿体排序", Kind = "Sheet"]}[Data], {"矿体"}),
-				    中区东区排序映射表 = Table.Distinct(指标映射工作簿{[Item = "中区东区排序", Kind = "Sheet"]}[Data], {"中区东区"}),
+				    区域排序映射表 = Table.Distinct(指标映射工作簿{[Item = "区域排序", Kind = "Sheet"]}[Data], {"区域"}),
 				    指标名称排序映射表 = Table.Distinct(指标映射工作簿{[Item = "指标名称排序", Kind = "Sheet"]}[Data], {"指标名称"}),
 				    // ========== 2. 连接 BW QAS 环境 ==========
 				    // 连接 BW QAS 环境：Implementation=2.0 用新版接口 / LanguageCode=ZH 返回中文 / EnableStructures=true 开启内置结构 / BatchSize 放大提升批量拉取性能
@@ -168,9 +181,12 @@ table 'L2-01-14 物料单耗月表'
 				                // 设置 BW 期间参数 [ZMSDQNY] = 当前循环月份（BW 据此返回截止该月的累计数据）
 				                {Cube.ApplyParameter, "[ZMSDQNY]", {month}},
 				                // ========== 维度展开 ==========
-				                {Cube.AddAndExpandDimensionColumn, "[4ZRCO_CP004-ZUNIT]", {"[4ZRCO_CP004-ZUNIT].[LEVEL01]"}, {"单位"}},
 				                {Cube.AddAndExpandDimensionColumn, "[ZKT]", {"[ZKT].[LEVEL01]"}, {"矿体"}},
-				                {Cube.AddAndExpandDimensionColumn, "[ZTDISTRCT]", {"[ZTDISTRCT].[LEVEL01]"}, {"中区东区"}},
+				                {Cube.AddAndExpandDimensionColumn, "[ZTDISTRCT]", {"[ZTDISTRCT].[LEVEL01]"}, {"区域"}},
+				                {Cube.AddAndExpandDimensionColumn, "[ZYJGX]", {"[ZYJGX].[LEVEL01]"}, {"一级工序"}},
+				                {Cube.AddAndExpandDimensionColumn, "[4ZRCO_CP004-ZINDITEM]", {"[4ZRCO_CP004-ZINDITEM].[LEVEL01]"}, {"主要耗材用量"}},
+				                {Cube.AddAndExpandDimensionColumn, "[4ZRCO_CP004-ZUNIT]", {"[4ZRCO_CP004-ZUNIT].[LEVEL01]"}, {"单位"}},
+				
 				                // ========== 目标类 ==========
 				                {Cube.AddMeasureColumn, "26年目标", "[4VGQHR12MHZ1PH0QD0454F134].[4VGQHR12MHZ1PH0RGAVD1MOPL]"},
 				                {Cube.AddMeasureColumn, "比目标±%", "[4VGQHR12MHZ1PH0QD0454F134].[4VGQHR12MHZ1PH0RGAVD1N7O9]"},
@@ -202,7 +218,7 @@ table 'L2-01-14 物料单耗月表'
 				                "上月", "实际量AM", "实际数AM", "预算量BM", "预算数BM"}
 				            ),
 				            // 逆透视：保留维度与加载日期，把指标列转为「指标名称」「指标值」两列
-				            逆透视 = Table.UnpivotOtherColumns(空值替换, {"中区东区", "矿体", "单位", "加载日期"}, "指标名称", "指标值")
+				            逆透视 = Table.UnpivotOtherColumns(空值替换, {"区域","一级工序","主要耗材用量", "矿体", "单位", "加载日期"}, "指标名称", "指标值")
 				        in
 				            逆透视,
 				    // 遍历月份文本列表，对每个 YYYYMM 调用查询单月，得到 N 个月的结果表
@@ -226,11 +242,11 @@ table 'L2-01-14 物料单耗月表'
 				    展开矿体排序 = Table.ExpandTableColumn(左连接矿体排序, "映射矿体", {"矿体排序"}, {"矿体排序"}),
 				    // ========== 8. 左连接「中区/东区排序」映射表 ==========
 				    // 左连接「中区东区排序」映射表（按 中区东区 匹配；JoinKind.LeftOuter，未匹配行保留）
-				    左连接中区东区排序 = Table.NestedJoin(展开矿体排序, {"中区东区"}, 中区东区排序映射表, {"中区东区"}, "映射中区东区", JoinKind.LeftOuter),
+				    左连接区域排序 = Table.NestedJoin(展开矿体排序, {"区域"}, 区域排序映射表, {"区域"}, "映射区域", JoinKind.LeftOuter),
 				    // 展开临时映射列，仅保留「中区东区排序」字段
-				    展开中区东区排序 = Table.ExpandTableColumn(左连接中区东区排序, "映射中区东区", {"中区东区排序"}, {"中区东区排序"})
+				    展开区域排序 = Table.ExpandTableColumn(左连接区域排序, "映射区域", {"区域排序"}, {"区域排序"})
 				in
-				    展开中区东区排序
+				    展开区域排序
 
-	annotation PBI_ResultType = Table
+	annotation PBI_ResultType = Exception
 
