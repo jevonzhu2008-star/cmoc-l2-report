@@ -146,6 +146,15 @@ svg text{font-family:var(--sans)}
 <script>
 const DATA = [
   {
+    "short": "3557c9f",
+    "date": "2026-11-02 14:12",
+    "msg": "M 查询注释全面规范化（14 张表，代码零改动）",
+    "files": 14,
+    "add": 730,
+    "del": 562,
+    "ms": false
+  },
+  {
     "short": "b68bb14",
     "date": "2026-11-02 13:53",
     "msg": "L2-01-14 / L2-01-25 / L2-03-06 切换 BW Cube ZRCO_CP011 并调整维度",
@@ -617,6 +626,27 @@ const DATA = [
 
 // 完整提交备注（由 update-version-html.py 维护，去 Co-Authored-By）
 const NOTES = {
+  "3557c9f": [
+    "统一按标准模板重写 14 个 M 查询的注释，涉及 11 张事实表 + 日期表 + 矿体表 + Security_Ore_Permission：",
+    "- 表头统一为 `/* 【查询名称】/【对应报表】/【BW对象】/【说明 1~N】 */`，覆盖数据源、BW 对象、维度、指标、月度循环、清洗与长表化、排序映射、该表特有逻辑。",
+    "- 正文按 `// ========== N. 中文标题 ==========` 分节，每个 let 步骤上方补一行「做什么 + 为什么」，关键行补行尾注释（BW 度量业务含义）。",
+    "- 补齐去重键与原因、左连接匹配键 + JoinKind、YYYYMM 文本 vs date 的 `#date` 坑、null→0 / 0→null 方向、逆透视保留列等易错点。",
+    "按代码事实改写原注释中的错误描述，各处保留 `// ⚠ 待核对`：",
+    "- L2-03-06：ZRCO_CP005/Q0003 → ZRCO_CP011/Q0015",
+    "- L2-01-25：ZRCO_CP004/Q0008 → ZRCO_CP011/Q0014，补 `成本指标`(ZINDID) 维度",
+    "- L2-01-14：维度描述改为 5 维（矿体/区域/一级工序/主要耗材用量/单位）",
+    "- L2-01-04：成本要素 10 项、无勾稽差度量",
+    "- L2-04-01：矿体标识 `合计` → `集团合计`",
+    "- L2-05-01：代码未传 `EnableStructures`",
+    "- L2-01-02：null→0 只覆盖 8 个指标列，1-12 月分月列被注释掉",
+    "验证：逐文件剥离 `//` 与 `/* */` 后与上一版逐行比对，14 个文件代码行完全一致（206/151/132/160/150/129/125/128/161/143/134/86/29/41 行），`/* */` 配对、`git diff --check` 无空白错误。",
+    "提交后待确认（仅记录，未改代码）：",
+    "- Security_Ore_Permission 按 `{\"UPN\"}` 去重，同一用户多矿体授权会被截断，疑应改为 `{\"UPN\",\"OreName\"}`",
+    "- 关系 `L2-03-01.业务板块 → 矿体表.矿体` 语义可疑",
+    "- 零值口径三种并存：0→null（03-02、04-01）、null→0（多数）、不洗（01-03、01-04、05-01）",
+    "- L2-01-14 的 单位排序/矿体排序/区域排序 已带入模型但未配 sortByColumn，区域排序仍可见",
+    "- L2-01-14 的 `PBI_ResultType` 仍为 Exception，最可能是 SharePoint 映射 Sheet 未由「中区东区排序」改名为「区域排序」"
+  ],
   "b68bb14": [
     "- L2-01-14：维度「中区东区」重命名为「区域」，并新增「一级工序」(ZYJGX)、「主要耗材用量」(4ZRCO_CP004-ZINDITEM) 两个维度；排序映射 Sheet 由「中区东区排序」改为「区域排序」，排序列同步改为 `区域排序`；逆透视保留列与左连接随之调整。",
     "- L2-01-25：新增「成本指标」维度 (ZINDID)；Cube/Query 由 ZRCO_CP004 / ZRCO_CP004_Q0008 切到 ZRCO_CP011 / ZRCO_CP011_Q0014，7 个 BW 度量 ID 全部替换。",
@@ -1055,7 +1085,7 @@ const NOTES = {
 const totalAdd = DATA.reduce((s,d)=>s+d.add,0);
 const totalDel = DATA.reduce((s,d)=>s+d.del,0);
 const totalFiles = DATA.reduce((s,d)=>s+d.files,0);
-const days = "12.8";
+const days = "12.9";
 
 document.getElementById('kpis').innerHTML = `
   <div class="kpi"><div class="n">${DATA.length}</div><div class="l">提交数（main）</div></div>
