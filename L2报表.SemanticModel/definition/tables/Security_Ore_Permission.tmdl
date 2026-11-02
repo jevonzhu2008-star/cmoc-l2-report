@@ -41,14 +41,27 @@ table Security_Ore_Permission
 		queryGroup: 辅助
 		source =
 				let
-				    // ========== 1. 读取 SharePoint 上的维度表 ==========
-				    // 连接财经 SharePoint 站点，列出全部文件（ApiVersion=15 为较新 REST API），结果为文件列表表
+				    /*
+				    【查询名称】Security_Ore_Permission SharePoint 权限表取数
+				    【对应报表】RLS 角色 Role_Dynamic_OreFilter（动态矿体权限）
+				    【数据源】SharePoint 财经站点文件名含「Security_Ore_Permission」的 xlsx，Sheet「Security_Ore_Permission」
+				    【说明】
+				        1、数据来源：SharePoint 财经站点上的权限 Excel，不读 BW
+				        2、维度/字段：UPN（用户主邮箱/UPN）、OreName（矿体名，"*" 代表全部矿体）、IsActive（授权是否生效）
+				        3、口径与运算：当前代码按【UPN】去重；角色 Role_Dynamic_OreFilter 用 UPN = USERPRINCIPALNAME() 且 IsActive = TRUE 取权限，再按 OreName 判断 "*" 或当前矿体
+				        4、为什么隐藏：整表及各列均为 isHidden，仅用于 RLS 判断，不参与报表展示
+				    */
+				    // ========== 1. 读取 SharePoint 权限表 ==========
+				    // 连接财经 SharePoint 站点，列出站点下全部文件（ApiVersion=15 为较新 REST API），结果为文件列表表
 				    源 = SharePoint.Files(财经SharePoint站点, [ApiVersion = 15]),
-				
+				    // 按文件名筛出「Security_Ore_Permission」xlsx，取第一条的 [Content] 二进制内容
 				    权限文件 = Table.SelectRows(源, each Text.Contains([Name], "Security_Ore_Permission") and [Extension] = ".xlsx"){0}[Content],
-				
+				    // 工作簿只解析一次，后续直接取 Sheet
 				    权限工作簿 = Excel.Workbook(权限文件, true),
-				
+				    // ========== 2. 按 UPN 去重生成权限表 ==========
+				    // 取「Security_Ore_Permission」Sheet 并按【UPN】去重：每个用户只保留一行，RLS 按 UPN 匹配 CurrentUPN
+				    // 注意：步骤名「矿体表」沿用历史命名，实际内容是权限明细（UPN / OreName / IsActive），勿与维度表「矿体表」混淆
+				    // ⚠ 待核对：代码实际按 {"UPN"} 去重，而不是按「UPN + OreName」；同一用户多矿体授权会被截断，上线前确认。
 				    矿体表 = Table.Distinct(权限工作簿{[Item = "Security_Ore_Permission", Kind = "Sheet"]}[Data], {"UPN"})
 				in
 				    矿体表

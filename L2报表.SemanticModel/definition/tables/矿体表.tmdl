@@ -27,14 +27,26 @@ table 矿体表
 		queryGroup: 辅助
 		source =
 				let
-				    // ========== 1. 读取 SharePoint 上的维度表 ==========
-				    // 连接财经 SharePoint 站点，列出全部文件（ApiVersion=15 为较新 REST API），结果为文件列表表
+				    /*
+				    【查询名称】矿体表 SharePoint 维度表取数
+				    【对应报表】L2-04-01 库存汇总表「矿体」切片器；RLS 角色 Role_Dynamic_OreFilter 的过滤依据
+				    【数据源】SharePoint 财经站点「维度表.xlsx」的 Sheet「矿体」
+				    【说明】
+				        1、数据来源：SharePoint 财经站点维度表 xlsx 的「矿体」Sheet，不读 BW
+				        2、维度/字段：主键【矿体】；【矿体排序】供 sortByColumn，控制切片器与矩阵中的矿体顺序
+				        3、口径与运算：按【矿体】去重，保证维度主键唯一——事实表按矿体关联、切片器筛选、RLS 判断时都不能出现一对多
+				        4、被谁使用：L2-04-01 / L2-01-04 / L2-01-14 / L2-01-25 / L2-03-06 的【矿体】列，以及 L2-03-01 的【业务板块】列与本表【矿体】建关系；L2-04-01 页「矿体」切片器直接用本表；RLS 角色 Role_Dynamic_OreFilter 以本表【矿体】为过滤对象
+				    */
+				    // ========== 1. 读取 SharePoint 维度表（Sheet「矿体」） ==========
+				    // 连接财经 SharePoint 站点，列出站点下全部文件（ApiVersion=15 为较新 REST API），结果为文件列表表
 				    源 = SharePoint.Files(财经SharePoint站点, [ApiVersion = 15]),
-				    // 筛选文件名含「维度表」且扩展名为 .xlsx 的文件，取第一个并读取其 [Content]（二进制内容）
+				    // 按文件名筛出「维度表.xlsx」（名称含「维度表」、扩展名 .xlsx），取第一条的 [Content] 二进制内容
 				    维度表文件 = Table.SelectRows(源, each Text.Contains([Name], "维度表") and [Extension] = ".xlsx"){0}[Content],
-				    // 工作簿只解析一次，后续各 Sheet 直接取用（同一 xlsx 反复解析会拖慢刷新）
+				    // 工作簿只解析一次，避免 Excel.Workbook 重复解析拖慢刷新
 				    矿体工作簿 = Excel.Workbook(维度表文件, true),
-				    // 取「矿体」Sheet 并按矿体去重：作为维度表供各事实表按矿体筛选，也是四个 RLS 角色的过滤依据
+				    // ========== 2. 按【矿体】去重生成维度表 ==========
+				    // 取「矿体」Sheet 并按【矿体】去重：主键唯一，才能供关系、切片器与 RLS 一对一匹配；本表也是角色 Role_Dynamic_OreFilter 的过滤对象
+				    // ⚠ 待核对：原注释写「四个 RLS 角色」，当前 definition/roles 下只有 Role_Dynamic_OreFilter 一个角色，上线前确认是否删过角色。
 				    矿体表 = Table.Distinct(矿体工作簿{[Item = "矿体", Kind = "Sheet"]}[Data], {"矿体"})
 				in
 				    矿体表

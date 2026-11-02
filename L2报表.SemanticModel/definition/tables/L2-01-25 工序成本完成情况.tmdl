@@ -138,105 +138,112 @@ table 'L2-01-25 工序成本完成情况'
 		source =
 				let
 				    /*
-				    【查询名称】ZRCO_CP004 工序成本完成情况 BW 取数
+				    【查询名称】L2-01-25 工序成本完成情况 BW 取数
 				    【对应报表】L2-01-25 工序成本完成情况
-				    【BW对象】Cube:ZRCO_CP004，Query:ZRCO_CP004_Q0008
+				    【BW对象】Cube:ZRCO_CP011，Query:ZRCO_CP011/ZRCO_CP011_Q0014
 				    【说明】
-				        1、循环取数：从 p_月报起始日期 到 p_月报终止日期，逐月查询 BW 后合并成长表
-				        2、BW 参数 [ZMSDQNY]：YYYYMM 格式年月
-				        3、维度：大工序、单位、矿体
-				        4、指标：本月计划、本月完成、累计完成率、年累计实际数、年累计预算数、上月完成、完成率%
-				        5、连接参数统一：QAS 服务器、系统编号、客户端 ID，与项目其他 BW 查询保持同一套参数规范
-				        6、EnableStructures=true，开启 BW 内置结构
-				        7、末尾逆透视，统一长表结构，便于矩阵报表排序展示
-				        8、读取 SharePoint 指标映射表，左连接带出「指标名称排序」「大工序排序」「矿体排序」「单位排序」
-				
-				        ⚠️ 注意：当前代码内Cube/QueryID写的是 ZRCO_CP011，和表头说明ZRCO_CP004不一致，上线前核对BW对象！
+				        1、数据源：SharePoint「L2-01-25 工序成本完成情况指标映射」+ SAP BW QAS（参数 QAS服务器 / 系统编号 / 客户端ID）
+				        2、维度：大工序（ZEJGX）、单位（4ZRCO_CP011-ZUNIT）、矿体（ZKT）、成本指标（ZINDID）
+				        3、指标：本月计划、本月完成、累计完成率、年累计实际数、年累计预算数、上月完成、完成率%
+				        4、月度循环：p_月报起始日期 ~ p_月报终止日期，逐月传 [ZMSDQNY]=YYYYMM（文本，不是日期）
+				        5、清洗：7 个指标 null → 0；加载日期 = 该月 1 日（date），供日期表关系与切片器筛选
+				        6、长表化：逆透视保留列 大工序 / 单位 / 矿体 / 成本指标 / 加载日期，其余列转为【指标名称、指标值】
+				        7、排序：左连接指标名称、大工序、矿体、单位四张映射表，带出对应排序序号
+				        8、本表特有：维度比其余 L2 表多一个「成本指标」（ZINDID），同一组大工序/单位/矿体下按成本指标拆成多行，逆透视保留列也相应多出这一维
 				    */
-				    // ========== 1. 读取 SharePoint 维度排序映射表 ==========
-				    // 访问财经SharePoint站点，获取站点内文件清单，ApiVersion=15 使用新版REST接口
+				    // ⚠ 待核对：原注释写 Cube:ZRCO_CP004 / Query:ZRCO_CP004_Q0008，代码已切到 ZRCO_CP011 / ZRCO_CP011_Q0014，上线前确认 BW 侧。
+				    // ========== 1. 读取 SharePoint 指标映射工作簿 ==========
+				    // 站点文件清单，ApiVersion=15 走新版 REST 接口
 				    源 = SharePoint.Files(财经SharePoint站点, [ApiVersion = 15]),
-				    // 筛选目标映射Excel文件，取匹配文件的二进制内容
+				    // 按文件名关键字锁定本表映射 xlsx，取唯一匹配项的二进制内容
 				    指标映射文件 = Table.SelectRows(源, each Text.Contains([Name], "L2-01-25 工序成本完成情况指标映射") and [Extension] = ".xlsx"){0}[Content],
-				    // 一次性加载工作簿，避免循环内重复解析Excel，优化刷新性能
+				    // 工作簿只解析一次，下面几张排序 Sheet 共用，避免重复读 Excel
 				    指标映射工作簿 = Excel.Workbook(指标映射文件, true),
-				    // 读取各维度排序Sheet，按关键字去重，保证一对一匹配，防止关联后数据膨胀
+				    // 指标名称排序映射：按「指标名称」去重，保证连接时 1:1，不放大行数
 				    指标名称排序映射表 = Table.Distinct(指标映射工作簿{[Item = "指标名称排序", Kind = "Sheet"]}[Data], {"指标名称"}),
+				    // 大工序排序映射：按「大工序」去重（同上，防连接后行数膨胀）
 				    大工序排序映射表 = Table.Distinct(指标映射工作簿{[Item = "大工序排序", Kind = "Sheet"]}[Data], {"大工序"}),
+				    // 矿体排序映射：按「矿体」去重
 				    矿体排序映射表 = Table.Distinct(指标映射工作簿{[Item = "矿体排序", Kind = "Sheet"]}[Data], {"矿体"}),
+				    // 单位排序映射：按「单位」去重
 				    单位排序映射表 = Table.Distinct(指标映射工作簿{[Item = "单位排序", Kind = "Sheet"]}[Data], {"单位"}),
-				
-				    // ========== 2. 连接 BW QAS 数据源，Cube全局只加载一次，避免循环重复建立会话 ==========
-				    // 连接BW QAS：新版接口、中文返回、开启BW结构、放大批量拉取数量提升性能
+
+				    // ========== 2. 连接 BW QAS 数据源 ==========
+				    // Implementation=2.0 新接口、中文返回、开启 BW 内置结构、BatchSize 放大批量拉取量；Cube 在循环外只实例化一次，循环里只做 Cube.Transform，避免逐月重建会话
 				    数据源 = SapBusinessWarehouse.Cubes(QAS服务器, 系统编号, 客户端ID, [Implementation="2.0", LanguageCode="ZH", EnableStructures=true, BatchSize=500000000]),
-				    // 定位目标Cube
+				    // 定位目标 Cube ZRCO_CP011
 				    立方体 = 数据源{[Name="ZRCO_CP011"]}[Data],
-				    // 定位目标BW Query
+				    // 定位该 Cube 下的取数 Query（工序成本完成情况）
 				    基础查询 = 立方体{[Id="ZRCO_CP011/ZRCO_CP011_Q0014"]}[Data],
-				
-				    // ========== 3. 月份循环参数与序列生成 ==========
-				    // 月报起始日期，PowerBI参数，Date类型
+
+				    // ========== 3. 生成月份序列 ==========
+				    // 期间起点：模型参数 p_月报起始日期（date）
 				    起始月份 = p_月报起始日期,
-				    // 月报结束日期，PowerBI参数，Date类型
+				    // 期间终点：模型参数 p_月报终止日期（手写值，跨月后需手动后移，否则取不到新月份）
 				    结束月份 = p_月报终止日期,
-				    // 生成连续日期序列，逐月递增，用于循环
+				    // 按月递增，首尾都包含
 				    月份序列 = List.Generate(() => 起始月份, each _ <= 结束月份, each Date.AddMonths(_, 1)),
-				    // 日期转为BW参数需要的YYYYMM文本格式，例：2026-01-01 → "202601"
+				    // 转成 BW 参数要求的 YYYYMM 文本（年×100+月，天然 6 位）；之后 month 变量一律按文本使用，不能直接当日期
 				    月份文本列表 = List.Transform(月份序列, each Text.From(Date.Year(_) * 100 + Date.Month(_))),
-				
-				    // ========== 4. 单月BW取数自定义函数 ==========
-				    // 入参：month YYYYMM文本；返回：清洗、逆透视后的当月长表
+
+				    // ========== 4. 单月取数并清洗 ==========
+				    // 入参 month 为 YYYYMM 文本；返回该月已清洗、逆透视后的长表
 				    查询单月 = (month as text) =>
 				        let
-				            // BW查询变换：传入期间参数、展开维度、挂载所需度量
+				            // BW 查询变换：先传期间参数，再展开维度、挂载度量；顺序决定输出列，勿随意调换
 				            Query = Cube.Transform(基础查询, {
-				                // 给BW变量ZMSDQNY传入当前年月，控制查询取数期间
+				                // 向 BW 变量 ZMSDQNY 传当前年月，决定本次取数的期间
 				                {Cube.ApplyParameter, "[ZMSDQNY]", {month}},
-				                // 维度展开：大工序
+				                // 维度展开：大工序（ZEJGX 的 LEVEL01）
 				                {Cube.AddAndExpandDimensionColumn, "[ZEJGX]", {"[ZEJGX].[LEVEL01]"}, {"大工序"}},
-				                // 维度展开：单位
+				                // 维度展开：单位（本 Cube 专属的单位维度 4ZRCO_CP011-ZUNIT）
 				                {Cube.AddAndExpandDimensionColumn, "[4ZRCO_CP011-ZUNIT]", {"[4ZRCO_CP011-ZUNIT].[LEVEL01]"}, {"单位"}},
-				                // 维度展开：矿体
+				                // 维度展开：矿体（ZKT）
 				                {Cube.AddAndExpandDimensionColumn, "[ZKT]", {"[ZKT].[LEVEL01]"}, {"矿体"}},
-				                // 维度展开：成本指标
+				                // 维度展开：成本指标（ZINDID），本表特有维度
 				                {Cube.AddAndExpandDimensionColumn, "[ZINDID]", {"[ZINDID].[LEVEL01]"}, {"成本指标"}},
-				                // 挂载BW度量值
-				                {Cube.AddMeasureColumn, "本月计划", "[4VGQHR12MHZ1PM20PS95N7ZVH].[4VGQHR12MHZ1PM20PS95NAT0D]"},
-				                {Cube.AddMeasureColumn, "本月完成", "[4VGQHR12MHZ1PM20PS95N7ZVH].[4VGQHR12MHZ1PM20PS95NAA1P]"},
-				                {Cube.AddMeasureColumn, "累计完成率", "[4VGQHR12MHZ1PM20PS95N7ZVH].[4VGQHR12MHZ1PM20PS95NFPZX]"},
-				                {Cube.AddMeasureColumn, "年累计实际数", "[4VGQHR12MHZ1PM20PS95N7ZVH].[4VGQHR12MHZ1PM20PS95NEO2L]"},
-				                {Cube.AddMeasureColumn, "年累计预算数", "[4VGQHR12MHZ1PM20PS95N7ZVH].[4VGQHR12MHZ1PM20PS95NF719]"},
-				                {Cube.AddMeasureColumn, "上月完成", "[4VGQHR12MHZ1PM20PS95N7ZVH].[4VGQHR12MHZ1PM20PS95N9R31]"},
-				                {Cube.AddMeasureColumn, "完成率%", "[4VGQHR12MHZ1PM20PS95N7ZVH].[4VGQHR12MHZ1PM20PS95NBBZ1]"}
+				                // 挂载 7 个 BW 度量，列名即报表口径名；空值统一在后面 null → 0
+				                {Cube.AddMeasureColumn, "本月计划", "[4VGQHR12MHZ1PM20PS95N7ZVH].[4VGQHR12MHZ1PM20PS95NAT0D]"},  // 当月计划值
+				                {Cube.AddMeasureColumn, "本月完成", "[4VGQHR12MHZ1PM20PS95N7ZVH].[4VGQHR12MHZ1PM20PS95NAA1P]"},  // 当月实际完成
+				                {Cube.AddMeasureColumn, "累计完成率", "[4VGQHR12MHZ1PM20PS95N7ZVH].[4VGQHR12MHZ1PM20PS95NFPZX]"},  // 累计实际 ÷ 累计预算（BW 已算好，M 不重算）
+				                {Cube.AddMeasureColumn, "年累计实际数", "[4VGQHR12MHZ1PM20PS95N7ZVH].[4VGQHR12MHZ1PM20PS95NEO2L]"},  // YTD 实际数
+				                {Cube.AddMeasureColumn, "年累计预算数", "[4VGQHR12MHZ1PM20PS95N7ZVH].[4VGQHR12MHZ1PM20PS95NF719]"},  // YTD 预算数
+				                {Cube.AddMeasureColumn, "上月完成", "[4VGQHR12MHZ1PM20PS95N7ZVH].[4VGQHR12MHZ1PM20PS95N9R31]"},  // 上一月实际完成
+				                {Cube.AddMeasureColumn, "完成率%", "[4VGQHR12MHZ1PM20PS95N7ZVH].[4VGQHR12MHZ1PM20PS95NBBZ1]"}  // 本月完成 ÷ 本月计划
 				            }),
-				            // 添加加载日期，标记本条数据归属的业务月份（当月1号日期类型）
+				            // 由 YYYYMM 文本重建该月 1 日的 date 值并显式声明 type date：month 是文本，直接赋给日期列会类型错误；加载日期用于与日期表建关系、驱动切片器筛选
 				            附加月份 = Table.AddColumn(Query, "加载日期", each #date(Number.From(Text.Start(month, 4)), Number.From(Text.End(month, 2)), 1), type date),
-				            // 指标空值替换为0，避免报表计算时空白、DIVIDE报错
+				            // 7 个指标统一 null → 0，避免矩阵出现空白、比率的 DIVIDE 落到空分母报错
 				            空值替换为0 = Table.ReplaceValue(附加月份, null, 0, Replacer.ReplaceValue,
 				                {"本月计划","本月完成","累计完成率","年累计实际数","年累计预算数","上月完成","完成率%"}
 				            ),
-				            // 宽表转长表：维度保留，所有指标列转为【指标名称、指标值】，适配报表矩阵
+				            // 宽表转长表：保留列必须写全维度 + 加载日期，其余 7 个指标列逆透视成【指标名称、指标值】；保留列漏写某维度，该维度会被当成指标值一起转走
 				            逆透视 = Table.UnpivotOtherColumns(空值替换为0, {"大工序","单位","矿体","成本指标","加载日期"}, "指标名称", "指标值")
 				        in
 				            逆透视,
-				
-				    // 循环调用取数函数，拿到每个月份的结果表集合
+
+				    // ========== 5. 合并各月结果 ==========
+				    // 逐月执行取数函数，得到与月份序列等长的结果表列表
 				    各月结果 = List.Transform(月份文本列表, 查询单月),
-				    // 把所有月份数据纵向合并为一张总表
+				    // 各月表结构一致，直接纵向拼接成一张长表
 				    合并结果 = Table.Combine(各月结果),
-				
-				    // ========== 5. 依次左连接四张排序映射表，带出排序序号用于报表自定义排序 ==========
-				    // 关联指标名称排序
+
+				    // ========== 6. 左连接排序映射表 ==========
+				    // 匹配键「指标名称」，JoinKind.LeftOuter：未映射的指标也要保留，排序留 null；映射表已去重保证 1:1，不会放大行数
 				    左连接指标排序 = Table.NestedJoin(合并结果, {"指标名称"}, 指标名称排序映射表, {"指标名称"}, "映射指标", JoinKind.LeftOuter),
+				    // 展开指标名称排序列；未映射的指标该列为 null，模型里只用于 sortByColumn、不对外展示
 				    展开指标排序 = Table.ExpandTableColumn(左连接指标排序, "映射指标", {"指标名称排序"}, {"指标名称排序"}),
-				    // 关联大工序排序
+				    // 匹配键「大工序」，LeftOuter + 映射表去重，同上
 				    左连接大工序排序 = Table.NestedJoin(展开指标排序, {"大工序"}, 大工序排序映射表, {"大工序"}, "映射大工序", JoinKind.LeftOuter),
+				    // 展开出大工序排序
 				    展开大工序排序 = Table.ExpandTableColumn(左连接大工序排序, "映射大工序", {"大工序排序"}, {"大工序排序"}),
-				    // 关联矿体排序
+				    // 匹配键「矿体」，LeftOuter + 映射表去重，同上
 				    左连接矿体排序 = Table.NestedJoin(展开大工序排序, {"矿体"}, 矿体排序映射表, {"矿体"}, "映射矿体", JoinKind.LeftOuter),
+				    // 展开出矿体排序
 				    展开矿体排序 = Table.ExpandTableColumn(左连接矿体排序, "映射矿体", {"矿体排序"}, {"矿体排序"}),
-				    // 关联单位排序
+				    // 匹配键「单位」，LeftOuter + 映射表去重，同上
 				    左连接单位排序 = Table.NestedJoin(展开矿体排序, {"单位"}, 单位排序映射表, {"单位"}, "映射单位", JoinKind.LeftOuter),
+				    // 展开出单位排序；四张排序字段在模型里通过 sortByColumn 生效
 				    展开单位排序 = Table.ExpandTableColumn(左连接单位排序, "映射单位", {"单位排序"}, {"单位排序"})
 				in
 				    展开单位排序

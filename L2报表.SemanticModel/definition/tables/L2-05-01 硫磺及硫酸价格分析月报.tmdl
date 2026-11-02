@@ -126,52 +126,52 @@ table 'L2-05-01 硫磺及硫酸价格分析月报'
 				    /*
 				    【查询名称】ZRFI_CP008 硫磺&硫酸采购成本 BW 取数
 				    【对应报表】L2-05-01 硫磺及硫酸价格分析月报
-				    【BW对象】Cube:ZRFI_CP008，Query:ZRFI_CP008_Q0001
+				    【BW对象】Cube:ZRFI_CP008，Query:ZRFI_CP008/ZRFI_CP008_Q0001
 				    【说明】
-				        1、按月循环取数：从参数 p_月报起始日期 开始，取到 p_月报终止日期，逐月查询 BW，最后合并为长表
-				        2、BW 参数 [ZMSDQNY]：YYYYMM 格式年月，控制 BW 查询的统计期间
-				        3、指标：硫磺/硫酸采购单价、分项费用、采购量；维度：数据类别、日历年月
-				        4、单月结果追加【加载日期】列（当月首日），标记本次循环查询的期间，用于 Power BI 内筛选与报表切片
-				        5、连接参数统一：QAS 服务器、系统编号、客户端 ID，与 ZRFI_CP005 保持一致
-				        6、BatchSize 放大，提升大批量 BW 数据拉取性能
-				        7、派生【期间名称】：ACT 为「年-月」，BGT 为「年预算」，月份固定两位
-				        8、派生【期间排序】数值列：ACT 按年月数字排序，BGT 统一放在同一年末尾，用于报表可视化排序
-				        9、末尾逆透视：把宽表的指标列转为「指标名称」「指标值」两列，形成长表
-				        10、左连接指标排序映射表，带出「指标排序」「指标单位」字段，供报表排序与单位显示
+				        1、数据源：SharePoint「L2-05-01 硫磺及硫酸价格分析月报指标映射.xlsx」（指标排序 Sheet）+ SAP BW QAS（参数 QAS服务器 / 系统编号 / 客户端ID）
+				        2、维度：数据类别（ZSJLB）、年月（0CALMONTH）、年（0CALYEAR）、月（0CALMONTH2）
+				        3、指标：硫磺 采购价 / 陆运费 / 清关税费 / DDP 单价与采购量，硫酸 DDP 单价与采购量，共 7 个
+				        4、月度循环：p_月报起始日期 ~ p_月报终止日期，逐月传 [ZMSDQNY]=YYYYMM（文本）
+				        5、清洗：本表不做 null → 0 替换，指标值保留 null 进入长表（与多数事实表不同）；加载日期 = 该月 1 日（date），供日期表关系与切片器筛选
+				        6、长表化：逆透视保留 数据类别 / 年月 / 年 / 月 / 加载日期 / 期间名称 / 期间排序，7 个指标列转为 指标名称 / 指标值
+				        7、排序：左连接「指标排序」映射 Sheet（按 指标名称 匹配），带出 指标排序 / 指标单位
+				        8、本表特有：按 数据类别 派生 期间名称（ACT=「年-月」，BGT=「年预算」）与 期间排序（ACT=年*100+月，BGT=年*100+99，排在当年月份之后）
 				    */
-				    // ========== 1. 读取 SharePoint 上的指标排序映射表 ==========
-				    // 连接财经 SharePoint 站点，列出全部文件（ApiVersion=15 为较新 REST API），结果为文件列表表
+				    // ========== 1. 读取 SharePoint 指标排序映射工作簿 ==========
+				    // 连接财经 SharePoint 站点取文件清单；ApiVersion=15 走新版 REST 接口
 				    源 = SharePoint.Files(财经SharePoint站点, [ApiVersion = 15]),
-				    // 筛选文件名含「L2-05-01 硫磺及硫酸价格分析月报指标映射」且扩展名为 .xlsx 的文件，取第一个并读取其 [Content]（二进制内容）
+				    // 按文件名含「L2-05-01 硫磺及硫酸价格分析月报指标映射」且扩展名为 .xlsx 筛选，取第一个匹配文件的二进制内容
 				    指标映射文件 = Table.SelectRows(源, each Text.Contains([Name], "L2-05-01 硫磺及硫酸价格分析月报指标映射") and [Extension] = ".xlsx"){0}[Content],
-				    // 工作簿只解析一次，后续各 Sheet 直接取用（同一 xlsx 反复解析会拖慢刷新）
+				    // 工作簿只解析一次，后续 Sheet 直接取用，避免重复解析 xlsx
 				    指标映射工作簿 = Excel.Workbook(指标映射文件, true),
+				    // 读取【指标排序】Sheet，按「指标名称」去重，保证左连接一行指标只匹配一条排序；注意本表未做 Trim / 转 text 清洗，指标名称带首尾空格会匹配不上
 				    指标排序表 = Table.Distinct(指标映射工作簿{[Item = "指标排序", Kind = "Sheet"]}[Data], {"指标名称"}),
-				    // ========== 2. 连接 BW QAS 环境 ==========
-				    // 连接 BW QAS 环境：Implementation=2.0 用新版接口 / LanguageCode=ZH 返回中文 / EnableStructures=true 开启内置结构 / BatchSize 放大提升批量拉取性能
+				    // ========== 2. 连接 BW QAS，Cube 与 Query 只实例化一次 ==========
+				    // 连接 BW QAS：Implementation=2.0 走新版接口、LanguageCode=ZH 返回中文、BatchSize 放大以提升批量拉取性能
+				    // ⚠ 待核对：原注释写「EnableStructures=true 开启内置结构」，代码实际未传该参数，上线前确认是否需要补上。
 				    数据源 = SapBusinessWarehouse.Cubes(QAS服务器, 系统编号, 客户端ID, [LanguageCode="ZH", Implementation="2.0", BatchSize=500000000]),
 				    // 按 Cube 名称定位 ZRFI_CP008
 				    立方体 = 数据源{[Name="ZRFI_CP008"]}[Data],
-				    // 按 Query ID 定位 ZRFI_CP008/ZRFI_CP008_Q0001
+				    // 按 Query Id 定位 ZRFI_CP008/ZRFI_CP008_Q0001；BW 会话只在这里建一次，循环内只做 Cube.Transform
 				    基础查询 = 立方体{[Id="ZRFI_CP008/ZRFI_CP008_Q0001"]}[Data],
-				    // ========== 3. 月份循环配置 ==========
-				    // 月报起始月份，取自 Power BI 参数 p_月报起始日期
+				    // ========== 3. 生成月份循环区间 ==========
+				    // 起始月 = 参数 p_月报起始日期（date 类型）
 				    起始月份 = p_月报起始日期,
-				    // 结束月份：p_月报终止日期
+				    // 结束月 = 参数 p_月报终止日期（date 类型，当前为手写值，跨月后需手动往后调）
 				    结束月份 = p_月报终止日期,
-				    // 生成连续月份序列：从起始月份起每月 +1，直到不超过结束月份（结果为 date 列表）
+				    // 生成含首尾的逐月 date 序列
 				    月份序列 = List.Generate(() => 起始月份, each _ <= 结束月份, each Date.AddMonths(_, 1)),
-				    // 把每个日期转成 BW 要求的 YYYYMM 文本：年×100 + 月（如 2026 年 1 月 → 「202601」）
+				    // 转成 BW 参数要求的 YYYYMM 文本（2026-01-01 → "202601"）；循环变量必须是文本，不能直接写进日期列
 				    月份文本列表 = List.Transform(月份序列, each Text.From(Date.Year(_) * 100 + Date.Month(_))),
-				    // ========== 4. 单月取数函数 ==========
-				    // 输入年月文本，返回当月 BW 查询结果，并追加【加载日期】标记列、派生期间字段
+				    // ========== 4. 单月取数函数：BW 取数 → 加载日期 → 期间名称 / 期间排序 ==========
+				    // 入参 month 为 YYYYMM 文本；返回当月宽表，已追加 加载日期 与两个派生期间字段
 				    查询单月 = (month as text) =>
 				        let
-				            // 对基础查询应用一组 BW 变换：设置期间参数、展开维度、添加度量值
+				            // 对基础查询应用一组 BW 变换：先传期间参数，再挂 7 个指标、展开 4 个维度
 				            Query = Cube.Transform(基础查询, {
-				                // BW 参数 ZMSDQNY：传入当前循环年月
+				                // 给 BW 变量 ZMSDQNY 传当前月份（YYYYMM 文本）
 				                {Cube.ApplyParameter, "[ZMSDQNY]", {month}},
-				                // ========== 度量值：采购成本&采购量指标 ==========
+				                // 【指标组】硫磺 / 硫酸采购成本与采购量（共 7 个）
 				                {Cube.AddMeasureColumn, "硫磺-采购价(单价)", "[Measures].[4VGQHR12MHZ3FTP539NWA8ZZ6]"}, // 硫磺采购单价
 				                {Cube.AddMeasureColumn, "硫磺-陆运费(单价)", "[Measures].[4VGQHR12MHZ3FTP539NWA96AQ]"}, // 硫磺陆路运费单价
 				                {Cube.AddMeasureColumn, "硫磺-清关税费(单价)", "[Measures].[4VGQHR12MHZ3FTP539NWA9CMA]"}, // 硫磺清关税费单价
@@ -179,15 +179,15 @@ table 'L2-05-01 硫磺及硫酸价格分析月报'
 				                {Cube.AddMeasureColumn, "硫磺-采购量", "[Measures].[4VGQHR12MHZ3FTP539NWA9P9E]"}, // 硫磺采购数量
 				                {Cube.AddMeasureColumn, "硫酸-DDP(单价)", "[Measures].[4VGQHR12MHZ3FTP539NWA9VKY]"}, // 硫酸 DDP 全成本单价
 				                {Cube.AddMeasureColumn, "硫酸-采购量", "[Measures].[4VGQHR12MHZ3FTP539NWAA1WI]"}, // 硫酸采购数量
-				                // ========== 维度字段展开 ==========
-				                {Cube.AddAndExpandDimensionColumn, "[ZSJLB]", {"[ZSJLB].[LEVEL01]"}, {"数据类别"}}, // 数据类别
-				                {Cube.AddAndExpandDimensionColumn, "[0CALMONTH]", {"[0CALMONTH].[LEVEL01]"}, {"年月"}}, // 日历年月
+				                // 【维度展开】数据类别、年月、年、月
+				                {Cube.AddAndExpandDimensionColumn, "[ZSJLB]", {"[ZSJLB].[LEVEL01]"}, {"数据类别"}}, // 数据类别（ACT 实际 / BGT 预算）
+				                {Cube.AddAndExpandDimensionColumn, "[0CALMONTH]", {"[0CALMONTH].[LEVEL01]"}, {"年月"}}, // 日历年月（YYYYMM）
 				                {Cube.AddAndExpandDimensionColumn, "[0CALYEAR]", {"[0CALYEAR].[LEVEL01]"}, {"年"}}, // 日历年
 				                {Cube.AddAndExpandDimensionColumn, "[0CALMONTH2]", {"[0CALMONTH2].[LEVEL01]"}, {"月"}} // 月份（1-12）
 				            }),
-				            // 追加「加载日期」列：把当前循环 YYYYMM 转成当月首日 date（如 202601 → 2026-01-01），标记该行数据所属期间
+				            // 追加「加载日期」：用 #date 从 YYYYMM 文本构造当月 1 日（date 类型）；month 是文本，不能直接赋给日期列。该列与日期表建关系，供切片器联动
 				            附加加载日期 = Table.AddColumn(Query, "加载日期", each #date(Number.From(Text.Start(month, 4)), Number.From(Text.End(month, 2)), 1), type date),
-				            // 派生【期间名称】：ACT 为「年-月」，BGT 为「年预算」，月份固定两位
+				            // 派生【期间名称】：ACT 显示「年-月」（月补两位，如 2026-01），BGT 显示「年预算」，其余为空
 				            附加期间名称 = Table.AddColumn(附加加载日期, "期间名称",
 				                each if [数据类别] = "ACT"
 				                    then Text.From([年]) & "-" & Text.PadStart(Text.From([月]),2,"0")
@@ -195,7 +195,7 @@ table 'L2-05-01 硫磺及硫酸价格分析月报'
 				                    then Text.From([年]) & "预算"
 				                    else null
 				            ),
-				            // 派生【期间排序】数值列：Number.From 把 BW 返回的文本年月转为数字后计算
+				            // 派生【期间排序】数值列：ACT = 年*100+月（按年月自然排序），BGT = 年*100+99（排在当年所有月份之后），其余为空
 				            附加期间排序 = Table.AddColumn(附加期间名称, "期间排序",
 				                each if [数据类别] = "ACT"
 				                    then Number.From([年]) * 100 + Number.From([月])
@@ -205,18 +205,21 @@ table 'L2-05-01 硫磺及硫酸价格分析月报'
 				            )
 				        in
 				            附加期间排序,
-				    // 遍历月份列表，逐个执行单月查询
+				
+				    // ========== 5. 逐月循环合并并逆透视成长表 ==========
+				    // 对月份列表逐个调用 查询单月，得到各月宽表集合
 				    各月结果 = List.Transform(月份文本列表, 查询单月),
-				    // 合并各月结果为一张宽表
+				    // 纵向合并所有月份宽表
 				    合并结果 = Table.Combine(各月结果),
-				    // 逆透视：把宽表的指标列转为「指标名称」「指标值」两列，形成长表
+				    // 逆透视：保留 数据类别 / 年月 / 年 / 月 / 加载日期 / 期间名称 / 期间排序，7 个指标列转成「指标名称」「指标值」
 				    逆透视长表 = Table.UnpivotOtherColumns(合并结果, {"数据类别", "年月", "年", "月", "加载日期", "期间名称", "期间排序"}, "指标名称", "指标值"),
-				    // ========== 5. 左连接「指标排序」映射表 ==========
-				    // 左连接「指标排序」映射表（按「指标名称」匹配；JoinKind.LeftOuter，未匹配行保留）
+				    // ========== 6. 左连接指标排序映射表 ==========
+				    // 左连接指标排序：按「指标名称」匹配，JoinKind.LeftOuter 保留全部指标行；映射表已按指标名称去重，避免一对多放大行数
 				    左连接指标排序 = Table.NestedJoin(逆透视长表, {"指标名称"}, 指标排序表, {"指标名称"}, "指标映射临时", JoinKind.LeftOuter),
-				    // 展开临时映射列，仅保留「指标排序」「指标单位」字段
+				    // 只展开 指标排序 / 指标单位 两列回主表，指标单位供报表动态显示单位
 				    展开指标排序 = Table.ExpandTableColumn(左连接指标排序, "指标映射临时", {"指标排序", "指标单位"}, {"指标排序", "指标单位"})
 				in
+				    // 最终输出：长表 + 指标排序 / 指标单位
 				    展开指标排序
 
 	annotation PBI_ResultType = Table

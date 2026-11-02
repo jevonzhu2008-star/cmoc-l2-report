@@ -103,74 +103,77 @@ table 'L2-06-01 主要产品价格波动汇总表'
 		source =
 				let
 				    /*
-				    【查询名称】ZRSD_CP001 产品指标多期对比 BW 取数
-				    【对应报表】L2-06-01 主要产品价格波动汇总表
+				    【查询名称】L2-06-01 主要产品价格波动汇总表 BW 取数
+				    【对应报表】L2-06-01 主要产品价格波动汇总表（产品价格多期对比矩阵）
 				    【BW对象】Cube:ZRSD_CP001，Query:ZRSD_CP001_Q0001
 				    【说明】
-				        1、按月循环取数：从参数 p_月报起始日期 开始，取到 p_月报终止日期，逐月查询 BW 后合并为长表
-				        2、BW 参数 [ZMSDQNY]：YYYYMM 格式年月，BW 根据该参数自动返回截止该月的多期对比数据
-				        3、维度：产品、指标名称
-				        4、指标：FY(Y-2)、FY(Y-1)、当年预算、Q-2 季度、Q-1 季度、季度环比%、M-3 月、M-2 月、M-1 月、当月、月度环比%
-				        5、连接参数统一：QAS 服务器、系统编号、客户端 ID，与项目其他 BW 查询保持一套参数规范
-				        6、EnableStructures=true 开启 BW 结构解析；BatchSize 放大以提升大批量拉取性能
-				        7、读取 SharePoint 映射 Excel，一次性解析工作簿后分别取出 3 张排序 Sheet，避免重复解析
-				        8、单月结果追加【加载日期】列（当月首日），并把各指标列的 null 统一替换为 0
-				        9、末尾对多口径列做逆透视，统一为「指标口径 / 指标值」长表结构
+				        1、数据源：SAP BW QAS（QAS服务器 / 系统编号 / 客户端ID）的 Cube ZRSD_CP001 → Query ZRSD_CP001_Q0001；另读 SharePoint 财经站点的「L2-06-01 主要产品价格波动汇总表指标映射.xlsx」中 3 张排序 Sheet
+				        2、维度/字段：BW 展开【产品】【指标名称】两个维度；逆透视后保留【产品】【指标名称】【加载日期】，产出【指标口径】【指标值】；排序列【产品排序】【指标名称排序】【指标口径排序】由映射表带出
+				        3、口径与运算：按 p_月报起始日期 ~ p_月报终止日期 逐月取数，[ZMSDQNY] 传 YYYYMM 文本；每月追加当月 1 日的【加载日期】（date 类型），指标列 null 统一替换为 0，再逆透视成「指标口径 / 指标值」长表；最后左连接 3 张排序映射表
+				        4、指标：FY（Y-2）、FY（Y-1）、（当年）预算、（Q-2）季度、（Q-1）季度、季度环比%、（M-3）月、（M-2）月、（M-1）月、当月、月度环比%
+				        5、连接参数：Implementation=2.0（新版接口）、LanguageCode=ZH（中文）、EnableStructures=true（开启 BW 结构支持）、BatchSize=500000000（大批量拉取）
+				        6、注意：循环变量 month 是 YYYYMM 文本（[ZMSDQNY] 的要求），【加载日期】必须用 #date(年, 月, 1) 单独构造，不能直接把 month 赋给日期列，否则类型报错
+				        7、报表用法：矩阵按【产品】【指标名称】展开，用【指标口径】区分数年 / 数季 / 数月对比；指标值口径混合，度量值不使用金额 UDF，统一打 PBI_FormatHint 通用数字格式
+				        8、性能：Cube 与 Query 只实例化一次，循环内仅做 Cube.Transform；BatchSize=500000000 缩短大批量拉取时间
+				        9、风险：BW 返回的产品 / 指标名称必须与 SharePoint 排序映射表一致，否则左连接后排序列为 null，需在映射表补齐
 				    */
-				    // ========== 1. 读取 SharePoint 上的映射 Excel ==========
-				    // 连接财经 SharePoint 站点，列出全部文件（ApiVersion=15 为较新 REST API），结果为文件列表表
+				    // ========== 1. 读取 SharePoint 指标映射工作簿（3 张排序 Sheet） ==========
+				    // 连接财经 SharePoint 站点，列出站点下全部文件（ApiVersion=15 为较新 REST API），结果为文件列表表
 				    源 = SharePoint.Files(财经SharePoint站点, [ApiVersion = 15]),
-				    // 筛选文件名含「L2-06-01 主要产品价格波动汇总表指标映射」且扩展名为 .xlsx 的文件，取第一个并读取其 [Content]（二进制内容）
+				    // 按文件名筛出本表的指标映射 xlsx（名称含「L2-06-01 主要产品价格波动汇总表指标映射」、扩展名 .xlsx），取第一条的 [Content] 二进制内容
 				    指标映射文件 = Table.SelectRows(源, each Text.Contains([Name], "L2-06-01 主要产品价格波动汇总表指标映射") and [Extension] = ".xlsx"){0}[Content],
-				    // 工作簿只解析一次，后续各 Sheet 直接取用（同一 xlsx 反复解析会拖慢刷新）
+				    // 工作簿只解析一次，3 张排序 Sheet 都从这里取；反复 Excel.Workbook 会成倍拖慢刷新
 				    指标映射工作簿 = Excel.Workbook(指标映射文件, true),
+				    // 取「产品排序」Sheet 并按【产品】去重：左连接键必须唯一，否则一条事实行会匹配出多条、行数翻倍
 				    产品排序映射表 = Table.Distinct(指标映射工作簿{[Item = "产品排序", Kind = "Sheet"]}[Data], {"产品"}),
+				    // 取「指标名称排序」Sheet 并按【指标名称】去重：同上，保证指标名称一对一
 				    指标名称映射表 = Table.Distinct(指标映射工作簿{[Item = "指标名称排序", Kind = "Sheet"]}[Data], {"指标名称"}),
+				    // 取「指标口径排序」Sheet 并按【指标口径】去重：同上，保证每个口径只带出一行排序值
 				    指标口径映射表 = Table.Distinct(指标映射工作簿{[Item = "指标口径排序", Kind = "Sheet"]}[Data], {"指标口径"}),
-				    // ========== 2. 连接 BW QAS 环境 ==========
-				    // 连接 BW QAS 环境：Implementation=2.0 用新版接口 / LanguageCode=ZH 返回中文 / EnableStructures=true 开启内置结构 / BatchSize 放大提升批量拉取性能
+				    // ========== 2. 连接 BW QAS 环境（Cube / Query 只实例化一次） ==========
+				    // 连接 BW QAS：Implementation=2.0 走新版接口 / LanguageCode=ZH 返回中文 / EnableStructures=true 开启 BW 结构支持 / BatchSize 放大提升批量拉取性能
 				    数据源 = SapBusinessWarehouse.Cubes(QAS服务器, 系统编号, 客户端ID, [Implementation="2.0", LanguageCode="ZH", EnableStructures=true, BatchSize=500000000]),
-				    // 按 Cube 名称定位 ZRSD_CP001
+				    // 按 Cube 名称定位 ZRSD_CP001：Cube 在循环外实例化，循环内只做 Cube.Transform，避免每月重连
 				    立方体 = 数据源{[Name="ZRSD_CP001"]}[Data],
-				    // 按 Query ID 定位 ZRSD_CP001/ZRSD_CP001_Q0001
+				    // 按 Query Id 定位 ZRSD_CP001/ZRSD_CP001_Q0001，作为每月取数的查询模板
 				    基础查询 = 立方体{[Id="ZRSD_CP001/ZRSD_CP001_Q0001"]}[Data],
-				    // ========== 3. 月份循环配置 ==========
-				    // 月报起始月份，取自 Power BI 参数 p_月报起始日期
+				    // ========== 3. 生成月份序列（日期 → BW 要求的 YYYYMM 文本） ==========
+				    // 起始月份：参数 p_月报起始日期（date），循环下限，必须与日期表起始日一致
 				    起始月份 = p_月报起始日期,
-				    // 结束月份：p_月报终止日期
+				    // 结束月份：参数 p_月报终止日期（date），循环上限；跨月后需手工往后调，否则取不到新月份（已知坑）
 				    结束月份 = p_月报终止日期,
-				    // 生成连续月份序列：从起始月份起每月 +1，直到不超过结束月份（结果为 date 列表）
+				    // 从起始月份起每月 +1，直到不超过结束月份，得到 date 列表（含首尾所在月）
 				    月份序列 = List.Generate(() => 起始月份, each _ <= 结束月份, each Date.AddMonths(_, 1)),
-				    // 把每个日期转成 BW 要求的 YYYYMM 文本：年×100 + 月（如 2026 年 1 月 → 「202601」）
+				    // 转成 [ZMSDQNY] 要求的 YYYYMM 文本（如 2026 年 1 月 → 「202601」）；此处已是文本，不能再当日期用
 				    月份文本列表 = List.Transform(月份序列, each Text.From(Date.Year(_) * 100 + Date.Month(_))),
-				    // ========== 4. 单月取数函数 ==========
-				    // 输入年月文本，返回当月 BW 查询结果，追加【加载日期】列与 null 替换，并逆透视多口径列
+				    // ========== 4. 单月取数：BW 变换 → 追加加载日期 → null 归零 → 逆透视 ==========
+				    // 入参 month 为 YYYYMM 文本；返回该月的长表（指标口径 / 指标值）并带【加载日期】，供 List.Transform 逐月调用
 				    查询单月 = (month as text) =>
 				        let
-				            // 对基础查询应用一组 BW 变换：设置期间参数、展开维度、添加度量值
+				            // 对基础查询应用 BW 变换：设置期间参数 → 展开维度 → 添加度量值
 				            Query = Cube.Transform(基础查询,
 				                {
-				                    // BW 参数 ZMSDQNY：传入当前循环年月
+				                    // 期间参数 [ZMSDQNY]：传入当前循环的 YYYYMM，BW 按该月返回多期对比口径
 				                    {Cube.ApplyParameter, "[ZMSDQNY]", {month}},
-				                    // ========== 维度字段展开 ==========
-				                    {Cube.AddAndExpandDimensionColumn, "[4ZRSD_CP001-ZCP]", {"[4ZRSD_CP001-ZCP].[LEVEL01]"}, {"产品"}},
-				                    {Cube.AddAndExpandDimensionColumn, "[4ZRSD_CP001-ZINDNAME]", {"[4ZRSD_CP001-ZINDNAME].[LEVEL01]"}, {"指标名称"}},
-				                    // ========== 度量值：多期对比指标 ==========
-				                    {Cube.AddMeasureColumn, "FY（Y-2）", "[4VGQHR12MHZ1PHK1NB6E6C649].[4VGQHR12MHZ1PJ8W4FO18FRJE]"},
-				                    {Cube.AddMeasureColumn, "FY（Y-1）", "[4VGQHR12MHZ1PHK1NB6E6C649].[4VGQHR12MHZ1PJ8W5EFCBP92K]"},
-				                    {Cube.AddMeasureColumn, "（当年）预算", "[4VGQHR12MHZ1PHK1NB6E6C649].[4VGQHR12MHZ1PJ8W5EFCBPFE4]"},
-				                    {Cube.AddMeasureColumn, "（Q-2）季度", "[4VGQHR12MHZ1PHK1NB6E6C649].[4VGQHR12MHZ1PJ8W9TN0HJ5TP]"},
-				                    {Cube.AddMeasureColumn, "（Q-1）季度", "[4VGQHR12MHZ1PHK1NB6E6C649].[4VGQHR12MHZ1PJ8W9TN0HK1FH]"},
-				                    {Cube.AddMeasureColumn, "季度环比%", "[4VGQHR12MHZ1PHK1NB6E6C649].[4VGQHR12MHZ1PJ8WADGXTKX1B]"},
-				                    {Cube.AddMeasureColumn, "（M-3）月", "[4VGQHR12MHZ1PHK1NB6E6C649].[4VGQHR12MHZ1PLXJHO3QTX3S2]"},
-				                    {Cube.AddMeasureColumn, "（M-2）月", "[4VGQHR12MHZ1PHK1NB6E6C649].[4VGQHR12MHZ1PLXJEVKLS4IFW]"},
-				                    {Cube.AddMeasureColumn, "（M-1）月", "[4VGQHR12MHZ1PHK1NB6E6C649].[4VGQHR12MHZ1PJ8WA0MQ79932]"},
-				                    {Cube.AddMeasureColumn, "当月", "[4VGQHR12MHZ1PHK1NB6E6C649].[4VGQHR12MHZ1PJ8WA0MQ7A4OU]"},
-				                    {Cube.AddMeasureColumn, "月度环比%", "[4VGQHR12MHZ1PHK1NB6E6C649].[4VGQHR12MHZ1PJ8WADGXTL3CV]"}
+				                    // 维度字段：展开到 LEVEL01 末级，列名与 SharePoint 排序映射表的主键一一对应
+				                    {Cube.AddAndExpandDimensionColumn, "[4ZRSD_CP001-ZCP]", {"[4ZRSD_CP001-ZCP].[LEVEL01]"}, {"产品"}}, // 产品：BW 维度末级文本，对应报表行标签与「产品排序」映射
+				                    {Cube.AddAndExpandDimensionColumn, "[4ZRSD_CP001-ZINDNAME]", {"[4ZRSD_CP001-ZINDNAME].[LEVEL01]"}, {"指标名称"}}, // 指标名称：BW 维度末级文本，对应报表列标签与「指标名称排序」映射
+				                    // 度量值：多期对比指标（11 个），行尾注释为业务含义
+				                    {Cube.AddMeasureColumn, "FY（Y-2）", "[4VGQHR12MHZ1PHK1NB6E6C649].[4VGQHR12MHZ1PJ8W4FO18FRJE]"}, // 两年前（Y-2）全年值
+				                    {Cube.AddMeasureColumn, "FY（Y-1）", "[4VGQHR12MHZ1PHK1NB6E6C649].[4VGQHR12MHZ1PJ8W5EFCBP92K]"}, // 上一年（Y-1）全年值
+				                    {Cube.AddMeasureColumn, "（当年）预算", "[4VGQHR12MHZ1PHK1NB6E6C649].[4VGQHR12MHZ1PJ8W5EFCBPFE4]"}, // 当年全年预算
+				                    {Cube.AddMeasureColumn, "（Q-2）季度", "[4VGQHR12MHZ1PHK1NB6E6C649].[4VGQHR12MHZ1PJ8W9TN0HJ5TP]"}, // 前 2 个季度（Q-2）值
+				                    {Cube.AddMeasureColumn, "（Q-1）季度", "[4VGQHR12MHZ1PHK1NB6E6C649].[4VGQHR12MHZ1PJ8W9TN0HK1FH]"}, // 前 1 个季度（Q-1）值
+				                    {Cube.AddMeasureColumn, "季度环比%", "[4VGQHR12MHZ1PHK1NB6E6C649].[4VGQHR12MHZ1PJ8WADGXTKX1B]"}, // 季度环比变化率（%）
+				                    {Cube.AddMeasureColumn, "（M-3）月", "[4VGQHR12MHZ1PHK1NB6E6C649].[4VGQHR12MHZ1PLXJHO3QTX3S2]"}, // 前 3 个月（M-3）值
+				                    {Cube.AddMeasureColumn, "（M-2）月", "[4VGQHR12MHZ1PHK1NB6E6C649].[4VGQHR12MHZ1PLXJEVKLS4IFW]"}, // 前 2 个月（M-2）值
+				                    {Cube.AddMeasureColumn, "（M-1）月", "[4VGQHR12MHZ1PHK1NB6E6C649].[4VGQHR12MHZ1PJ8WA0MQ79932]"}, // 上月（M-1）值
+				                    {Cube.AddMeasureColumn, "当月", "[4VGQHR12MHZ1PHK1NB6E6C649].[4VGQHR12MHZ1PJ8WA0MQ7A4OU]"}, // 所选月份当月值
+				                    {Cube.AddMeasureColumn, "月度环比%", "[4VGQHR12MHZ1PHK1NB6E6C649].[4VGQHR12MHZ1PJ8WADGXTL3CV]"} // 月度环比变化率（%）
 				                }),
-				            // 追加「加载日期」列：把当前循环 YYYYMM 转成当月首日 date（如 202601 → 2026-01-01），标记该行数据所属期间
+				            // 追加【加载日期】：由 YYYYMM 文本单独构造当月 1 日 date（如 202601 → 2026-01-01）；它是与日期表建关系、被「年月筛选」切片器过滤的键
 				            附加加载日期 = Table.AddColumn(Query, "加载日期", each #date(Number.From(Text.Start(month, 4)), Number.From(Text.End(month, 2)), 1), type date),
-				            // 把各指标列的 null 统一替换为 0（避免空值干扰报表）
+				            // 指标列 null 统一替换为 0：BW 无数据月份返回 null，报表矩阵需要显示 0 而不是空白
 				            空值替换为0 = Table.ReplaceValue(
 				                附加加载日期,
 				                null,
@@ -178,7 +181,7 @@ table 'L2-06-01 主要产品价格波动汇总表'
 				                Replacer.ReplaceValue,
 				                {"FY（Y-2）","FY（Y-1）","（当年）预算","（Q-2）季度","（Q-1）季度","季度环比%","（M-3）月","（M-2）月","（M-1）月","当月","月度环比%"}
 				            ),
-				            // 逆透视：除产品、指标名称、加载日期外的指标列转为「指标口径」「指标值」两列，形成长表
+				            // 逆透视：保留【产品】【指标名称】【加载日期】，把 11 个指标列转为【指标口径】+【指标值】长表，度量值再按指标口径聚合
 				            逆透视口径列 = Table.UnpivotOtherColumns(
 				                空值替换为0,
 				                {"产品","指标名称","加载日期"},
@@ -187,19 +190,23 @@ table 'L2-06-01 主要产品价格波动汇总表'
 				            )
 				        in
 				            逆透视口径列,
-				    // 遍历月份列表，逐个执行单月查询
+				    // ========== 5. 逐月执行并合并 ==========
+				    // 按月份文本逐月调用单月取数函数：每月一次 BW 查询，月份跨度越大刷新越慢
 				    各月结果 = List.Transform(月份文本列表, 查询单月),
-				    // 合并各月结果为一张宽表
+				    // 把各月结果纵向合并为一张长表，行数 = 月份数 × 产品数 × 指标数
 				    合并结果 = Table.Combine(各月结果),
-				    // ========== 5. 依次左连接 3 张排序映射表 ==========
-				    // 左连接指标口径排序映射表（按「指标口径」匹配；JoinKind.LeftOuter，未匹配行保留）
+				    // ========== 6. 左连接 3 张排序映射表（带出排序字段） ==========
+				    // 左连接【指标口径排序】：匹配键 指标口径，JoinKind.LeftOuter，映射表缺项时保留事实行（排序列为 null）
 				    关联口径排序 = Table.NestedJoin(合并结果, {"指标口径"}, 指标口径映射表, {"指标口径"}, "临时口径", JoinKind.LeftOuter),
+				    // 展开带出的【指标口径排序】列，供【指标口径】按 sortByColumn 排序
 				    展开口径排序 = Table.ExpandTableColumn(关联口径排序, "临时口径", {"指标口径排序"}, {"指标口径排序"}),
-				    // 左连接指标名称排序映射表（按「指标名称」匹配；JoinKind.LeftOuter，未匹配行保留）
+				    // 左连接【指标名称排序】：匹配键 指标名称，JoinKind.LeftOuter，未匹配行保留
 				    关联指标名称排序 = Table.NestedJoin(展开口径排序, {"指标名称"}, 指标名称映射表, {"指标名称"}, "临时指标名称", JoinKind.LeftOuter),
+				    // 展开带出的【指标名称排序】列，供【指标名称】按 sortByColumn 排序
 				    展开指标名称排序 = Table.ExpandTableColumn(关联指标名称排序, "临时指标名称", {"指标名称排序"}, {"指标名称排序"}),
-				    // 左连接产品排序映射表（按「产品」匹配；JoinKind.LeftOuter，未匹配行保留）
+				    // 左连接【产品排序】：匹配键 产品，JoinKind.LeftOuter，未匹配行保留
 				    关联产品排序 = Table.NestedJoin(展开指标名称排序, {"产品"}, 产品排序映射表, {"产品"}, "临时产品", JoinKind.LeftOuter),
+				    // 展开带出的【产品排序】列，供【产品】按 sortByColumn 排序
 				    展开全部排序 = Table.ExpandTableColumn(关联产品排序, "临时产品", {"产品排序"}, {"产品排序"})
 				in
 				    展开全部排序

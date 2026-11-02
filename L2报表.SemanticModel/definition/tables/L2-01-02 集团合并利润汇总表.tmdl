@@ -205,49 +205,50 @@ table 'L2-01-02 集团合并利润汇总表'
 				    【对应报表】L2-01-02 集团合并利润汇总表
 				    【BW对象】Cube:ZRFI_CP011，Query:ZRFI_CP011_Q0001
 				    【说明】
-				        1、循环取数：从参数 p_月报起始日期 到 p_月报终止日期，逐月查询 BW 后合并成长表
-				        2、BW 参数 [ZMSDQNY]：YYYYMM 格式年月，BW 根据该参数自动返回截止该月的 YTD 数据
-				        3、维度：利润表项目（Structure 内置）
-				        4、指标：YTD 累计指标 + 1-12 月分月度量 + MTD 当月/上月/环比指标
-				        5、连接参数统一：QAS服务器、系统编号、客户端ID，和项目其他 BW 查询保持一套参数规范
-				        6、EnableStructures=true 必须开启，否则内置 Structure 行维度无法解析
-				        7、末尾逆透视分月列、添加月份排序，统一长表结构，方便矩阵报表排序展示
-				        8、【季度】由【月份排序】1-12 计算，代表该行分月所属季度
-				        9、读取 SharePoint 指标映射表，按【结构】成员的 UniqueName 左连接，带出【结构排序】
+				        1、数据源：SharePoint「L2-01-02 集团合并利润汇总表指标映射.xlsx」的「结构排序」工作表 + SAP BW QAS（参数 QAS服务器 / 系统编号 / 客户端ID）
+				        2、BW 对象：Cube ZRFI_CP011 → Query ZRFI_CP011/ZRFI_CP011_Q0001；连接必须 EnableStructures=true，否则内置 Structure 维度无法展开成 [结构]
+				        3、维度：内置利润表项目 Structure，展开为 [结构]；另取成员 MEMBER_UNIQUE_NAME 存成 [结构唯一ID]，作为关联排序映射的键
+				        4、指标：YTD 累计类（当月 / 同比 / 去年同期 / 预算 / 预算达成率）+ 1-12 月分月度量 + MTD 类（当月 / 上月 / 环比），共 20 个 Measure
+				        5、月度循环：p_月报起始日期 ~ p_月报终止日期 逐月查询后纵向合并；[ZMSDQNY] 必须传 YYYYMM 文本，BW 据此返回截止该月的 YTD
+				        6、清洗：8 个非分月指标列 null → 0；1-12 月分月列在 ReplaceValue 列表中被块注释排除、未参与替换，逆透视后 [实际值] 仍可能为 null
+				        7、长表化：逆透视 1-12 月分月列 → [月份] / [实际值]，保留 结构、结构唯一ID、各 YTD / MTD 指标与 加载日期；加载日期取该月 1 日（date 类型），供日期表关系与切片器筛选
+				        8、排序映射：按 [结构唯一ID] = [结构UniqueName] 左连接「结构排序」映射表带出 [结构排序]；映射先按 结构UniqueName 去重，避免一对多放大行数
+				        9、特有逻辑：分月数据取自 BW 预生成的宽表度量列；[月份排序] 从「N月」解析 N 供数值排序，[季度] 由月份排序 1-12 推算；结构维度走内置 Structure 而非普通属性
 				    */
-				    // ========== 1. 读取 SharePoint 上的结构排序映射表 ==========
-				    // 连接财经 SharePoint 站点，列出全部文件（ApiVersion=15 为较新 REST API），结果为文件列表表
+				    // ========== 1. 读取 SharePoint 映射工作簿 ==========
+				    // 连接财经 SharePoint 站点；ApiVersion=15 为新版 REST 接口，返回的是文件列表（不是工作簿内容）
 				    源 = SharePoint.Files(财经SharePoint站点, [ApiVersion = 15]),
-				    // 筛选文件名含「L2-01-02 集团合并利润汇总表指标映射」且扩展名为 .xlsx 的文件，取第一个并读取其 [Content]（二进制内容）
+				    // 按文件名含「L2-01-02 集团合并利润汇总表指标映射」且扩展名 .xlsx 筛出，{0}[Content] 直接取第一条的二进制内容——站点上若有多份同名映射或文件缺失，这里会取错 / 报错
 				    指标映射文件 = Table.SelectRows(源, each Text.Contains([Name], "L2-01-02 集团合并利润汇总表指标映射") and [Extension] = ".xlsx"){0}[Content],
-				    // 工作簿只解析一次，后续各 Sheet 直接取用（同一 xlsx 反复解析会拖慢刷新）
+				    // 工作簿只解析一次，后续各 Sheet 复用该结果（同一 xlsx 反复解析会明显拖慢刷新）
 				    指标映射工作簿 = Excel.Workbook(指标映射文件, true),
+				    // 按 结构UniqueName 去重：映射表若同一结构出现多行，左连接会把事实行放大，所以先 Table.Distinct 保证键唯一
 				    结构排序映射表 = Table.Distinct(指标映射工作簿{[Item = "结构排序", Kind = "Sheet"]}[Data], {"结构UniqueName"}),
 				    // ========== 2. 连接 BW QAS 环境 ==========
-				    // 连接 BW QAS 环境：Implementation=2.0 用新版接口 / LanguageCode=ZH 返回中文 / EnableStructures=true 开启内置结构 / BatchSize 放大提升批量拉取性能
+				    // 连接 BW QAS 环境：Implementation=2.0 用新版接口 / LanguageCode=ZH 返回中文 / EnableStructures=true 开启内置结构（本表展开 [结构] 的前提）/ BatchSize 放大单次批量拉取量
 				    数据源 = SapBusinessWarehouse.Cubes(QAS服务器, 系统编号, 客户端ID, [Implementation="2.0", LanguageCode="ZH", EnableStructures=true, BatchSize=500000000]),
-				    // 按 Cube 名称定位 ZRFI_CP011
+				    // 按 Cube 名称定位 ZRFI_CP011；Cube 只在这里实例化一次，月份循环里只做 Cube.Transform，不重复连 BW
 				    立方体 = 数据源{[Name="ZRFI_CP011"]}[Data],
-				    // 按 Query ID 定位 ZRFI_CP011/ZRFI_CP011_Q0001
+				    // 按 Query ID 定位 ZRFI_CP011/ZRFI_CP011_Q0001，作为逐月变换的基础查询
 				    基础查询 = 立方体{[Id="ZRFI_CP011/ZRFI_CP011_Q0001"]}[Data],
 				    // ========== 3. 月份循环配置 ==========
-				    // 月报起始月份，取自 Power BI 参数 p_月报起始日期
+				    // 循环起始月份，取自 Power BI 参数 p_月报起始日期（date 类型）
 				    起始月份 = p_月报起始日期,
-				    // 结束月份，取自 Power BI 参数 p_月报终止日期
+				    // 循环结束月份，取自 Power BI 参数 p_月报终止日期（date 类型，手写值，跨月后需手动后延，否则取不到新月份）
 				    结束月份 = p_月报终止日期,
-				    // 生成连续月份序列：从起始月份起每月 +1，直到不超过结束月份（结果为 date 列表）
+				    // 生成连续月份序列：从起始月份起每月 +1，直到不超过结束月份（date 列表）
 				    月份序列 = List.Generate(() => 起始月份, each _ <= 结束月份, each Date.AddMonths(_, 1)),
-				    // 把每个日期转成 BW 要求的 YYYYMM 文本：年×100 + 月（如 2026 年 1 月 → "202601"）
+				    // 转成 BW 要求的 YYYYMM 文本（年×100+月，如 2026-01 → "202601"）；month 全程是文本，不能当日期用，加载日期必须另行 #date 构造
 				    月份文本列表 = List.Transform(月份序列, each Text.From(Date.Year(_) * 100 + Date.Month(_))),
 				    // ========== 4. 单月取数函数 ==========
-				    // 单月取数函数：输入年月文本，返回当月 BW 查询结果，并追加月份标记列
+				    // 输入 YYYYMM 文本，返回该月 BW 明细：已展开 [结构]，并补齐 [结构唯一ID] 与 [加载日期]
 				    查询单月 = (month as text) =>
 				        let
-				            // 对基础查询应用一组 BW 变换：设置期间参数、展开维度、添加度量值
+				            // 对基础查询应用一组 BW 变换：设置期间参数、展开结构维度、添加全部度量列
 				            Query = Cube.Transform(基础查询, {
-				                // BW 期间参数，传入当前循环年月
+				                // 设置 BW 期间参数 [ZMSDQNY] = 当前循环月份，BW 据此返回截止该月的累计口径
 				                {Cube.ApplyParameter, "[ZMSDQNY]", {month}},
-				                // ========== 展开内置结构维度 利润表项目，输出列名：结构 ==========
+				                // ========== 维度展开：内置结构维度（利润表项目）→ [结构] ==========
 				                {Cube.AddAndExpandDimensionColumn, "[4VGQHR12MHZ3FU4L96KDFQ9OO]", {"[4VGQHR12MHZ3FU4L96KDFQ9OO]"}, {"结构"}},
 				                // ========== YTD 累计类指标（截止参数所选月份） ==========
 				                {Cube.AddMeasureColumn, "当月YTD", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4L96KDFR5AG]"},     // 实际归母净利 YTD
@@ -255,7 +256,7 @@ table 'L2-01-02 集团合并利润汇总表'
 				                {Cube.AddMeasureColumn, "去年同期YTD", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4L96KDFRUKO]"},  // 上一年同期 YTD 实际
 				                {Cube.AddMeasureColumn, "预算YTD", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4L96KDFS0W8]"},     // YTD 预算
 				                {Cube.AddMeasureColumn, "预算达成率", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4L96KDFS77S]"},   // YTD 预算达成率
-				                // ========== 1-12 月分月度量列（BW 预生成宽表列，用于报表 Q1/Q2 分月展示） ==========
+				                // ========== 1-12 月分月度量列（BW 预生成宽表列，后面逆透视成 月份 / 实际值） ==========
 				                // 1月当月实际值（BW 预生成的分月宽表列）
 				                {Cube.AddMeasureColumn, "1月", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4L96KDFSDJC]"},
 				                // 2月当月实际值（BW 预生成的分月宽表列）
@@ -285,11 +286,12 @@ table 'L2-01-02 集团合并利润汇总表'
 				                {Cube.AddMeasureColumn, "当月MTD", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4MVP8LMPJ5V]"},     // 参数所选月份当月实际
 				                {Cube.AddMeasureColumn, "上月MTD", "[4VGQHR12MHZ3FU4L96KDFPQQ0].[4VGQHR12MHZ3FU4MVP8LMPPHF]"}      // 参数所选月份的上一个月实际
 				            }),
-				            // 追加「结构唯一ID」列：取结构维度成员的 MEMBER_UNIQUE_NAME，供后面关联映射表
+				            // 取 [结构] 成员的 MEMBER_UNIQUE_NAME 存为 [结构唯一ID]：属性必须等维度展开后才能取，故放在 Cube.Transform 之后；它是关联排序映射的匹配键
 				            添加结构唯一ID = Table.AddColumn(Query, "结构唯一ID", each Cube.AttributeMemberProperty([结构], "[MEMBER_UNIQUE_NAME]")),
-				            // 追加「加载日期」列：把当前循环 YYYYMM 转成当月首日 date（如 202601 → 2026-01-01），标记该行数据所属期间
+				            // 加载日期：把循环变量 month（YYYYMM 文本）换算成该月 1 日的 date；⚠ month 是文本不能直接赋给 date 列，必须用 #date(年, 月, 1) 重新构造
 				            附加月份 = Table.AddColumn(添加结构唯一ID, "加载日期", each #date(Number.From(Text.Start(month, 4)), Number.From(Text.End(month, 2)), 1), type date),
-				            // 把各指标列的 null 统一替换为 0（避免空值干扰报表；加载日期列不在替换范围内）
+				            // null → 0：仅替换 8 个非分月指标列（当月YTD、同比YTD、去年同期YTD、预算YTD、预算达成率、环比MTD、当月MTD、上月MTD）；1-12 月分月列被块注释排除
+				            // ⚠ 待核对：原注释写「把各指标列的 null 统一替换为 0」，代码实际只替换 8 个非分月指标列，1-12 月分月列被块注释排除，上线前确认。
 				            空值替换为0 = Table.ReplaceValue(
 				                附加月份,
 				                null,
@@ -297,27 +299,28 @@ table 'L2-01-02 集团合并利润汇总表'
 				                Replacer.ReplaceValue,
 				                {"当月YTD", "同比YTD", "去年同期YTD", "预算YTD", "预算达成率",/* "1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月", */"环比MTD", "当月MTD", "上月MTD"}
 				            ),
-				            // 逆透视 1-12 月分月列：把宽表的「1月..12月」列转为两列「月份」「实际值」，形成长表
+				            // 逆透视 1-12 月分月列：除保留列（结构、结构唯一ID、当月YTD、同比YTD、去年同期YTD、预算YTD、预算达成率、环比MTD、当月MTD、上月MTD、加载日期）以外的列，全部转成 [月份] / [实际值]
 				            逆透视分月列 = Table.UnpivotOtherColumns(空值替换为0, {"结构","结构唯一ID","环比MTD", "当月MTD", "上月MTD", "加载日期", "预算达成率", "预算YTD", "去年同期YTD", "同比YTD", "当月YTD"}, "月份", "实际值"),
-				            // 追加「月份排序」整数列：从「N月」中取出 N，供报表按数值排序（无法解析时给 999）
+				            // 从「N月」解析出整数月份供数值排序；解析失败给 999，异常值排到末尾而不是报错
 				            添加月份排序 = Table.AddColumn(逆透视分月列, "月份排序", each
 				                try Number.FromText(Text.BeforeDelimiter([月份], "月")) otherwise 999
 				            , Int64.Type),
-				            // 追加「季度」列：由月份排序 1-12 推算 Q1-Q4（非 1-12 时为 null）
+				            // 由月份排序 1-12 推算所属季度 Q1-Q4（不在 1-12 范围内时为 null）
 				            添加季度 = Table.AddColumn(添加月份排序, "季度", each
 				                if [月份排序] >= 1 and [月份排序] <= 12 then "Q" & Text.From(Number.RoundUp([月份排序] / 3)) else null
 				            , type text)
 				        in
 				        添加季度,
 				    // ========== 5. 循环遍历月份，逐个取数 ==========
-				    // 遍历月份文本列表，对每个 YYYYMM 调用查询单月，得到 N 个月的结果表
+				    // 逐月调用单月函数：每月一次 BW 往返，月份数直接决定刷新耗时，是该取数模式的主要成本
 				    各月结果 = List.Transform(月份文本列表, 查询单月),
+				    // ========== 6. 合并所有月份的结果 ==========
 				    // 把 N 个月的结果表上下合并成一张长表
 				    合并结果 = Table.Combine(各月结果),
-				    // ========== 6. 左连接「结构排序」映射表 ==========
-				    // 左连接「结构排序」映射表（按「结构唯一ID」匹配映射表键「结构UniqueName」；JoinKind.LeftOuter，未匹配行保留）
+				    // ========== 7. 左连接「结构排序」映射表 ==========
+				    // 按 [结构唯一ID] = [结构UniqueName] 匹配；JoinKind.LeftOuter 保留未匹配行；映射表已按 结构UniqueName 去重，不会一对多放大行数
 				    左连接结构排序 = Table.NestedJoin(合并结果, {"结构唯一ID"}, 结构排序映射表, {"结构UniqueName"}, "映射临时", JoinKind.LeftOuter),
-				    // 展开临时映射列，仅保留「结构排序」字段
+				    // 只展开 [结构排序] 一个字段，其余映射列丢弃
 				    展开结构排序 = Table.ExpandTableColumn(左连接结构排序, "映射临时", {"结构排序"}, {"结构排序"})
 				in
 				    展开结构排序
