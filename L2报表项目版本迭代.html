@@ -146,6 +146,15 @@ svg text{font-family:var(--sans)}
 <script>
 const DATA = [
   {
+    "short": "b68bb14",
+    "date": "2026-11-02 13:53",
+    "msg": "L2-01-14 / L2-01-25 / L2-03-06 切换 BW Cube ZRCO_CP011 并调整维度",
+    "files": 7,
+    "add": 216,
+    "del": 135,
+    "ms": false
+  },
+  {
     "short": "27ff8d5",
     "date": "2026-11-02 10:09",
     "msg": "L2-03-01/L2-04-01 增加集团合计行并精简模型列",
@@ -608,6 +617,14 @@ const DATA = [
 
 // 完整提交备注（由 update-version-html.py 维护，去 Co-Authored-By）
 const NOTES = {
+  "b68bb14": [
+    "- L2-01-14：维度「中区东区」重命名为「区域」，并新增「一级工序」(ZYJGX)、「主要耗材用量」(4ZRCO_CP004-ZINDITEM) 两个维度；排序映射 Sheet 由「中区东区排序」改为「区域排序」，排序列同步改为 `区域排序`；逆透视保留列与左连接随之调整。",
+    "- L2-01-25：新增「成本指标」维度 (ZINDID)；Cube/Query 由 ZRCO_CP004 / ZRCO_CP004_Q0008 切到 ZRCO_CP011 / ZRCO_CP011_Q0014，7 个 BW 度量 ID 全部替换。",
+    "- L2-03-06：Cube/Query 由 ZRCO_CP005 / ZRCO_CP005_Q0003 切到 ZRCO_CP011 / ZRCO_CP011_Q0015，指标项维度改用 ZINDID，13 个 BW 度量 ID 全部替换。",
+    "- 三张表的 M 查询注释重写为分步说明，并在表头标注「Cube/Query 与注释不一致，上线前核对 BW 对象」的提醒。",
+    "- 报表侧：L2-01-14 矩阵行字段改为 区域 / 一级工序 / 主要耗材用量；L2-01-25 矩阵新增「成本指标」行字段；L2-03-06 页视觉位置微调；活动页切到 L2-03-06 矿石成本分析。",
+    "遗留：L2-01-14 的 `PBI_ResultType` 仍为 `Exception`（其余表均为 Table），下次在 Desktop 刷新需确认该查询是否恢复正常。"
+  ],
   "27ff8d5": [
     "- L2-03-01：M 查询内部完成业务板块三级匹配后仅保留核心字段，删去公司代码、管理口径利润中心、销管费分类代码、利润中心代码、公司名称 5 个隐藏编码列；按「销管费分类排序 + 加载日期 + 销管费分类」汇总生成「业务板块 = 集团合计」行并追加回明细；同步清理 zh-CN 语言架构中对应的 5 个孤儿条目。",
     "- L2-04-01：指标值数据类型 double → decimal；恢复「明细 + 合计」合并（此前切到仅明细），汇总行的矿体标识由「合计」改为「集团合计」，与 L2-03-01 口径统一。",
@@ -1038,7 +1055,7 @@ const NOTES = {
 const totalAdd = DATA.reduce((s,d)=>s+d.add,0);
 const totalDel = DATA.reduce((s,d)=>s+d.del,0);
 const totalFiles = DATA.reduce((s,d)=>s+d.files,0);
-const days = "12.7";
+const days = "12.8";
 
 document.getElementById('kpis').innerHTML = `
   <div class="kpi"><div class="n">${DATA.length}</div><div class="l">提交数（main）</div></div>
