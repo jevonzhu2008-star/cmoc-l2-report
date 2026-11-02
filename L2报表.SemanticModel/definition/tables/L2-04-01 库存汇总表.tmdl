@@ -107,10 +107,12 @@ table 'L2-04-01 库存汇总表'
 		annotation SummarizationSetBy = Automatic
 
 	column 指标值
-		dataType: double
+		dataType: decimal
 		lineageTag: dcd71d6c-cdf3-49b1-b035-cc49ab9d1b1f
 		summarizeBy: sum
 		sourceColumn: 指标值
+
+		changedProperty = DataType
 
 		annotation SummarizationSetBy = Automatic
 
@@ -223,17 +225,17 @@ table 'L2-04-01 库存汇总表'
 				            // 按【分类、加载日期、属性】分组求和，生成合计行数值
 				            分组的行 = Table.Group(已筛选行, {"分类", "加载日期", "指标名称"}, {{"指标值", each List.Sum([指标值]), type any}}),
 				            // 给分组合计行打上矿体标识：合计
-				            已添加自定义 = Table.AddColumn(分组的行, "矿体", each "合计"),
+				            已添加自定义 = Table.AddColumn(分组的行, "矿体", each "集团合计"),
 				            // 调整列顺序，统一结构：分类、矿体、加载日期、属性、值
 				            已重新排序列 = Table.ReorderColumns(已添加自定义, {"分类", "矿体", "加载日期", "指标名称", "指标值"}),
 				            // 明细行 和 合计行上下合并，形成当月完整数据集
 				            已追加明细合计 = Table.Combine({已重新排序列, 已逆透视其他列})
 				        in
 				            // 返回当月明细+合计结果
-				            // 已追加明细合计,
+				            已追加明细合计,
 				
 				            //返回当月明细
-				            已逆透视其他列,
+				            // 已逆透视其他列,
 				
 				    // ========== 5. 循环遍历月份并合并全部结果 ==========
 				    // 循环每个月份文本，调用【取单月】函数，把所有月份结果合并成一张总表

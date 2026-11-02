@@ -377,22 +377,6 @@ cultureInfo zh-CN
 			        }
 			      ]
 			    },
-			    "L20301_销售管理费用预算执行汇总表.公司代码": {
-			      "Definition": {
-			        "Binding": {
-			          "ConceptualEntity": "L2-03-01 销售管理费用预算执行汇总表",
-			          "ConceptualProperty": "公司代码"
-			        }
-			      },
-			      "State": "Generated",
-			      "Terms": [
-			        {
-			          "公司代码": {
-			            "State": "Generated"
-			          }
-			        }
-			      ]
-			    },
 			    "L20301_销售管理费用预算执行汇总表.销管费分类": {
 			      "Definition": {
 			        "Binding": {
@@ -404,22 +388,6 @@ cultureInfo zh-CN
 			      "Terms": [
 			        {
 			          "销管费分类": {
-			            "State": "Generated"
-			          }
-			        }
-			      ]
-			    },
-			    "L20301_销售管理费用预算执行汇总表.管理口径利润中心": {
-			      "Definition": {
-			        "Binding": {
-			          "ConceptualEntity": "L2-03-01 销售管理费用预算执行汇总表",
-			          "ConceptualProperty": "管理口径利润中心"
-			        }
-			      },
-			      "State": "Generated",
-			      "Terms": [
-			        {
-			          "管理口径利润中心": {
 			            "State": "Generated"
 			          }
 			        }
